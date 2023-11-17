@@ -23,14 +23,20 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent">
 
-            <SearchView
-                android:id="@+id/searchView"
+            <EditText
+                android:id="@+id/editTextSearch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
-                android:autofillHints="Search book"
+                android:hint="Search for a book here..."
                 android:background="@drawable/custom_searchview"
-                android:queryHint="Search for a book here..." />
+                android:padding="16dp"
+                android:paddingStart="16dp"
+                android:drawableStart="@mipmap/search"
+                android:drawablePadding="8dp"
+                />
+
+
 
 
 
@@ -291,7 +297,7 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_gravity="bottom"
-        android:layout_marginTop="520dp"
+        android:layout_marginTop="530dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@+id/scrollView2"
         tools:layout_editor_absoluteX="1dp">
