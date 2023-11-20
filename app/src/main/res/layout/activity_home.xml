@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bookTitle3"
+    android:id="@+id/home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Home">
@@ -79,13 +79,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-
                     <LinearLayout
+                        android:id="@+id/bookCard1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book1"
@@ -109,13 +110,14 @@
                             android:text="Cartoon"
                             android:textColor="#848484" />
                     </LinearLayout>
-
                     <LinearLayout
+                        android:id="@+id/bookCard2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book2"
@@ -141,11 +143,13 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/bookCard3"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book3"
@@ -217,11 +221,13 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
+                        android:id="@+id/bookCard4"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book4"
@@ -246,11 +252,13 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/bookCard5"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book5"
@@ -275,11 +283,13 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/bookCard6"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:clickable="true">
 
                         <ImageView
                             android:id="@+id/book6"
