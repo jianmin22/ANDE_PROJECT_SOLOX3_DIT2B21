@@ -30,5 +30,6 @@ public class SplashScreen extends AppCompatActivity {
         };
         // To Start the thread
         splashThread.start();
+
     }
 }
