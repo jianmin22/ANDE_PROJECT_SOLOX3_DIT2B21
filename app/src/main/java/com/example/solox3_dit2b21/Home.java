@@ -27,10 +27,10 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-//            FirebaseApp.initializeApp(this);
-//            FirebaseDatabase database = FirebaseDatabase.getInstance();
-//            DatabaseReference myRef = database.getReference("message");
-//            myRef.setValue("Hello World");
+            FirebaseApp.initializeApp(this);
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("message");
+            myRef.setValue("Hello World");
         } catch (Exception e) {
             e.printStackTrace();
             // Log or handle the exception as needed
