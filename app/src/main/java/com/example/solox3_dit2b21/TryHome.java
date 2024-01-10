@@ -18,13 +18,13 @@ public class TryHome extends AppCompatActivity implements View.OnClickListener {
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_details);
+        setContentView(R.layout.activity_try_home);
         recyclerView = findViewById(R.id.recycler_view_TryHome);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
 
         List<Book> books = new ArrayList<>();
 
@@ -52,7 +52,7 @@ public class TryHome extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.bookCard){
-            Intent i = new Intent(this, TryHome.class);
+            Intent i = new Intent(this, Home.class);
             startActivity(i);
         }
     }
