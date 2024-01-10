@@ -1,49 +1,30 @@
 package com.example.solox3_dit2b21;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.SearchView;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Home extends AppCompatActivity implements View.OnClickListener {
+public class TryHome extends AppCompatActivity implements View.OnClickListener {
 
-    private RecyclerView recyclerView1;
-    private RecyclerView recyclerView2;
+    private RecyclerView recyclerView;
+    private HomeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-//            FirebaseApp.initializeApp(this);
-//            FirebaseDatabase database = FirebaseDatabase.getInstance();
-//            DatabaseReference myRef = database.getReference("message");
-//            myRef.setValue("Hello World");
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Log or handle the exception as needed
-        }
-        setContentView(R.layout.activity_home);
-
-        recyclerView1 = findViewById(R.id.recycler_view_HomePopular);
-        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerView1.setLayoutManager(layoutManager1);
-
-        recyclerView2 = findViewById(R.id.recycler_view_HomeRecommendation);
-        LinearLayoutManager layoutManager2 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerView2.setLayoutManager(layoutManager2);
+        setContentView(R.layout.activity_try_home);
+        recyclerView = findViewById(R.id.recycler_view_TryHome);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
 
         List<Book> books = new ArrayList<>();
 
@@ -65,15 +46,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         books.add(book2);
         books.add(book3);
 
-        // Create separate adapters for each RecyclerView
-        HomeAdapter adapter1 = new HomeAdapter(books);
-        HomeAdapter adapter2 = new HomeAdapter(books);
-
-        recyclerView1.setAdapter(adapter1);
-        recyclerView2.setAdapter(adapter2);
+        adapter = new HomeAdapter(books);
+        recyclerView.setAdapter(adapter);
     }
-
-
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.bookCard){
