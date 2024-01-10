@@ -8,22 +8,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView recyclerView1;
     private RecyclerView recyclerView2;
+    HomeAdapter adapter1;
+    HomeAdapter adapter2;
 private List<Book> books = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +56,7 @@ private List<Book> books = new ArrayList<>();
 
 
         // Create separate adapters for each RecyclerView
-        HomeAdapter adapter1 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
+        adapter1 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
         {
             @Override
             public void onItemClicked(Book book)
@@ -56,7 +66,7 @@ private List<Book> books = new ArrayList<>();
                 startActivity(intent);
             }
         });
-        HomeAdapter adapter2 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
+        adapter2 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
         {
             @Override
             public void onItemClicked(Book book)
@@ -74,23 +84,35 @@ private List<Book> books = new ArrayList<>();
 
     private void bindData()
     {
-        // Create Date instances for publishedDate, createdDate, and lastUpdated
-        Date currentDate = new Date();
 
-        // Adding three Book instances to the list
-        Book book1 = new Book("bookId1", "Doraemon Adventure", "Exciting adventures of Doraemon",
-                "categoryId1", 4.5, "@mipmap/doraemonbook", currentDate, currentDate, currentDate);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        try {
 
-        Book book2 = new Book("bookId2", "Doraemon's Time Travel", "Time-travel with Doraemon and friends",
-                "categoryId1", 4.7, "@mipmap/doraemonbook", currentDate, currentDate, currentDate);
+            DatabaseReference ref = database.getReference("Book");
 
-        Book book3 = new Book("bookId3", "Doraemon's Inventions", "Fun with Doraemon's gadgets",
-                "categoryId1", 4.2, "@mipmap/doraemonbook", currentDate, currentDate, currentDate);
+            Log.d("Firebase", "Books Reference: " + ref.toString());
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
 
-        // Add the books to the list
-        books.add(book1);
-        books.add(book2);
-        books.add(book3);
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    books.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Book book = snapshot.getValue(Book.class);
+                        books.add(book);
+                        Log.d("Firebase", "Books Reference: " + book.getBookId());
+                    }
+                    adapter1.notifyDataSetChanged();
+                    adapter2.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public void onClick(View v){

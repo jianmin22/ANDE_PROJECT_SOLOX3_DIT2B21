@@ -1,15 +1,14 @@
 package com.example.solox3_dit2b21;
 
-import java.util.Date;
 
 public class ReadingHistory {
     private String userId;
     private String bookId;
     private String chapterId;
-    private Date lastRead;
+    private String lastRead;
 
     // Constructor
-    public ReadingHistory(String userId, String bookId, String chapterId, Date lastRead) {
+    public ReadingHistory(String userId, String bookId, String chapterId, String lastRead) {
         this.userId = userId;
         this.bookId = bookId;
         this.chapterId = chapterId;
@@ -40,11 +39,11 @@ public class ReadingHistory {
         this.chapterId = chapterId;
     }
 
-    public Date getLastRead() {
+    public String getLastRead() {
         return lastRead;
     }
 
-    public void setLastRead(Date lastRead) {
+    public void setLastRead(String lastRead) {
         this.lastRead = lastRead;
     }
 }

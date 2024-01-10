@@ -1,14 +1,13 @@
 package com.example.solox3_dit2b21;
 
-import java.util.Date;
 
 public class UserRating {
     private String userRatingId;
     private double rating;
-    private Date date;
+    private String date;
 
     // Constructor
-    public UserRating(String userRatingId, double rating, Date date) {
+    public UserRating(String userRatingId, double rating, String date) {
         this.userRatingId = userRatingId;
         this.rating = rating;
         this.date = date;
@@ -30,11 +29,11 @@ public class UserRating {
         this.rating = rating;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

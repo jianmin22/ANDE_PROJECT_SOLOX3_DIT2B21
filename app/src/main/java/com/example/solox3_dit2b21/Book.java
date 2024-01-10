@@ -1,6 +1,8 @@
 package com.example.solox3_dit2b21;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class Book {
     private String bookId;
@@ -9,12 +11,15 @@ public class Book {
     private String categoryId;
     private double rating;
     private String image;
-    private Date publishedDate;
-    private Date createdDate;
-    private Date lastUpdated;
+    private String publishedDate;
+    private String createdDate;
+    private String lastUpdated;
+    public Book() {
+    }
+
 
     public Book(String bookId, String title, String description, String categoryId, double rating,
-                String image, Date publishedDate, Date createdDate, Date lastUpdated) {
+                String image, String publishedDate, String createdDate, String lastUpdated) {
         this.bookId = bookId;
         this.title = title;
         this.description = description;
@@ -74,27 +79,27 @@ public class Book {
         this.image = image;
     }
 
-    public Date getPublishedDate() {
+    public String getPublishedDate() {
         return publishedDate;
     }
 
-    public void setPublishedDate(Date publishedDate) {
+    public void setPublishedDate(String publishedDate) {
         this.publishedDate = publishedDate;
     }
 
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getLastUpdated() {
+    public String getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Date lastUpdated) {
+    public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 }
