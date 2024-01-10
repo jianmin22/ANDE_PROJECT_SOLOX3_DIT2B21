@@ -5,10 +5,12 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
@@ -22,20 +24,18 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView recyclerView1;
     private RecyclerView recyclerView2;
-
+private List<Book> books = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            FirebaseApp.initializeApp(this);
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("message");
-            myRef.setValue("Hello World");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         setContentView(R.layout.activity_home);
+        bindData();
+        setUIRef();
 
+    }
+
+    private void setUIRef()
+    {
         recyclerView1 = findViewById(R.id.recycler_view_HomePopular);
         LinearLayoutManager layoutManager1 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView1.setLayoutManager(layoutManager1);
@@ -44,8 +44,36 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         LinearLayoutManager layoutManager2 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView2.setLayoutManager(layoutManager2);
 
-        List<Book> books = new ArrayList<>();
 
+        // Create separate adapters for each RecyclerView
+        HomeAdapter adapter1 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
+        {
+            @Override
+            public void onItemClicked(Book book)
+            {
+                Intent intent = new Intent(Home.this, BookDetails.class);
+                intent.putExtra("bookId", book.getBookId());
+                startActivity(intent);
+            }
+        });
+        HomeAdapter adapter2 = new HomeAdapter(books, new HomeAdapter.MyRecyclerViewItemClickListener()
+        {
+            @Override
+            public void onItemClicked(Book book)
+            {
+                Intent intent = new Intent(Home.this, BookDetails.class);
+                intent.putExtra("bookId", book.getBookId());
+                startActivity(intent);
+            }
+        });
+
+        recyclerView1.setAdapter(adapter1);
+        recyclerView2.setAdapter(adapter2);
+
+    }
+
+    private void bindData()
+    {
         // Create Date instances for publishedDate, createdDate, and lastUpdated
         Date currentDate = new Date();
 
@@ -63,16 +91,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         books.add(book1);
         books.add(book2);
         books.add(book3);
-
-        // Create separate adapters for each RecyclerView
-        HomeAdapter adapter1 = new HomeAdapter(books, this);
-        HomeAdapter adapter2 = new HomeAdapter(books, this);
-
-        recyclerView1.setAdapter(adapter1);
-        recyclerView2.setAdapter(adapter2);
     }
-
-
     @Override
     public void onClick(View v){
     }

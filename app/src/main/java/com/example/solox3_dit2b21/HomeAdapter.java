@@ -1,7 +1,6 @@
 package com.example.solox3_dit2b21;
 
-import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +13,26 @@ import java.util.List;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;
-    Context context;
-    public HomeAdapter(List<Book> allBooks, Context context) {
+    private MyRecyclerViewItemClickListener mItemClickListener;
+    public HomeAdapter(List<Book> allBooks, MyRecyclerViewItemClickListener itemClickListener) {
         this.allBooks = allBooks;
-        this.context=context;
+        this.mItemClickListener = itemClickListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycleritembooks, parent, false);
-        return new ViewHolder(view);
+
+        final ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("RecyclerViewAdapter", "sdegonItemClicked called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                mItemClickListener.onItemClicked(allBooks.get(viewHolder.getLayoutPosition()));
+            }
+        });
+        return viewHolder;
     }
 
     @Override
@@ -35,16 +43,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.bookId.setText(book.getBookId());
 
         // Set OnClickListener for bookCard
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Handle item click
-                Intent intent = new Intent(context, BookDetails.class);
-                // Pass the book ID to the BookDetails activity
-                intent.putExtra("bookId", book.getBookId());
-                context.startActivity(intent);
-            }
-        });
+
     }
 
     @Override
@@ -66,5 +65,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             category = itemView.findViewById(R.id.category);
             bookId = itemView.findViewById(R.id.bookId);
         }
+    }
+    //RecyclerView Click Listener
+    public interface MyRecyclerViewItemClickListener {
+        void onItemClicked(Book book);
     }
 }
