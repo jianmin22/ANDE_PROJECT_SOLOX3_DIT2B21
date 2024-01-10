@@ -1,5 +1,7 @@
 package com.example.solox3_dit2b21;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +14,10 @@ import java.util.List;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;
-
-    public HomeAdapter(List<Book> allBooks) {
+    Context context;
+    public HomeAdapter(List<Book> allBooks, Context context) {
         this.allBooks = allBooks;
+        this.context=context;
     }
 
     @Override
@@ -29,6 +32,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         Book book = allBooks.get(position);
         holder.bookTitle.setText(book.getTitle());
         holder.category.setText("yay");
+        holder.bookId.setText(book.getBookId());
+
+        // Set OnClickListener for bookCard
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle item click
+                Intent intent = new Intent(context, BookDetails.class);
+                // Pass the book ID to the BookDetails activity
+                intent.putExtra("bookId", book.getBookId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -41,11 +57,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         public TextView bookTitle;
         public TextView category;
 
+        public TextView bookId;
+
         public ViewHolder(View itemView) {
             super(itemView);
             bookTitle = itemView.findViewById(R.id.bookTitle);
             bookImage = itemView.findViewById(R.id.bookImage);
             category = itemView.findViewById(R.id.category);
+            bookId = itemView.findViewById(R.id.bookId);
         }
     }
 }

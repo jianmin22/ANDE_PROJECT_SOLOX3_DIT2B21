@@ -33,7 +33,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             myRef.setValue("Hello World");
         } catch (Exception e) {
             e.printStackTrace();
-            // Log or handle the exception as needed
         }
         setContentView(R.layout.activity_home);
 
@@ -66,8 +65,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         books.add(book3);
 
         // Create separate adapters for each RecyclerView
-        HomeAdapter adapter1 = new HomeAdapter(books);
-        HomeAdapter adapter2 = new HomeAdapter(books);
+        HomeAdapter adapter1 = new HomeAdapter(books, this);
+        HomeAdapter adapter2 = new HomeAdapter(books, this);
 
         recyclerView1.setAdapter(adapter1);
         recyclerView2.setAdapter(adapter2);
@@ -76,9 +75,5 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        if(v.getId() == R.id.bookCard){
-            Intent i = new Intent(this, Home.class);
-            startActivity(i);
-        }
     }
 }
