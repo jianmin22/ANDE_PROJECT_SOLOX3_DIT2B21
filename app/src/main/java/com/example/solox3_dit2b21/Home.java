@@ -26,15 +26,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
+//        try {
 //            FirebaseApp.initializeApp(this);
 //            FirebaseDatabase database = FirebaseDatabase.getInstance();
 //            DatabaseReference myRef = database.getReference("message");
 //            myRef.setValue("Hello World");
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Log or handle the exception as needed
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         setContentView(R.layout.activity_home);
 
         recyclerView1 = findViewById(R.id.recycler_view_HomePopular);
@@ -76,9 +75,5 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        if(v.getId() == R.id.bookCard){
-            Intent i = new Intent(this, Home.class);
-            startActivity(i);
-        }
     }
 }
