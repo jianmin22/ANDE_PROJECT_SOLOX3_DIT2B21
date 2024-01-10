@@ -20,7 +20,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycleritempopularbooks, parent, false);
+                .inflate(R.layout.recycleritembooks, parent, false);
         return new ViewHolder(view);
     }
 
