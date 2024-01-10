@@ -26,14 +26,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        try {
-//            FirebaseApp.initializeApp(this);
-//            FirebaseDatabase database = FirebaseDatabase.getInstance();
-//            DatabaseReference myRef = database.getReference("message");
-//            myRef.setValue("Hello World");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            FirebaseApp.initializeApp(this);
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("message");
+            myRef.setValue("Hello World");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         setContentView(R.layout.activity_home);
 
         recyclerView1 = findViewById(R.id.recycler_view_HomePopular);
@@ -65,8 +65,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         books.add(book3);
 
         // Create separate adapters for each RecyclerView
-        HomeAdapter adapter1 = new HomeAdapter(books);
-        HomeAdapter adapter2 = new HomeAdapter(books);
+        HomeAdapter adapter1 = new HomeAdapter(books, this);
+        HomeAdapter adapter2 = new HomeAdapter(books, this);
 
         recyclerView1.setAdapter(adapter1);
         recyclerView2.setAdapter(adapter2);

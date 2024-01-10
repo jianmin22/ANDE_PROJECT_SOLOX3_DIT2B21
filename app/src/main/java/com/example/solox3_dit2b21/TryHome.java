@@ -46,7 +46,7 @@ public class TryHome extends AppCompatActivity implements View.OnClickListener {
         books.add(book2);
         books.add(book3);
 
-        adapter = new HomeAdapter(books);
+        adapter = new HomeAdapter(books, this);
         recyclerView.setAdapter(adapter);
     }
     @Override
