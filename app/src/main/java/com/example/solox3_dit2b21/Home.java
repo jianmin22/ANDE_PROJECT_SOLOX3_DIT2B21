@@ -99,7 +99,7 @@ private List<Book> books = new ArrayList<>();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Book book = snapshot.getValue(Book.class);
                         books.add(book);
-                        Log.d("Firebase", "Books Reference: " + book.getBookId());
+                        Log.d("Firebase", "Books Reference:nnn " + book.getBookId());
                     }
                     adapter1.notifyDataSetChanged();
                     adapter2.notifyDataSetChanged();

@@ -1,5 +1,6 @@
 package com.example.solox3_dit2b21;
 
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,13 +20,18 @@ import com.google.firebase.database.ValueEventListener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
-
+import com.bumptech.glide.Glide;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.FirebaseStorage;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;
+    private FirebaseStorage storage;
+
     private MyRecyclerViewItemClickListener mItemClickListener;
     public HomeAdapter(List<Book> allBooks, MyRecyclerViewItemClickListener itemClickListener) {
         this.allBooks = allBooks;
         this.mItemClickListener = itemClickListener;
+        storage = FirebaseStorage.getInstance();
     }
 
     @Override
@@ -63,10 +70,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 Log.e("Firebase", "Error fetching category data", databaseError.toException());
             }
         });
+        loadBookImage(book.getImage(), holder.bookImage);
         holder.bookId.setText(book.getBookId());
-
-        // Set OnClickListener for bookCard
-
     }
 
     @Override
@@ -81,6 +86,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         public TextView bookId;
 
+
         public ViewHolder(View itemView) {
             super(itemView);
             bookTitle = itemView.findViewById(R.id.bookTitle);
@@ -93,4 +99,24 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public interface MyRecyclerViewItemClickListener {
         void onItemClicked(Book book);
     }
+    private void loadBookImage(String imageUrl, ImageView imageView) {
+        // Load image into ImageView using Glide
+        Glide.with(imageView.getContext())
+                .load(imageUrl)
+//                .placeholder(R.mipmap.doraemonbook) // Optional placeholder image while loading
+//                .error(R.drawable.error_image) // Optional error image if the load fails
+                .into(imageView);
+    }
+
+//    private void loadBookImage(String storagePath, ImageView imageView) {
+//        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//            @Override
+//            public void onSuccess(Uri uri) {
+//                // Load image into ImageView using Glide
+//                Glide.with(imageView.getContext())
+//                        .load(uri)
+//                        .into(imageView);
+//            }
+//        });
+//    }
 }

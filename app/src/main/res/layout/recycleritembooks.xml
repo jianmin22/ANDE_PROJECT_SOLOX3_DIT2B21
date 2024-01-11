@@ -12,10 +12,9 @@
 
         <ImageView
             android:id="@+id/bookImage"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="159dp"
-            android:layout_weight="1"
-            app:srcCompat="@mipmap/doraemonbook" />
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/bookTitle"
