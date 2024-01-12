@@ -1,6 +1,5 @@
 package com.example.solox3_dit2b21;
 
-import java.util.Date;
 
 public class User {
     private String userId;
@@ -10,10 +9,10 @@ public class User {
     private int commentNumber;
     private int averageRating;
     private String image;
-    private Date createdDate;
+    private String createdDate;
 
     public User(String userId, String email, String password, int publishedNumber,
-                int commentNumber, int averageRating, String image, Date createdDate) {
+                int commentNumber, int averageRating, String image, String createdDate) {
         this.userId = userId;
         this.email = email;
         this.password = password;
@@ -80,11 +79,11 @@ public class User {
         this.image = image;
     }
 
-    public Date getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 }

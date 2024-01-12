@@ -7,10 +7,10 @@ public class Comments {
     private String bookId;
     private String commentsText;
     private String userId;
-    private Date date;
+    private String date;
 
     // Constructor
-    public Comments(String commentsId, String bookId, String commentsText, String userId, Date date) {
+    public Comments(String commentsId, String bookId, String commentsText, String userId, String date) {
         this.commentsId = commentsId;
         this.bookId = bookId;
         this.commentsText = commentsText;
@@ -50,11 +50,11 @@ public class Comments {
         this.userId = userId;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

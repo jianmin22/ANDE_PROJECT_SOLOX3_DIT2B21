@@ -16,6 +16,9 @@
             android:name=".CategoriesPage"
             android:exported="false" />
         <activity
+            android:name=".Search"
+            android:exported="false" />
+        <activity
             android:name=".BookDetails"
             android:exported="false">
             <meta-data

@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bookCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:clickable="true"
-        tools:ignore="MissingConstraints">
+    >
 
         <ImageView
             android:id="@+id/bookImage"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="159dp"
-            android:layout_weight="1"
-            app:srcCompat="@mipmap/doraemonbook" />
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/bookTitle"
@@ -26,14 +22,16 @@
             android:layout_height="wrap_content"
             android:text="Doraemon, Vol.1"
             android:textColor="#000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_margin="4dp"/>
 
         <TextView
             android:id="@+id/category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cartoon"
-            android:textColor="#848484" />
+            android:textColor="#848484"
+            />
 
         <TextView
             android:id="@+id/bookId"
@@ -42,4 +40,3 @@
             android:visibility="gone" />
 
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>

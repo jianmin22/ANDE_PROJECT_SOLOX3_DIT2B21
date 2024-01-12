@@ -5,10 +5,10 @@ import java.util.Date;
 public class SearchHistory {
     private String userId;
     private String search;
-    private Date lastSearch;
+    private String lastSearch;
 
     // Constructor
-    public SearchHistory(String userId, String search, Date lastSearch) {
+    public SearchHistory(String userId, String search, String lastSearch) {
         this.userId = userId;
         this.search = search;
         this.lastSearch = lastSearch;
@@ -30,11 +30,11 @@ public class SearchHistory {
         this.search = search;
     }
 
-    public Date getLastSearch() {
+    public String getLastSearch() {
         return lastSearch;
     }
 
-    public void setLastSearch(Date lastSearch) {
+    public void setLastSearch(String lastSearch) {
         this.lastSearch = lastSearch;
     }
 }
