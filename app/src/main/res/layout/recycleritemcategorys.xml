@@ -29,7 +29,7 @@
                 app:srcCompat="@drawable/horror" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/categoryNametextView"
                 android:layout_width="110dp"
                 android:layout_height="19dp"
                 android:background="#8A0D16"
