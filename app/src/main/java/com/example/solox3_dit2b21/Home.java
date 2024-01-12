@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
@@ -41,7 +42,8 @@ private List<Book> books = new ArrayList<>();
         setContentView(R.layout.activity_home);
         bindData();
         setUIRef();
-
+        TextView mainSearchField = findViewById(R.id.MainSearchField);
+        mainSearchField.setOnClickListener(this);
     }
 
     private void setUIRef()
@@ -116,5 +118,12 @@ private List<Book> books = new ArrayList<>();
     }
     @Override
     public void onClick(View v){
+        if(v.getId() == R.id.MainSearchField) {
+            Intent intent = new Intent(Home.this, Search.class);
+            intent.putExtra("from", "Home.class");
+            startActivity(intent);
+        }
     }
+
+
 }
