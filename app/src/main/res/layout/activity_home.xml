@@ -32,6 +32,7 @@
                 android:layout_margin="20dp"
                 android:background="@drawable/custom_searchview"
                 android:clickable="true"
+                android:onClick="onClick"
                 android:drawableStart="@mipmap/search"
                 android:drawablePadding="8dp"
                 android:focusable="false"

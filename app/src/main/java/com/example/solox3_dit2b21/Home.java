@@ -42,8 +42,6 @@ private List<Book> books = new ArrayList<>();
         setContentView(R.layout.activity_home);
         bindData();
         setUIRef();
-        TextView mainSearchField = findViewById(R.id.MainSearchField);
-        mainSearchField.setOnClickListener(this);
     }
 
     private void setUIRef()
