@@ -10,11 +10,11 @@
         android:orientation="vertical"
     >
 
-        <ImageView
-            android:id="@+id/bookImage"
-            android:layout_width="100dp"
-            android:layout_height="159dp"
-            android:layout_weight="1"/>
+    <ImageView
+        android:id="@+id/bookImage"
+        android:layout_width="126dp"
+        android:layout_height="171dp"
+        android:layout_weight="1" />
 
         <TextView
             android:id="@+id/bookTitle"

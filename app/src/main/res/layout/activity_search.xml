@@ -15,21 +15,53 @@
         tools:layout_editor_absoluteY="1dp"
         tools:ignore="MissingConstraints">
 
-        <!-- EditText for Search -->
-        <EditText
-            android:id="@+id/MainSearchField"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/custom_searchview"
-            android:drawableStart="@mipmap/search"
-            android:drawablePadding="8dp"
-            android:focusable="false"
-            android:hint="Search for a book here..."
-            android:padding="16dp"
-            android:paddingStart="16dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_margin="10dp">
 
-        <!-- TextView for Search History Label -->
+            <!-- Back Button -->
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="onClick"
+                android:src="@drawable/back"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- EditText for Search -->
+            <EditText
+                android:id="@+id/MainSearchField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/custom_searchview"
+                android:drawableStart="@mipmap/search"
+                android:drawablePadding="8dp"
+                android:focusable="true"
+                android:hint="Search for a book here..."
+                android:padding="16dp"
+                android:paddingStart="16dp" />
+
+            <ImageView
+                android:id="@+id/seachButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:onClick="onClick"
+                android:src="@mipmap/search"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp" />
+
+        </LinearLayout>
+
+
+
+
         <TextView
             android:id="@+id/searchHistoryLabel"
             android:layout_width="wrap_content"
@@ -40,6 +72,20 @@
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />
+<ScrollView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/flexboxLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:flexWrap="wrap"
+            app:alignContent="center">
+
+
+        </com.google.android.flexbox.FlexboxLayout>
+</ScrollView>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
