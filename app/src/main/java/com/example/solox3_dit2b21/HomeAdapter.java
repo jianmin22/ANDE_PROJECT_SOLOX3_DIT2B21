@@ -108,15 +108,5 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 .into(imageView);
     }
 
-//    private void loadBookImage(String storagePath, ImageView imageView) {
-//        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//            @Override
-//            public void onSuccess(Uri uri) {
-//                // Load image into ImageView using Glide
-//                Glide.with(imageView.getContext())
-//                        .load(uri)
-//                        .into(imageView);
-//            }
-//        });
-//    }
+
 }

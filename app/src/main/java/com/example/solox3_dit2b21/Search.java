@@ -3,10 +3,12 @@ package com.example.solox3_dit2b21;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -78,19 +80,20 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                         }
                     });
 
-                    // Create buttons dynamically and add them to FlexboxLayout
                     for (SearchHistory item : searchHistoryList) {
                         Button button = (Button) getLayoutInflater().inflate(R.layout.searchhistorybutton, null);
+                        button.setTag(item.getSearch());
                         button.setText(item.getSearch());
                         FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT);
                         layoutParams.setMargins(8, 8, 8, 8);
                         button.setLayoutParams(layoutParams);
+
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // Handle button click, use item.getSearchId() as a reference
+                                String searchString = (String) v.getTag();
                             }
                         });
 
@@ -110,18 +113,20 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     }
     private void insertNewSearchHistory(String search) {
         try {
-            // Generate a unique searchHistoryId using cuid
-            String searchHistoryId = generateUUID();
+            if(search.length()!=0){
+                // Generate a unique searchHistoryId using cuid
+                String searchHistoryId = generateUUID();
 
-            // Get a reference to the "SearchHistory" node
-            DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
+                // Get a reference to the "SearchHistory" node
+                DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
 
-            // Create a new SearchHistoryItem object
-            SearchHistory searchHistoryItem = new SearchHistory(searchHistoryId, "user1", search, getCurrentDateTime());
+                // Create a new SearchHistoryItem object
+                SearchHistory searchHistoryItem = new SearchHistory(searchHistoryId, "user1", search, getCurrentDateTime());
 
-            // Push the new SearchHistoryItem to the database
-            searchHistoryRef.child(searchHistoryId).setValue(searchHistoryItem);
-            mainSearchField.setText("");
+                // Push the new SearchHistoryItem to the database
+                searchHistoryRef.child(searchHistoryId).setValue(searchHistoryItem);
+                mainSearchField.setText("");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,6 +150,15 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v){
         if(v.getId() == R.id.seachButton) {
             insertNewSearchHistory(mainSearchField.getText().toString().trim());
+        }else if (v.getId() == R.id.backButton){
+            Bundle getData = getIntent().getExtras();
+            if (getData != null){
+                String fromPage = getData.getString("from");
+                Intent intent = new Intent(Search.this, fromPage.getClass());
+                startActivity(intent);
+            }else{
+                Log.d("Back Button", "Error Occurred");
+            }
         }
     }
 }
