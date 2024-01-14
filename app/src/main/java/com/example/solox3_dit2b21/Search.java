@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +37,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     private FlexboxLayout flexboxLayout;
     private EditText mainSearchField;
     private String userId = "user1";
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +57,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 return false;
             }
         });
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         try {
             DatabaseReference ref = database.getReference("SearchHistory");
             Query searchHistoryQuery = ref.orderByChild("userId").equalTo(userId);
@@ -81,25 +85,23 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                     });
 
                     for (SearchHistory item : searchHistoryList) {
-                        Button button = (Button) getLayoutInflater().inflate(R.layout.searchhistorybutton, null);
-                        button.setTag(item.getSearch());
-                        button.setText(item.getSearch());
+                        View customButtonView = LayoutInflater.from(Search.this).inflate(R.layout.searchhistorybutton, null);
+                        TextView buttonText = customButtonView.findViewById(R.id.buttonText);
+                        ImageView removeIcon = customButtonView.findViewById(R.id.removeIcon);
+
+                        buttonText.setTag(item.getSearchId());
+                        removeIcon.setTag(item.getSearchId());
+                        buttonText.setText(item.getSearch());
                         FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
                                 FlexboxLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(8, 8, 8, 8);
-                        button.setLayoutParams(layoutParams);
-
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String searchString = (String) v.getTag();
-                            }
-                        });
+                        layoutParams.setMargins(10, 10, 10, 10);
+                        customButtonView.setLayoutParams(layoutParams);
 
                         // Add the button to FlexboxLayout
-                        flexboxLayout.addView(button);
+                        flexboxLayout.addView(customButtonView);
                     }
+
                 }
 
                 @Override
@@ -159,7 +161,22 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             }else{
                 Log.d("Back Button", "Error Occurred");
             }
-        }
+        }else if(v.getId()==R.id.buttonText) {
+            String searchId = (String) v.getTag();
+            Log.d("Button", searchId);
+        } else if (v.getId() == R.id.removeIcon) {
+                String searchId = (String) v.getTag();
+
+                // Get a reference to the "SearchHistory" node
+                DatabaseReference ref = database.getReference("SearchHistory");
+
+                // Create a reference to the specific searchId
+                DatabaseReference searchIdRef = ref.child(searchId);
+
+                // Remove the record
+                searchIdRef.removeValue();
+            }
+
     }
 }
 
