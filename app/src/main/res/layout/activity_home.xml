@@ -33,7 +33,7 @@
                 android:background="@drawable/custom_searchview"
                 android:clickable="true"
                 android:onClick="onClick"
-                android:drawableStart="@mipmap/search"
+                android:drawableStart="@drawable/search_icon"
                 android:drawablePadding="8dp"
                 android:focusable="false"
                 android:hint="Search for a book here..."
@@ -67,7 +67,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/popularTitle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@mipmap/flame" />
+                    app:srcCompat="@drawable/flame" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
             <androidx.recyclerview.widget.RecyclerView
@@ -103,7 +103,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/latestTitle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@mipmap/binoculars" />
+                    app:srcCompat="@drawable/binoculars" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
