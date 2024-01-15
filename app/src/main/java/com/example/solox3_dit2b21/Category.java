@@ -5,6 +5,9 @@ public class Category {
     private String categoryName;
     private String categoryImageUrl;
 
+    public Category(){
+
+    }
     public Category(String categoryId, String categoryName, String categoryImageUrl) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
