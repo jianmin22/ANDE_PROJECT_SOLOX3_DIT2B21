@@ -27,12 +27,13 @@
 
             <TextView
                 android:id="@+id/MainSearchField"
-                android:layout_width="match_parent"
+                android:layout_width="358dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
                 android:background="@drawable/custom_searchview"
                 android:clickable="true"
-                android:drawableStart="@mipmap/search"
+                android:onClick="onClick"
+                android:drawableStart="@drawable/search_icon"
                 android:drawablePadding="8dp"
                 android:focusable="false"
                 android:hint="Search for a book here..."
@@ -66,7 +67,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/popularTitle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@mipmap/flame" />
+                    app:srcCompat="@drawable/flame" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
             <androidx.recyclerview.widget.RecyclerView
@@ -81,12 +82,12 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/recommendationTitle"
+                    android:id="@+id/latestTitle"
                     android:layout_width="235dp"
                     android:layout_height="37dp"
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginVertical="10dp"
-                    android:text="Recommendation"
+                    android:text="Latest Published"
                     android:textColor="#040404"
                     android:textSize="29sp"
                     android:textStyle="bold"
@@ -100,14 +101,14 @@
                     android:layout_width="37dp"
                     android:layout_height="37dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/recommendationTitle"
+                    app:layout_constraintStart_toEndOf="@+id/latestTitle"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@mipmap/binoculars" />
+                    app:srcCompat="@drawable/binoculars" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_HomeRecommendation"
+                android:id="@+id/recycler_view_HomeLatest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

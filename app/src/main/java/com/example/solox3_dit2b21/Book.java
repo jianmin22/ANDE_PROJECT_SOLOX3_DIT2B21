@@ -14,12 +14,14 @@ public class Book {
     private String publishedDate;
     private String createdDate;
     private String lastUpdated;
+
+    private int numberOfReads;
     public Book() {
     }
 
 
     public Book(String bookId, String title, String description, String categoryId, double rating,
-                String image, String publishedDate, String createdDate, String lastUpdated) {
+                String image, String publishedDate, int numberOfReads, String createdDate, String lastUpdated) {
         this.bookId = bookId;
         this.title = title;
         this.description = description;
@@ -27,6 +29,7 @@ public class Book {
         this.rating = rating;
         this.image = image;
         this.publishedDate = publishedDate;
+        this.numberOfReads=numberOfReads;
         this.createdDate = createdDate;
         this.lastUpdated = lastUpdated;
     }
@@ -49,6 +52,14 @@ public class Book {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getNumberOfReads() {
+        return numberOfReads;
+    }
+
+    public void setNumberOfReads(int numberOfReads) {
+        this.numberOfReads = numberOfReads;
     }
 
     public void setDescription(String description) {
