@@ -17,7 +17,7 @@
 
         <ImageView
             android:id="@+id/CategoryImage"
-            android:layout_width="162dp"
+            android:layout_width="170dp"
             android:layout_height="108dp"
             android:layout_marginTop="4dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,6 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="19dp"
             android:background="#8A0D16"
+            android:layout_marginHorizontal="10dp"
             android:text="Horror"
             android:textAlignment="center"
             android:textColor="#FFFFFF"

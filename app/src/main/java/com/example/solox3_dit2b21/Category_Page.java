@@ -1,5 +1,6 @@
 package com.example.solox3_dit2b21;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -60,14 +61,14 @@ public class Category_Page extends AppCompatActivity {
     private void displayCategories(List<Category> categories) {
         categoryGridLayout.removeAllViews();
 
-        for (Category category : categories) {
+        for (final Category category : categories) {
             View categoryItemView = LayoutInflater.from(this).inflate(R.layout.categoryitemholder, null);
 
             ImageView categoryImage = categoryItemView.findViewById(R.id.CategoryImage);
             TextView categoryNameTextView = categoryItemView.findViewById(R.id.CategoryNameTextView);
 
             categoryNameTextView.setText(category.getCategoryName());
-            loadBookImage(category.getCategoryImageUrl(), categoryImage);
+            loadCategoryImage(category.getCategoryImageUrl(), categoryImage);
 
             // Set margins for categoryItemView
             GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
@@ -78,16 +79,35 @@ public class Category_Page extends AppCompatActivity {
                     getResources().getDisplayMetrics()
             );
 
-            layoutParams.setMargins(marginInDp, marginInDp, marginInDp, marginInDp);
+            layoutParams.setMargins(marginInPixels, marginInPixels, marginInPixels, marginInPixels);
             categoryItemView.setLayoutParams(layoutParams);
+
+            // Add an OnClickListener to handle category item clicks
+            categoryItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle category item click here
+                    navigateToFilterResult(category.getCategoryId()); // You can pass the category ID or other relevant data
+                }
+            });
+
+
 
             // Add the categoryItemView to GridLayout
             categoryGridLayout.addView(categoryItemView);
         }
     }
+    private void navigateToFilterResult(String categoryId) {
+        // Implement the logic to navigate to the filter_result page
+        // You can use Intent to start the new activity and pass the category ID
+        // Example:
+         Intent intent = new Intent(Category_Page.this, SearchFilterResults.class);
+         intent.putExtra("CATEGORY_ID", categoryId);
+         startActivity(intent);
+    }
 
 
-    private void loadBookImage(String imageUrl, ImageView imageView) {
+    private void loadCategoryImage(String imageUrl, ImageView imageView) {
         Glide.with(imageView.getContext())
                 .load(imageUrl)
                 .into(imageView);
