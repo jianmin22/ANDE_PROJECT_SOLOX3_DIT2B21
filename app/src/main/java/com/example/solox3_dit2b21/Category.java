@@ -3,12 +3,12 @@ package com.example.solox3_dit2b21;
 public class Category {
     private String categoryId;
     private String categoryName;
-    private String categoryImage;
+    private String categoryImageUrl;
 
-    public Category(String categoryId, String categoryName, String categoryImage) {
+    public Category(String categoryId, String categoryName, String categoryImageUrl) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
-        this.categoryImage = categoryImage;
+        this.categoryImageUrl = categoryImageUrl;
     }
 
     public String getCategoryId() {
@@ -27,11 +27,11 @@ public class Category {
         this.categoryName = categoryName;
     }
 
-    public String getCategoryImage() {
-        return categoryImage;
+    public String getCategoryImageUrl() {
+        return categoryImageUrl;
     }
 
-    public void setCategoryImage(String categoryImage) {
-        this.categoryImage = categoryImage;
+    public void setCategoryImageUrl(String categoryImageUrl) {
+        this.categoryImageUrl = categoryImageUrl;
     }
 }
