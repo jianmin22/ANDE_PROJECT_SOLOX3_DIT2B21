@@ -97,6 +97,9 @@ public class Register extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
                                     Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(getApplicationContext(), Login.class);
+                                    startActivity(intent);
+                                    finish();
                                 } else {
                                     Toast.makeText(Register.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
                                 }

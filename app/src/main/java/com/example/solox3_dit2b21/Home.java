@@ -14,6 +14,8 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +32,8 @@ import java.util.Locale;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
 
+    FirebaseAuth auth;
+    FirebaseUser user;
     private RecyclerView recyclerView1;
     private RecyclerView recyclerView2;
     HomeAdapter adapter1;
@@ -39,6 +43,16 @@ private List<Book> books = new ArrayList<>();
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        if (user == null) {
+            Intent intent = new Intent(getApplicationContext(), Login.class);
+            startActivity(intent);
+            finish();
+        }
+        user.
+
         bindData();
         setUIRef();
 
