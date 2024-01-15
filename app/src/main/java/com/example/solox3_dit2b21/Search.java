@@ -51,7 +51,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    insertNewSearchHistory(mainSearchField.getText().toString().trim());
+                    insertOrUpdateSearchHistory(mainSearchField.getText().toString().trim());
                     return true;
                 }
                 return false;
@@ -113,26 +113,65 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             e.printStackTrace();
         }
     }
-    private void insertNewSearchHistory(String search) {
+    private void insertOrUpdateSearchHistory(String search) {
         try {
-            if(search.length()!=0){
-                // Generate a unique searchHistoryId using cuid
-                String searchHistoryId = generateUUID();
-
-                // Get a reference to the "SearchHistory" node
+            if (search.length() != 0) {
+                final String userId = "user1";
                 DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
+                Query searchQuery = searchHistoryRef.orderByChild("search").equalTo(search);
 
-                // Create a new SearchHistoryItem object
-                SearchHistory searchHistoryItem = new SearchHistory(searchHistoryId, "user1", search, getCurrentDateTime());
+                searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String searchId = snapshot.getKey();
+                                updateLastSearch(searchId, getCurrentDateTime());
+                            }
+                        } else {
+                            String searchHistoryId = generateUUID();
+                            insertNewSearchHistory(searchHistoryId, userId, search, getCurrentDateTime());
+                        }
+                    }
 
-                // Push the new SearchHistoryItem to the database
-                searchHistoryRef.child(searchHistoryId).setValue(searchHistoryItem);
-                mainSearchField.setText("");
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle errors
+                    }
+                });
+
+                Intent intent = new Intent(Search.this, SearchFilterResults.class);
+                intent.putExtra("type", "search");
+                intent.putExtra("search", mainSearchField.getText().toString().trim());
+                startActivity(intent);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    private void updateLastSearch(String searchId, String lastSearch) {
+        try {
+            DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory").child(searchId);
+            searchHistoryRef.child("lastSearch").setValue(lastSearch);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertNewSearchHistory(String searchHistoryId, String userId, String search, String lastSearch) {
+        try {
+            DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
+
+            SearchHistory searchHistoryItem = new SearchHistory(searchHistoryId, userId, search, lastSearch);
+
+            searchHistoryRef.child(searchHistoryId).setValue(searchHistoryItem);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private String getCurrentDateTime() {
         // Get the current date and time
@@ -151,7 +190,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.seachButton) {
-            insertNewSearchHistory(mainSearchField.getText().toString().trim());
+            insertOrUpdateSearchHistory(mainSearchField.getText().toString().trim());
         }else if (v.getId() == R.id.backButton){
             Bundle getData = getIntent().getExtras();
             if (getData != null){
@@ -161,16 +200,17 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             }else{
                 Log.d("Back Button", "Error Occurred");
             }
-        }else if(v.getId()==R.id.buttonText) {
-            String searchId = (String) v.getTag();
-            Log.d("Button", searchId);
+        }else if (v.getId() == R.id.buttonText) {
+            TextView buttonText = v.findViewById(R.id.buttonText);
+
+            String search = buttonText.getText().toString();
+
+            insertOrUpdateSearchHistory(search);
         } else if (v.getId() == R.id.removeIcon) {
                 String searchId = (String) v.getTag();
 
-                // Get a reference to the "SearchHistory" node
                 DatabaseReference ref = database.getReference("SearchHistory");
 
-                // Create a reference to the specific searchId
                 DatabaseReference searchIdRef = ref.child(searchId);
 
                 // Remove the record

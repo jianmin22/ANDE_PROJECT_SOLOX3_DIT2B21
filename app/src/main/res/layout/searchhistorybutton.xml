@@ -26,6 +26,6 @@
         android:clickable="true"
         android:focusable="true"
         android:onClick="onClick"
-        android:src="@mipmap/deletecross" />
+        android:src="@drawable/deletecross" />
 
 </LinearLayout>
