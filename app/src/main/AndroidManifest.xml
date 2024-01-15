@@ -16,9 +16,6 @@
             android:name=".SearchFilterResults"
             android:exported="false" />
         <activity
-            android:name=".CategoriesPage"
-            android:exported="false" />
-        <activity
             android:name=".Search"
             android:exported="false" />
         <activity
@@ -44,13 +41,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity
-            android:name=".TryHome"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
+
     </application>
 
 </manifest>
