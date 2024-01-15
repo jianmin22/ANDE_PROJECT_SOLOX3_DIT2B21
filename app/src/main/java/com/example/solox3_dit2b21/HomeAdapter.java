@@ -103,8 +103,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         // Load image into ImageView using Glide
         Glide.with(imageView.getContext())
                 .load(imageUrl)
-//                .placeholder(R.mipmap.doraemonbook) // Optional placeholder image while loading
-//                .error(R.drawable.error_image) // Optional error image if the load fails
                 .into(imageView);
     }
 
