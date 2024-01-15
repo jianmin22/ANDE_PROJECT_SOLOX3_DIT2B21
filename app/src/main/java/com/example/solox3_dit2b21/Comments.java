@@ -8,7 +8,9 @@ public class Comments {
     private String commentsText;
     private String userId;
     private String date;
+    public Comments(){
 
+    }
     // Constructor
     public Comments(String commentsId, String bookId, String commentsText, String userId, String date) {
         this.commentsId = commentsId;
