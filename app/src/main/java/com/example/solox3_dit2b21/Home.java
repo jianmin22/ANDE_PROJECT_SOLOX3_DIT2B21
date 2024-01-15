@@ -193,6 +193,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             Intent intent = new Intent(Home.this, Search.class);
             intent.putExtra("from", "Home");
             startActivity(intent);
+        }else if (v.getId()==R.id.categoryBtn){
+            Intent intent = new Intent(Home.this, Category_Page.class);
+            startActivity(intent);
         }
     }
 
