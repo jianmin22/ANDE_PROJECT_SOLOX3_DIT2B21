@@ -51,7 +51,6 @@ private List<Book> books = new ArrayList<>();
             startActivity(intent);
             finish();
         }
-        user.
 
         bindData();
         setUIRef();
