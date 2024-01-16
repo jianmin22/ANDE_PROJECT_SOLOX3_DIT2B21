@@ -4,7 +4,9 @@ public class UserFavouriteBook {
     private String userId;
     private String bookId;
 
-    // Constructor
+    public UserFavouriteBook() {
+    }
+
     public UserFavouriteBook(String userId, String bookId) {
         this.userId = userId;
         this.bookId = bookId;
