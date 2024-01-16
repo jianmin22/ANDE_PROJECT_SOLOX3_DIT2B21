@@ -20,7 +20,7 @@
 >>>>>>> d3d6e0f5a9c5877b13c1f4a419b29bf372be66d0
             android:exported="false" />
         <activity
-            android:name=".Category_Page"
+            android:name=".CategoryPage"
             android:exported="false" />
         <activity
             android:name=".SearchFilterResults"
