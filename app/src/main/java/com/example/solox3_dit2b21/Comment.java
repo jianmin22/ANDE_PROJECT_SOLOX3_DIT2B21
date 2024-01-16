@@ -6,10 +6,10 @@ public class Comment {
     private String commentsText;
     private String userId;
     private String date;
+    public Comment(){
 
-    public Comment() {
     }
-
+    // Constructor
     public Comment(String commentsId, String bookId, String commentsText, String userId, String date) {
         this.commentsId = commentsId;
         this.bookId = bookId;
