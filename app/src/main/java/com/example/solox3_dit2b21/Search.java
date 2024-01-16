@@ -213,9 +213,11 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
                 DatabaseReference searchIdRef = ref.child(searchId);
 
-                // Remove the record
                 searchIdRef.removeValue();
-            }
+            }else if (v.getId()==R.id.filterButton){
+                Intent intent = new Intent(Search.this, CategoryPage.class);
+                startActivity(intent);
+        }
 
     }
 }

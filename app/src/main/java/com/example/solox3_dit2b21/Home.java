@@ -1,37 +1,27 @@
 package com.example.solox3_dit2b21;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
 
@@ -207,7 +197,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             intent.putExtra("from", "Home");
             startActivity(intent);
         }else if (v.getId()==R.id.categoryBtn){
-            Intent intent = new Intent(Home.this, Category_Page.class);
+            Intent intent = new Intent(Home.this, CategoryPage.class);
             startActivity(intent);
         } else if (v.getId()==R.id.profileBtn){
             Intent intent = new Intent(Home.this, AllComments.class);

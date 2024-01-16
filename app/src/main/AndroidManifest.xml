@@ -25,7 +25,7 @@
             android:name=".AllComments"
             android:exported="false" />
         <activity
-            android:name=".Category_Page"
+            android:name=".CategoryPage"
             android:exported="false" />
         <activity
             android:name=".SearchFilterResults"
