@@ -189,7 +189,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     }
     @Override
     public void onClick(View v){
-        if(v.getId() == R.id.seachButton) {
+        if(v.getId() == R.id.searchButton) {
             insertOrUpdateSearchHistory(mainSearchField.getText().toString().trim());
         }else if (v.getId() == R.id.backButton){
             Bundle getData = getIntent().getExtras();

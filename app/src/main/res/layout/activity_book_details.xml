@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".BookDetails">
 
-    <TextView
-        android:id="@+id/bookId"
+    <ImageView
+        android:id="@+id/imageView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="31dp"
-        tools:layout_editor_absoluteY="38dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteX="141dp"
+        tools:layout_editor_absoluteY="53dp"
+        tools:srcCompat="@tools:sample/avatars" />
 </androidx.constraintlayout.widget.ConstraintLayout>

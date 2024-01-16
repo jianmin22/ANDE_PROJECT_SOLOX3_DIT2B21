@@ -53,7 +53,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Book book = allBooks.get(position);
         holder.bookTitle.setText(book.getTitle());
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("categories").child(book.getCategoryId());
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
         categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -103,8 +103,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         // Load image into ImageView using Glide
         Glide.with(imageView.getContext())
                 .load(imageUrl)
-//                .placeholder(R.mipmap.doraemonbook) // Optional placeholder image while loading
-//                .error(R.drawable.error_image) // Optional error image if the load fails
                 .into(imageView);
     }
 

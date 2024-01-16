@@ -1,16 +1,16 @@
 package com.example.solox3_dit2b21;
 
-import java.util.Date;
-
-public class Comments {
+public class Comment {
     private String commentsId;
     private String bookId;
     private String commentsText;
     private String userId;
     private String date;
+    public Comment(){
 
+    }
     // Constructor
-    public Comments(String commentsId, String bookId, String commentsText, String userId, String date) {
+    public Comment(String commentsId, String bookId, String commentsText, String userId, String date) {
         this.commentsId = commentsId;
         this.bookId = bookId;
         this.commentsText = commentsText;
