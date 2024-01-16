@@ -178,9 +178,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        if(v.getId() == R.id.MainSearchField) {
+        if(v.getId() == R.id.mainSearchField) {
             Intent intent = new Intent(Home.this, Search.class);
-            intent.putExtra("from", "Home");
             startActivity(intent);
         }else if (v.getId()==R.id.categoryBtn){
             Intent intent = new Intent(Home.this, CategoryPage.class);

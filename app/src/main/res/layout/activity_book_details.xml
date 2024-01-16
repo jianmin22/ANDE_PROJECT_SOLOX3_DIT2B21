@@ -38,6 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:onClick="onClick"
                 android:layout_centerVertical="true">
 
                 <ImageView
@@ -45,8 +46,6 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_centerHorizontal="true"
-                    android:clickable="true"
-                    android:onClick="onStarClick"
                     android:src="@drawable/starnocolor" />
 
                 <TextView
@@ -246,6 +245,8 @@
             android:text="Sed eget accumsan elit, interdum malesuada velit. Suspendisse viverra est purus, sit amet suscipit odio ullamcorper sed. Nulla sed cursus lacus, vel congue arcu. Nunc volutpat augue a tristique viverra. Aliquam maximus, dui ut tincidunt tincidunt, sapien justo pellentesque odio, a faucibus justo risus non "
             android:textAlignment="viewStart"
             android:textSize="18sp" />
+
+
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
@@ -253,6 +254,17 @@
             android:layout_marginBottom="15dp"
             android:background="#D8A57A" />
 
+
+        <Button
+            android:id="@+id/button_read"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#D8A57A"
+            android:padding="12dp"
+            android:text="Add Comments"
+            android:textColor="#000000" />
 
         <TextView
             android:layout_width="match_parent"
