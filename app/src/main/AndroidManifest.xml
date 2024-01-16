@@ -15,16 +15,15 @@
         android:theme="@style/Theme.SOLOX3_DIT2B21"
         tools:targetApi="31">
         <activity
-<<<<<<< HEAD
             android:name=".Register"
             android:theme="@style/Theme.Material3.Light.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".Login"
             android:theme="@style/Theme.Material3.Light.NoActionBar"
-=======
+            android:exported="false" />
+        <activity
             android:name=".SearchFilterResults"
->>>>>>> 534dbcb476b987fb4a42e9b4b9969cfd88528159
             android:exported="false" />
         <activity
             android:name=".Search"
