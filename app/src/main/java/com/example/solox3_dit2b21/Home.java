@@ -197,7 +197,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             Intent intent = new Intent(Home.this, Category_Page.class);
             startActivity(intent);
         } else if (v.getId()==R.id.profileBtn){
-            Intent intent = new Intent(Home.this, AllComments.class);
+            Intent intent = new Intent(Home.this, Reading.class);
             startActivity(intent);
         }
 
