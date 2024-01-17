@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+
 
 public class BookDetails extends AppCompatActivity implements View.OnClickListener {
     private String bookId;
@@ -242,10 +245,13 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 if (userFavouriteSnapshot.exists()) {
                     noOfUserFavouriteBook = (int) userFavouriteSnapshot.getChildrenCount();
                     addToFavouriteText.setText(String.valueOf(noOfUserFavouriteBook));
-                    //Continue from here
-                    addedToFavourite=true;
-                    if (addedToFavourite) {
-                        addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                    for (DataSnapshot snapshot : userFavouriteSnapshot.getChildren()) {
+                        UserFavouriteBook userFavourite = snapshot.getValue(UserFavouriteBook.class);
+                        if (userFavourite != null && userId.equals(userFavourite.getUserId())) {
+                            addedToFavourite = true;
+                            addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                            break;
+                        }
                     }
                 } else {
                     noOfUserFavouriteBook = 0;
@@ -263,6 +269,55 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
         });
     }
 
+    private void deleteUserFavourite() {
+        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
+
+        // Find the row with the userId and bookId and remove it
+        Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
+        deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+
+                            if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
+                                snapshot.getRef().removeValue();
+                                addedToFavourite = false;
+                                addToFavouriteStarImage.setImageResource(R.drawable.starnocolor);
+                                break;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("Firebase", "Failed to delete user favourite", databaseError.toException());
+                    }
+                });
+    }
+
+
+    private void insertUserFavourite() {
+        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
+        UserFavouriteBook userFavouriteBook = new UserFavouriteBook(userId, bookId);
+
+        // Insert the new UserFavouriteBook into the database
+        userFavouriteRef.push().setValue(userFavouriteBook)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Successfully added to the database
+                        addedToFavourite = true;
+                        addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Failed to add to the database
+                        Log.e("Firebase", "Failed to insert user favourite", e);
+                    }
+                });
+    }
 
 
     private void loadBookImage(String imageUrl, ImageView imageView) {
@@ -278,6 +333,16 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             finish();
         }else if(v.getId()==R.id.seeAllCommentsBtn){
             Intent intent= new Intent(BookDetails.this, AllComments.class);
+            intent.putExtra("bookId", bookId);
+            startActivity(intent);
+        } else if (v.getId()==R.id.starContainer){
+            if(!addedToFavourite){
+                insertUserFavourite();
+            }else{
+                deleteUserFavourite();
+            }
+        } else if (v.getId()==R.id.buttonRead){
+            Intent intent = new Intent(BookDetails.this, Reading.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
         }
