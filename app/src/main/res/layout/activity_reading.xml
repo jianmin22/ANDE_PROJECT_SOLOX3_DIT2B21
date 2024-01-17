@@ -23,6 +23,7 @@
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:src="@drawable/back"
+            android:onClick="onClick"
             tools:layout_editor_absoluteX="16dp" />
 
         <ImageView
@@ -32,6 +33,7 @@
             android:layout_gravity="end"
             android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="10dp"
+            android:onClick="onClick"
             android:src="@drawable/menu"
             tools:layout_editor_absoluteX="383dp"
             tools:layout_editor_absoluteY="10dp" />

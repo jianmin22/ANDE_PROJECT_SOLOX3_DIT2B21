@@ -5,7 +5,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
-import java.util.ArrayList;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
@@ -14,9 +14,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class Reading extends AppCompatActivity {
+public class Reading extends AppCompatActivity implements View.OnClickListener {
 
     private DatabaseReference databaseReference;
     private TextView currentPageNumber;
@@ -25,23 +27,44 @@ public class Reading extends AppCompatActivity {
     private ViewPager2 viewPager;
     private int currentPage = 0; // The current page index
     private List<String> pages;
+    private String bookId;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reading);
+
+        // Retrieve the bookId passed from the previous activity
+        bookId = getIntent().getStringExtra("bookId");
+
         // Initialize the ViewPager and other views
         viewPager = findViewById(R.id.viewPager);
         currentPageNumber = findViewById(R.id.currentPageNumber);
         previousButton = findViewById(R.id.previousButton);
         nextButton = findViewById(R.id.nextButton);
+
         // Initialize Firebase
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("Chapter");
+
+        // Update the reference to point to the specific book's chapters
+        // Use the bookId to dynamically refer to the correct book chapters
+        if (bookId != null && !bookId.isEmpty()) {
+            databaseReference = firebaseDatabase.getReference("Chapter");
+
+        } else {
+            Log.e("ReadingActivity", "No bookId provided");
+            return; // Exit if no bookId is provided
+        }
+
         // Set up button listeners
         setupButtonListeners();
+
         // Fetch data from Firebase
-        fetchChapterData();
+        fetchChapters();
     }
+
+
     private void setupButtonListeners() {
         previousButton.setOnClickListener(v -> {
             if (currentPage > 0) {
@@ -65,68 +88,77 @@ public class Reading extends AppCompatActivity {
             }
         });
     }
-    private void updatePagination() {
-        currentPageNumber.setText(String.valueOf(currentPage + 1)); // +1 because page numbers are usually 1-based
 
+    private void updatePagination() {
+        currentPageNumber.setText(String.valueOf(currentPage + 1));
         previousButton.setEnabled(currentPage > 0);
         nextButton.setEnabled(currentPage < pages.size() - 1);
     }
+
     private void setupViewPager(List<String> pages) {
-        this.pages = pages; // Keep a reference to the list of pages
+        this.pages = pages;
         ReadingPageAdapter adapter = new ReadingPageAdapter(this, pages);
         viewPager.setAdapter(adapter);
-        updatePagination(); // Initial pagination update
+        updatePagination();
     }
+
     private List<String> splitChapterIntoPages(String chapterContent) {
-        // Split logic here (e.g., split by every 1000 characters)
-        // This is a simple example and may need to be adjusted based on your content
         List<String> pages = new ArrayList<>();
-        int pageSize = 800; // Example page size
+        int pageSize = 800;
         for (int i = 0; i < chapterContent.length(); i += pageSize) {
             pages.add(chapterContent.substring(i, Math.min(chapterContent.length(), i + pageSize)));
         }
         return pages;
     }
 
-    private void fetchChapterData() {
-        databaseReference.child("chapter1").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void fetchChapters() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Retrieve data from dataSnapshot and update UI
-                Chapter chapter = dataSnapshot.getValue(Chapter.class);
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                        String fetchedBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
+                        if (bookId.equals(fetchedBookId)) {
+                            // Found the correct book chapter entry
+                            for (DataSnapshot chapterSnapshot : bookChapterSnapshot.child("chapters").getChildren()) {
+                                Chapter chapter = chapterSnapshot.getValue(Chapter.class);
+                                if (chapter != null && chapter.getSubChapters() != null) {
+                                    // Process the subchapters of the first chapter
+                                    Map<String, SubChapter> subChapters = chapter.getSubChapters();
+                                    if (subChapters.size() > 0) {
+                                        Map.Entry<String, SubChapter> firstEntry = subChapters.entrySet().iterator().next();
+                                        SubChapter firstSubChapter = firstEntry.getValue();
 
-                // Log the retrieved data
-                if (chapter != null) {
-                    Log.d("ReadingActivity", "Chapter Data Retrieved: " +
-                            "BookId: " + chapter.getBookId() +
-                            ", ChapterContent: " + chapter.getChapterContent() +
-                            ", ChapterId: " + chapter.getChapterId() +
-                            ", ChapterNumber: " + chapter.getChapterNumber() +
-                            ", ChapterOrder: " + chapter.getChapterOrder() +
-                            ", SubChapterOrder: " + chapter.getSubChapterOrder());
-                } else {
-                    Log.e("ReadingActivity", "Chapter Data is null");
-                }
+                                        // Update the UI with the first subchapter content
+                                        TextView chapterTitle = findViewById(R.id.ChapterTitle);
+                                        chapterTitle.setText(firstSubChapter.getTitle());
 
-                // Update UI elements with chapter data
-                TextView chapterTitle = findViewById(R.id.ChapterTitle);
-                if (chapter != null) {
-                    chapterTitle.setText("Chapter " + chapter.getChapterNumber() + " " + chapter.getTitle());
+                                        // Split the first subchapter content into pages
+                                        List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
+                                        setupViewPager(pages);
+                                    }
+                                    return; // Exit loop after processing the found book chapter
+                                }
+                            }
+                        }
+                    }
+                    Log.e("ReadingActivity", "No matching bookId found in chapters");
                 } else {
-                    chapterTitle.setText("Chapter Data Not Available");
+                    Log.e("ReadingActivity", "No chapters available");
                 }
-                List<String> pages = splitChapterIntoPages(chapter.getChapterContent());
-                setupViewPager(pages);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Handle errors
                 Log.e("ReadingActivity", "Failed to retrieve chapter data: " + databaseError.getMessage());
             }
         });
     }
-
-
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.backButton) {
+            finish();
+        }
+    }
 
 }
