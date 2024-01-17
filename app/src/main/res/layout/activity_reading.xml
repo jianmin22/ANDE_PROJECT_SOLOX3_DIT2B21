@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -23,6 +27,7 @@
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:src="@drawable/back"
+            android:onClick="onClick"
             tools:layout_editor_absoluteX="16dp" />
 
         <ImageView
@@ -32,6 +37,7 @@
             android:layout_gravity="end"
             android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="10dp"
+            android:onClick="onClick"
             android:src="@drawable/menu"
             tools:layout_editor_absoluteX="383dp"
             tools:layout_editor_absoluteY="10dp" />
@@ -99,3 +105,11 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Navigation Drawer -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu" /> <!-- Define your drawer menu items in res/menu/drawer_menu.xml -->
+</androidx.drawerlayout.widget.DrawerLayout>
