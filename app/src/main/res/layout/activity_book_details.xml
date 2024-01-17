@@ -99,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:text="X.X" />
+                    android:text="0.0" />
 
                 <TextView
                     android:id="@+id/ratingLabel"
@@ -160,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:text="X" />
+                    android:text="0" />
 
                 <TextView
                     android:id="@+id/noOfFavLabel"
