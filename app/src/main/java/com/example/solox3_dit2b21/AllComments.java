@@ -22,7 +22,7 @@ public class AllComments extends AppCompatActivity {
     private String bookId;
     private RecyclerView recyclerView;
     private CommentsAdapter adapter;
-    private List<Comments> allComments = new ArrayList<>();
+    private List<Comment> allComments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +49,16 @@ public class AllComments extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 allComments.clear(); // Clear existing data
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Comments comment = snapshot.getValue(Comments.class);
+                    Comment comment = snapshot.getValue(Comment.class);
                     if (comment != null) {
                         allComments.add(comment);
                     }
                 }
 
                 // Sort comments by date, assuming date is a string in "yyyy-MM-dd HH:mm:ss" format
-                Collections.sort(allComments, new Comparator<Comments>() {
+                Collections.sort(allComments, new Comparator<Comment>() {
                     @Override
-                    public int compare(Comments c1, Comments c2) {
+                    public int compare(Comment c1, Comment c2) {
                         return c2.getDate().compareTo(c1.getDate());
                     }
                 });

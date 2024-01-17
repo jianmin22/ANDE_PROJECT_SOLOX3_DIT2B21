@@ -12,9 +12,9 @@ import java.util.List;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentsViewHolder> {
 
-    private List<Comments> commentsList;
+    private List<Comment> commentsList;
 
-    public CommentsAdapter(List<Comments> commentsList) {
+    public CommentsAdapter(List<Comment> commentsList) {
         this.commentsList = commentsList;
     }
 
@@ -27,7 +27,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @Override
     public void onBindViewHolder(@NonNull CommentsViewHolder holder, int position) {
-        Comments comment = commentsList.get(position);
+        Comment comment = commentsList.get(position);
 
         // Set data to views
         holder.usernameTextView.setText(comment.getUserId());

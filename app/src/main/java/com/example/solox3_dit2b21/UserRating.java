@@ -6,11 +6,16 @@ public class UserRating {
     private double rating;
     private String date;
 
-    // Constructor
-    public UserRating(String userRatingId, double rating, String date) {
+    private String bookId;
+
+    public UserRating() {
+    }
+
+    public UserRating(String userRatingId, double rating, String date, String bookId) {
         this.userRatingId = userRatingId;
         this.rating = rating;
         this.date = date;
+        this.bookId=bookId;
     }
 
     public String getUserRatingId() {
@@ -35,5 +40,13 @@ public class UserRating {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
     }
 }

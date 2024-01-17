@@ -19,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Category_Page extends AppCompatActivity {
+public class CategoryPage extends AppCompatActivity {
 
     private GridLayout categoryGridLayout;
 
@@ -101,7 +101,7 @@ public class Category_Page extends AppCompatActivity {
         // Implement the logic to navigate to the filter_result page
         // You can use Intent to start the new activity and pass the category ID
         // Example:
-         Intent intent = new Intent(Category_Page.this, SearchFilterResults.class);
+         Intent intent = new Intent(CategoryPage.this, SearchFilterResults.class);
          intent.putExtra("CATEGORY_ID", categoryId);
          startActivity(intent);
     }

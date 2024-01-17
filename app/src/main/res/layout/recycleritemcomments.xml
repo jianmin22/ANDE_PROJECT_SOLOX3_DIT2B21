@@ -28,7 +28,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ellipse"
-                android:layout_marginRight="8dp"/>
+                android:layout_marginRight="8dp"
+                android:background="@drawable/profilepicshapecomment"/>
 
             <TextView
                 android:id="@+id/username"
