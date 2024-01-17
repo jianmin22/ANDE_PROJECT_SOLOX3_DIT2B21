@@ -9,7 +9,6 @@ public class Book {
     private String title;
     private String description;
     private String categoryId;
-    private double rating;
     private String image;
     private String publishedDate;
     private String createdDate;
@@ -26,7 +25,6 @@ public class Book {
         this.title = title;
         this.description = description;
         this.categoryId = categoryId;
-        this.rating = rating;
         this.image = image;
         this.publishedDate = publishedDate;
         this.numberOfReads=numberOfReads;
@@ -72,14 +70,6 @@ public class Book {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
     }
 
     public String getImage() {
