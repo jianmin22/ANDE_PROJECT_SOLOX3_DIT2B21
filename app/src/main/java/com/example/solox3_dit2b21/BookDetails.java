@@ -121,14 +121,14 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         loadBookImage(bookDetails.getImage(), bookImage);
                         bookTitle.setText(bookDetails.getTitle());
                         descriptionContent.setText(bookDetails.getDescription());
-                        loadCategory(bookId);
+                        loadCategory(bookDetails.getCategoryId());
                         loadComments(bookId);
                         loadUserRating(bookId);
                         currentUserName.setText(userId);
 
                         loadUserFavourite(bookId);
                     } else {
-                        Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }
@@ -136,6 +136,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.e("Firebase", "Failed to get book details", databaseError.toException());
+                    Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                     finish();
                 }
             });
@@ -173,13 +174,14 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                     }
                     adapter.notifyDataSetChanged();
                 } else {
-                    Log.e("NOT FOUND", "No comments found for the book");
+                    Log.d("NOT FOUND", "No comments found for the book");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to get comments", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                finish();
             }
         });
     }
@@ -222,35 +224,39 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
                     bookRating.setText(String.valueOf(calculatedUserRating));
                 } else {
-                    // No comments found for the book
-                    Log.e("NOT FOUND", "No user Rating found for the book");
+                    Log.d("NOT FOUND", "No user Rating found for the book");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("Firebase", "Failed to get user rating", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                finish();
             }
         });
     }
 
-    private void loadCategory(String bookId) {
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference("Category");
-        Query categoryQuery = categoryRef.orderByChild("bookId").equalTo(bookId);
-        categoryQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void loadCategory(String categoryId) {
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(categoryId);
+        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Category category = dataSnapshot.getValue(Category.class);
                     if (category != null) {
                         bookCategory=category;
-                        bookCategoryButton.setText(bookCategory.getCategoryName());
+                        bookCategoryButton.setText(category.getCategoryName());
                     }
+                }else {
+                    Log.d("NOT FOUND", "No Category found for the book");
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("Firebase", "Error fetching category data", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                finish();
             }
         });
     }
@@ -274,8 +280,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                     }
                 } else {
                     noOfUserFavouriteBook = 0;
-                    addToFavouriteText.setText("0");
-                    Log.e("NOT FOUND", "No user favourite found for the book");
+                    Log.d("NOT FOUND", "No user favourite found for the book");
                 }
             }
 
@@ -283,6 +288,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("Firebase", "Failed to get user favourite", databaseError.toException());
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
