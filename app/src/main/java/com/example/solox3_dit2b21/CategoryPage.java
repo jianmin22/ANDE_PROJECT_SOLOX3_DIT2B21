@@ -2,6 +2,7 @@ package com.example.solox3_dit2b21;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +70,7 @@ public class CategoryPage extends AppCompatActivity {
 
             categoryNameTextView.setText(category.getCategoryName());
             loadCategoryImage(category.getCategoryImageUrl(), categoryImage);
-
+            Log.d(category.getCategoryImageUrl(), "displayCategories: ");
             // Set margins for categoryItemView
             GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
             int marginInDp = 10; // Adjust the margin value as needed
