@@ -23,10 +23,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnFailureListener;
 
@@ -186,11 +192,24 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onDataChange(@NonNull DataSnapshot userRatingSnapshot) {
                 if (userRatingSnapshot.exists()) {
-                    List<UserRating> userRatingList = new ArrayList<>();
                     double sumOfRating=0;
                     int countOfRating=0;
                     for (DataSnapshot userRating : userRatingSnapshot.getChildren()) {
                         UserRating userRatingValue = userRating.getValue(UserRating.class);
+                        if(userRatingValue.getUserId().equals(userId)){
+                            rated=true;
+                            rateGiveByCurrentUser=userRatingValue.getRating();
+                            if(rateGiveByCurrentUser==1){
+                                sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                            }else if(rateGiveByCurrentUser==3){
+                                neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                            }else if(rateGiveByCurrentUser==5){
+                                happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                            }else {
+                                rated=false;
+                                rateGiveByCurrentUser=0;
+                            }
+                        }
                         countOfRating+=1;
                         sumOfRating+=userRatingValue.getRating();
                     }
@@ -320,11 +339,161 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     }
 
 
+    private void handleRating(int emojiId) {
+        double ratingToSet = 0;
+        if (emojiId == R.id.sadEmoji) {
+            ratingToSet = 1.0;
+        } else if (emojiId == R.id.neutralEmoji) {
+            ratingToSet = 3.0;
+        } else if (emojiId == R.id.happyEmoji) {
+            ratingToSet = 5.0;
+        }
+
+        if (rated && rateGiveByCurrentUser == ratingToSet) {
+            deleteRating();
+        } else {
+                if (rated) {
+                    updateRating(ratingToSet);
+                } else {
+                    insertRating(ratingToSet);
+                }
+
+        }
+    }
+
+    private void deleteRating() {
+        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
+        Query deleteQuery = userRatingRef.orderByChild("bookId").equalTo(bookId);
+        deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserRating userRating = snapshot.getValue(UserRating.class);
+                    if (userRating != null && userRating.getUserId().equals(userId)) {
+                        snapshot.getRef().removeValue();
+                        rated = false;
+                        if(rateGiveByCurrentUser==1){
+                            sadEmojiImage.setImageResource(R.drawable.sadnocolor);
+                        }else if(rateGiveByCurrentUser==3){
+                            neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
+                        }else{
+                            happyEmojiImage.setImageResource(R.drawable.happynocolor);
+                        }
+                        rateGiveByCurrentUser = 0.0;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Failed to delete user rating", databaseError.toException());
+            }
+        });
+    }
+
+
+    private void updateRating(double newRating) {
+        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
+
+        // Find the rating entry with the userId and bookId and update it
+        Query updateQuery = userRatingRef.orderByChild("bookId").equalTo(bookId);
+        updateQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserRating userRating = snapshot.getValue(UserRating.class);
+                    if (userRating != null && userRating.getUserId().equals(userId) ) {
+                        snapshot.getRef().child("rating").setValue(newRating);
+                        if(rateGiveByCurrentUser==1){
+                            sadEmojiImage.setImageResource(R.drawable.sadnocolor);
+                        }else if(rateGiveByCurrentUser==3){
+                            neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
+                        }else{
+                            happyEmojiImage.setImageResource(R.drawable.happynocolor);
+                        }
+                        rateGiveByCurrentUser = newRating;
+                        if(rateGiveByCurrentUser==1){
+                            sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                        }else if(rateGiveByCurrentUser==3){
+                            neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                        }else{
+                            happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Failed to update user rating", databaseError.toException());
+            }
+        });
+    }
+
+    private void insertRating(double newRating) {
+        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
+        UserRating userRating = new UserRating(generateUUID(),newRating,getCurrentDateTime(),bookId,userId);
+        userRatingRef.push().setValue(userRating)
+                .addOnSuccessListener(aVoid -> {
+                    rated = true;
+                    rateGiveByCurrentUser = newRating;
+                    if(rateGiveByCurrentUser==1){
+                        sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                    }else if(rateGiveByCurrentUser==3){
+                        neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                    }else{
+                        happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firebase", "Failed to insert user rating", e));
+    }
+
+    private void addComment() {
+        String commentText = addCommentsInputField.getText().toString().trim();
+        if (commentText.isEmpty()) {
+            Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String commentId = generateUUID();
+        String currentDate = getCurrentDateTime();
+
+        Comment newComment = new Comment(commentId, bookId, commentText, userId, currentDate);
+
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
+        commentsRef.child(commentId).setValue(newComment)
+                .addOnSuccessListener(aVoid -> {
+                    addCommentsInputField.setText("");
+                    loadComments(bookId);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(BookDetails.this, "Failed to add comment, Try again later", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+
     private void loadBookImage(String imageUrl, ImageView imageView) {
         // Load image into ImageView using Glide
         Glide.with(imageView.getContext())
                 .load(imageUrl)
                 .into(imageView);
+    }
+
+    private String getCurrentDateTime() {
+        // Get the current date and time
+        Date currentDate = new Date();
+
+        // Create a SimpleDateFormat object with the desired format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+
+        // Format the date as a string
+        return sdf.format(currentDate);
+    }
+    private String generateUUID() {
+        // Generate a unique searchHistoryId using UUID
+        return UUID.randomUUID().toString();
     }
 
     @Override
@@ -345,6 +514,10 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             Intent intent = new Intent(BookDetails.this, Reading.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
+        } else if (v.getId() == R.id.sadEmoji || v.getId() == R.id.neutralEmoji || v.getId() == R.id.happyEmoji) {
+            handleRating(v.getId());
+        } else if (v.getId() == R.id.addCommentBtn){
+            addComment();
         }
     }
 }

@@ -201,6 +201,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_weight="1"
+                android:onClick="onClick"
                 android:src="@drawable/sadnocolor" />
 
             <!-- Neutral Emoji -->
@@ -209,6 +210,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_weight="1"
+                android:onClick="onClick"
                 android:src="@drawable/neutralnocolor" />
 
             <!-- Happy Emoji -->
@@ -217,6 +219,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_weight="1"
+                android:onClick="onClick"
                 android:layout_marginRight="5dp"
                 android:src="@drawable/happynocolor" />
 
@@ -313,6 +316,7 @@
                 android:backgroundTint="#D8A57A"
                 android:padding="12dp"
                 android:textAllCaps="false"
+                android:onClick="onClick"
                 android:text="See All Comments"
                 android:textColor="#FFFFFF" />
 
@@ -367,7 +371,7 @@
                 android:padding="12dp" />
 
             <Button
-                android:id="@+id/button_add_comment"
+                android:id="@+id/addCommentBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -375,6 +379,7 @@
                 android:backgroundTint="#D8A57A"
                 android:padding="12dp"
                 android:text="Add Comments"
+                android:onClick="onClick"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF" />
 
