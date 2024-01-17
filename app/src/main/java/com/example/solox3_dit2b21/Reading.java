@@ -1,13 +1,19 @@
 package com.example.solox3_dit2b21;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -96,11 +102,13 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void setupViewPager(List<String> pages) {
-        this.pages = pages;
+        this.pages = pages;  // Update the list of pages
         ReadingPageAdapter adapter = new ReadingPageAdapter(this, pages);
         viewPager.setAdapter(adapter);
-        updatePagination();
+        viewPager.setCurrentItem(0);  // Reset to the first page of the new content
+        updatePagination();  // Update pagination controls
     }
+
 
     private List<String> splitChapterIntoPages(String chapterContent) {
         List<String> pages = new ArrayList<>();
@@ -116,18 +124,17 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    List<Chapter> chapters = new ArrayList<>();
                     for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
                         String fetchedBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
                         if (bookId.equals(fetchedBookId)) {
-                            // Found the correct book chapter entry
                             for (DataSnapshot chapterSnapshot : bookChapterSnapshot.child("chapters").getChildren()) {
                                 Chapter chapter = chapterSnapshot.getValue(Chapter.class);
-                                if (chapter != null && chapter.getSubChapters() != null) {
-                                    // Process the subchapters of the first chapter
-                                    Map<String, SubChapter> subChapters = chapter.getSubChapters();
-                                    if (subChapters.size() > 0) {
-                                        Map.Entry<String, SubChapter> firstEntry = subChapters.entrySet().iterator().next();
-                                        SubChapter firstSubChapter = firstEntry.getValue();
+                                if (chapter != null) {
+                                    chapters.add(chapter); // Add chapter to list
+                                    if (chapter.getSubChapters() != null && !chapter.getSubChapters().isEmpty()) {
+                                        // Assuming you want to display the first subchapter initially
+                                        SubChapter firstSubChapter = chapter.getSubChapters().values().iterator().next();
 
                                         // Update the UI with the first subchapter content
                                         TextView chapterTitle = findViewById(R.id.ChapterTitle);
@@ -137,9 +144,10 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
                                         List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
                                         setupViewPager(pages);
                                     }
-                                    return; // Exit loop after processing the found book chapter
                                 }
                             }
+                            populateDrawerMenu(chapters); // Populate the drawer menu with the chapters
+                            return; // Exit loop after processing the found book chapter
                         }
                     }
                     Log.e("ReadingActivity", "No matching bookId found in chapters");
@@ -154,10 +162,51 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             }
         });
     }
+
+    private void populateDrawerMenu(List<Chapter> chapters) {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        menu.clear(); // Clear any existing items
+
+        for (Chapter chapter : chapters) {
+            SubMenu chapterMenu = menu.addSubMenu(chapter.getTitle());
+            for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
+                SubChapter subChapter = entry.getValue();
+                chapterMenu.add(Menu.NONE, Menu.NONE, Menu.NONE, subChapter.getTitle()).setOnMenuItemClickListener(item -> {
+                    // Handle subchapter selection here
+                    navigateToSubChapter(subChapter);
+                    return true;
+                });
+            }
+        }
+    }
+
+    private void navigateToSubChapter(SubChapter subChapter) {
+        if (subChapter != null) {
+            // Update the title
+            TextView chapterTitle = findViewById(R.id.ChapterTitle);
+            chapterTitle.setText(subChapter.getTitle());
+
+            // Split the subchapter content into pages and update the ViewPager
+            List<String> pages = splitChapterIntoPages(subChapter.getChapterContent());
+            setupViewPager(pages);  // This method should reset and update the ViewPager
+
+            // Optionally, close the drawer if open
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        }
+    }
+
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.backButton) {
             finish();
+        } else if (v.getId()==R.id.menuButton) {
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.openDrawer(GravityCompat.START);
         }
     }
 
