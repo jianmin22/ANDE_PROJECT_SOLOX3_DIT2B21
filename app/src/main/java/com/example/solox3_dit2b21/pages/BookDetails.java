@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.Category;
+import com.example.solox3_dit2b21.model.Comment;
+import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.model.UserFavouriteBook;
+import com.example.solox3_dit2b21.model.UserRating;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +37,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -297,28 +303,40 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private void deleteUserFavourite() {
         DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
 
-        // Find the row with the userId and bookId and remove it
         Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
         deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
 
-                            if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
-                                snapshot.getRef().removeValue();
+                    if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
+                        snapshot.getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
                                 addedToFavourite = false;
                                 addToFavouriteStarImage.setImageResource(R.drawable.starnocolor);
-                                break;
+                                loadUserFavourite(bookId);
                             }
-                        }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firebase", "Failed to delete user favourite", e);
+                                // Handle the failure case here
+                            }
+                        });
+                        break;
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("Firebase", "Failed to delete user favourite", databaseError.toException());
-                    }
-                });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Failed to delete user favourite", databaseError.toException());
+            }
+        });
     }
+
 
 
     private void insertUserFavourite() {
@@ -333,6 +351,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         // Successfully added to the database
                         addedToFavourite = true;
                         addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                        loadUserFavourite(bookId);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -380,10 +399,13 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         rated = false;
                         if(rateGiveByCurrentUser==1){
                             sadEmojiImage.setImageResource(R.drawable.sadnocolor);
+                            loadUserRating(bookId);
                         }else if(rateGiveByCurrentUser==3){
                             neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
+                            loadUserRating(bookId);
                         }else{
                             happyEmojiImage.setImageResource(R.drawable.happynocolor);
+                            loadUserRating(bookId);
                         }
                         rateGiveByCurrentUser = 0.0;
                         break;
@@ -413,18 +435,24 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         snapshot.getRef().child("rating").setValue(newRating);
                         if(rateGiveByCurrentUser==1){
                             sadEmojiImage.setImageResource(R.drawable.sadnocolor);
+                            loadUserRating(bookId);
                         }else if(rateGiveByCurrentUser==3){
                             neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
+                            loadUserRating(bookId);
                         }else{
                             happyEmojiImage.setImageResource(R.drawable.happynocolor);
+                            loadUserRating(bookId);
                         }
                         rateGiveByCurrentUser = newRating;
                         if(rateGiveByCurrentUser==1){
                             sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                            loadUserRating(bookId);
                         }else if(rateGiveByCurrentUser==3){
                             neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                            loadUserRating(bookId);
                         }else{
                             happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                            loadUserRating(bookId);
                         }
                         break;
                     }
@@ -439,18 +467,22 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void insertRating(double newRating) {
+        String currentDateTime = CurrentDateUtils.getCurrentDateTime();
         DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
-        UserRating userRating = new UserRating(generateUUID(),newRating,getCurrentDateTime(),bookId,userId);
+        UserRating userRating = new UserRating(generateUUID(),newRating,currentDateTime,bookId,userId);
         userRatingRef.push().setValue(userRating)
                 .addOnSuccessListener(aVoid -> {
                     rated = true;
                     rateGiveByCurrentUser = newRating;
                     if(rateGiveByCurrentUser==1){
                         sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                        loadUserRating(bookId);
                     }else if(rateGiveByCurrentUser==3){
                         neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                        loadUserRating(bookId);
                     }else{
                         happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                        loadUserRating(bookId);
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Firebase", "Failed to insert user rating", e));
@@ -463,7 +495,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             return;
         }
         String commentId = generateUUID();
-        String currentDate = getCurrentDateTime();
+        String currentDate = CurrentDateUtils.getCurrentDateTime();
 
         Comment newComment = new Comment(commentId, bookId, commentText, userId, currentDate);
 
@@ -487,16 +519,6 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 .into(imageView);
     }
 
-    private String getCurrentDateTime() {
-        // Get the current date and time
-        Date currentDate = new Date();
-
-        // Create a SimpleDateFormat object with the desired format
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-
-        // Format the date as a string
-        return sdf.format(currentDate);
-    }
     private String generateUUID() {
         // Generate a unique searchHistoryId using UUID
         return UUID.randomUUID().toString();

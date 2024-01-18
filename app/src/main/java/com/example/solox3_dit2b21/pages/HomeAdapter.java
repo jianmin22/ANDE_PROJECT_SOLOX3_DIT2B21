@@ -1,6 +1,5 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,9 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,7 +22,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.FirebaseStorage;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;

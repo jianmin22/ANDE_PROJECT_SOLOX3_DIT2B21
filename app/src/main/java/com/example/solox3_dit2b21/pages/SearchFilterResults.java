@@ -1,8 +1,10 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.solox3_dit2b21.R;
 
 public class SearchFilterResults extends AppCompatActivity {
 

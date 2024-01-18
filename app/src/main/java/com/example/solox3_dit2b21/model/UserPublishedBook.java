@@ -1,10 +1,12 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.model;
 
 public class UserPublishedBook {
     private String userId;
     private String bookId;
 
-    // Constructor
+    public UserPublishedBook() {
+    }
+
     public UserPublishedBook(String userId, String bookId) {
         this.userId = userId;
         this.bookId = bookId;

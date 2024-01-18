@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
+import com.example.solox3_dit2b21.R;
 
 public class ReadingFragment extends Fragment {
 
