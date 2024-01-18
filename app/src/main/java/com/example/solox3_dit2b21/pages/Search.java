@@ -141,7 +141,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                     }
                 });
                 Intent intent = new Intent(Search.this, SearchFilterResults.class);
-                intent.putExtra("search", mainSearchField.getText().toString().trim());
+                intent.putExtra("search", search);
                 String searchOrder="1";
                 String filterOrder="2";
                 Bundle getData = getIntent().getExtras();
@@ -158,6 +158,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 }
                 intent.putExtra("searchOrder",searchOrder);
                 intent.putExtra("filterOrder", filterOrder);
+                mainSearchField.setText("");
                 startActivity(intent);
             }
         } catch (Exception e) {

@@ -4,8 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
@@ -19,11 +22,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFilterResults extends AppCompatActivity {
+public class SearchFilterResults extends AppCompatActivity implements View.OnClickListener{
 
     private RecyclerView recyclerView;
     private SearchFilterResultsAdapter adapter;
     private List<Book> bookList = new ArrayList<>();
+    private String search;
+    private String filter;
+    private String searchOrder;
+    private String filterOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,15 +40,20 @@ public class SearchFilterResults extends AppCompatActivity {
         recyclerView = findViewById(R.id.searchAndFilterResult);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        String search = getIntent().getStringExtra("search");
-        String filter = getIntent().getStringExtra("filter");
-        String searchOrder = getIntent().getStringExtra("searchOrder");
-        String filterOrder = getIntent().getStringExtra("filterOrder");
+        search = getIntent().getStringExtra("search");
+        filter = getIntent().getStringExtra("filter");
+        searchOrder = getIntent().getStringExtra("searchOrder");
+        filterOrder = getIntent().getStringExtra("filterOrder");
 
         if (search == null && filter == null) {
             Toast.makeText(this, "Error occurred, try again later", Toast.LENGTH_LONG).show();
             finish();
             return;
+        }
+
+        if (search!=null){
+            TextView searchHolder = findViewById(R.id.mainSearchField);
+            searchHolder.setHint(search);
         }
 
         fetchAndFilterBooks(search, filter, searchOrder, filterOrder);
@@ -51,7 +63,7 @@ public class SearchFilterResults extends AppCompatActivity {
     }
 
     private void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Books");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
 
         ValueEventListener eventListener = new ValueEventListener() {
             @Override
@@ -64,29 +76,26 @@ public class SearchFilterResults extends AppCompatActivity {
                             if (searchOrder.equals("1") && filterOrder.equals("2")) {
                                 if (book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
                                     bookList.add(book);
-                                    Log.d("book with id",book.getBookId());
                                 }
                             } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
                                 if (matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
                                     bookList.add(book);
-                                    Log.d("book with id",book.getBookId());
                                 }
                             }
                         } else if (search == null && filter != null) {
                             if (matchesFilter(book.getCategoryId(), filter)) {
                                 bookList.add(book);
-                                Log.d("book with id",book.getBookId());
                             }
                         } else if (search != null) {
                             if (book.getTitle().contains(search)) {
                                 bookList.add(book);
-                                Log.d("book with id",book.getBookId());
                             }
                         }
 
                     }
                 }
-
+                TextView resultsFoundView = findViewById(R.id.resultsFound);
+                resultsFoundView.setText(bookList.size() + " Results Found");
                 adapter.notifyDataSetChanged();
             }
 
@@ -100,6 +109,27 @@ public class SearchFilterResults extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(eventListener);
     }
 
+    private void navigateToSearch(){
+        Intent intent = new Intent(SearchFilterResults.this, Search.class);
+        if(filter!=null){
+            intent.putExtra("filter", filter);
+        }
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder",filterOrder);
+        startActivity(intent);
+    }
+
+    private void navigateToFilter(){
+        Intent intent = new Intent(SearchFilterResults.this, CategoryPage.class);
+        if(search!=null){
+            intent.putExtra("search", search);
+        }
+        intent.putExtra("filter",filter);
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder",filterOrder);
+        startActivity(intent);
+    }
+
     private boolean matchesFilter(String categoryId, String filter) {
         String[] filters = filter.split(",");
         for (String f : filters) {
@@ -110,4 +140,12 @@ public class SearchFilterResults extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onClick(View v){
+        if(v.getId() == R.id.mainSearchField) {
+            navigateToSearch();
+        }else if(v.getId()==R.id.back){
+            finish();
+        }
+    }
 }
