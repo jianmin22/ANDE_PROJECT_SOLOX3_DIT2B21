@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.Category;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +26,7 @@ import java.util.List;
 public class CategoryPage extends AppCompatActivity {
 
     private GridLayout categoryGridLayout;
-
+    private BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +36,36 @@ public class CategoryPage extends AppCompatActivity {
 
         // Load categories from Firebase
         loadCategories();
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navigation_bookshelf) {
+                // Navigate to Bookshelf activity
+                // Replace CategoryPage.class with the correct Activity class for Bookshelf
+                // if (this is not instance of BookshelfActivity) {
+                //Intent intent = new Intent(Home.this, BookshelfActivity.class);
+                //startActivity(intent);
+                // }
+            } else if (itemId == R.id.navigation_home) {
+                Intent intent = new Intent(CategoryPage.this, Home.class);
+                startActivity(intent);
+            } else if (itemId == R.id.navigation_category) {
+
+            } else if (itemId == R.id.navigation_profile) {
+                // Navigate to Profile activity
+                // Replace CategoryPage.class with the correct Activity class for Profile
+                // if (this is not instance of ProfileActivity) {
+                //Intent intent = new Intent(Home.this, ProfileActivity.class);
+                //startActivity(intent);
+                // }
+            }
+
+            return true;
+        });
+
+        // To select a default item (e.g., home) when the activity starts
+        bottomNavigationView.setSelectedItemId(R.id.navigation_category);
     }
 
     private void loadCategories() {

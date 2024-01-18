@@ -3,7 +3,7 @@ package com.example.solox3_dit2b21.pages;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
-
+    private BottomNavigationView bottomNavigationView;
     private RecyclerView recyclerView1;
     private RecyclerView recyclerView2;
     HomeAdapter adapter1;
@@ -37,7 +37,41 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         bindDataForPopular();
         bindDataForLatest();
         setUIRef();
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navigation_bookshelf) {
+                // Navigate to Bookshelf activity
+                // Replace CategoryPage.class with the correct Activity class for Bookshelf
+                // if (this is not instance of BookshelfActivity) {
+                //Intent intent = new Intent(Home.this, BookshelfActivity.class);
+                //startActivity(intent);
+                // }
+            } else if (itemId == R.id.navigation_home) {
+                // Already in Home, no action needed
+            } else if (itemId == R.id.navigation_category) {
+                // Navigate to Category activity
+                // if (this is not instance of CategoryPage) {
+                Intent intent = new Intent(Home.this, CategoryPage.class);
+                startActivity(intent);
+                // }
+            } else if (itemId == R.id.navigation_profile) {
+                // Navigate to Profile activity
+                // Replace CategoryPage.class with the correct Activity class for Profile
+                // if (this is not instance of ProfileActivity) {
+                //Intent intent = new Intent(Home.this, ProfileActivity.class);
+                //startActivity(intent);
+                // }
+            }
+
+            return true;
+        });
+
+        // To select a default item (e.g., home) when the activity starts
+        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
     }
+
 
     private void setUIRef()
     {
@@ -182,14 +216,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v){
         if(v.getId() == R.id.mainSearchField) {
             Intent intent = new Intent(Home.this, Search.class);
-            startActivity(intent);
-        }else if (v.getId()==R.id.categoryBtn){
-            Intent intent = new Intent(Home.this, CategoryPage.class);
-            startActivity(intent);
-        } else if (v.getId()==R.id.profileBtn){
-            Intent intent = new Intent(Home.this, Reading.class);
-            startActivity(intent);
-        }
+            startActivity(intent);}
+//        }else if (v.getId()==R.id.categoryBtn){
+//            Intent intent = new Intent(Home.this, CategoryPage.class);
+//            startActivity(intent);
+//        } else if (v.getId()==R.id.profileBtn){
+//            Intent intent = new Intent(Home.this, Reading.class);
+//            startActivity(intent);
+//        }
 
     }
 
