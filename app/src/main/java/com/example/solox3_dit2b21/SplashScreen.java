@@ -18,14 +18,15 @@ public class SplashScreen extends AppCompatActivity {
                 try {
                     // sleep time in milliseconds (3000 = 3sec)
                     sleep(3000);
-                }  catch(InterruptedException e) {
+                } catch(InterruptedException e) {
                     // Trace the error
                     e.printStackTrace();
-                } finally
-                {
+                } finally {
                     // Launch the login class
-                    Intent intent = new Intent(SplashScreen.this, Login.class);
-                    startActivity(intent);
+//                    Intent intent = new Intent(SplashScreen.this, Login.class);
+//                    startActivity(intent);
+                    SessionManager sessionManager = new SessionManager();
+                    sessionManager.checkAuthenticationAndNavigate(SplashScreen.this, Login.class);
                 }
 
             }
