@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.model;
 
 
 public class ReadingHistory {
@@ -7,7 +7,9 @@ public class ReadingHistory {
     private String chapterId;
     private String lastRead;
 
-    // Constructor
+    public ReadingHistory() {
+    }
+
     public ReadingHistory(String userId, String bookId, String chapterId, String lastRead) {
         this.userId = userId;
         this.bookId = bookId;

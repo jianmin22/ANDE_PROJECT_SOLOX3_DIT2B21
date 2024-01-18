@@ -1,11 +1,11 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateUtils {
+public class FormatDateUtils {
 
     // Function to format date string
     public static String formatDateString(String dateString) {

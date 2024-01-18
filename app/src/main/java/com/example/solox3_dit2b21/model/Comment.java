@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.model;
 
 public class Comment {
     private String commentsId;
@@ -9,7 +9,6 @@ public class Comment {
     public Comment(){
 
     }
-    // Constructor
     public Comment(String commentsId, String bookId, String commentsText, String userId, String date) {
         this.commentsId = commentsId;
         this.bookId = bookId;

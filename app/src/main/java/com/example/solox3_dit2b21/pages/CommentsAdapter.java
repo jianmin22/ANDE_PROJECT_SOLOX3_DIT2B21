@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.solox3_dit2b21.Utils.FormatDateUtils;
+import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.model.Comment;
 
 import java.util.List;
 
@@ -33,7 +37,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         holder.usernameTextView.setText(comment.getUserId());
         holder.commentTextView.setText(comment.getCommentsText());
         // Format and set the timestamp
-        String formattedDate = DateUtils.formatDateString(comment.getDate());
+        String formattedDate = FormatDateUtils.formatDateString(comment.getDate());
         holder.timestampTextView.setText(formattedDate);
     }
 

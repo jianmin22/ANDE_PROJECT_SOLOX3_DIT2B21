@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.model;
 
 
 public class User {
@@ -10,6 +10,9 @@ public class User {
     private int averageRating;
     private String image;
     private String createdDate;
+
+    public User() {
+    }
 
     public User(String userId, String email, String password, int publishedNumber,
                 int commentNumber, int averageRating, String image, String createdDate) {

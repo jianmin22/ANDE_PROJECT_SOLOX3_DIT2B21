@@ -1,10 +1,10 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.FirebaseApp;
+import com.example.solox3_dit2b21.R;
 
 public class SplashScreen extends AppCompatActivity {
     @Override

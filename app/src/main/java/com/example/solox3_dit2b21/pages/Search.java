@@ -1,7 +1,8 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.model.SearchHistory;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -119,26 +123,42 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        String currentDateTime = CurrentDateUtils.getCurrentDateTime();
                         if (dataSnapshot.exists()) {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 String searchId = snapshot.getKey();
-                                updateLastSearch(searchId, getCurrentDateTime());
+                                updateLastSearch(searchId, currentDateTime);
                             }
                         } else {
                             String searchHistoryId = generateUUID();
-                            insertNewSearchHistory(searchHistoryId, userId, search, getCurrentDateTime());
+                            insertNewSearchHistory(searchHistoryId, userId, search, currentDateTime);
                         }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Handle errors
+                        Log.d("NOT FOUND", "Insert or update search history failed");
                     }
                 });
 
                 Intent intent = new Intent(Search.this, SearchFilterResults.class);
-                intent.putExtra("type", "search");
                 intent.putExtra("search", mainSearchField.getText().toString().trim());
+                String searchOrder="1";
+                String filterOrder="2";
+                Bundle getData = getIntent().getExtras();
+                if (getData != null) {
+                    String filter = getData.getString("filter");
+                    String filterOrderPassed = getData.getString("filterOrder");
+                    if(filter != null){
+                        intent.putExtra("filter", filter);
+                        if(filterOrderPassed=="1"){
+                            filterOrder="1";
+                            searchOrder="2";
+                        }
+                    }
+                }
+                intent.putExtra("searchOrder",searchOrder);
+                intent.putExtra("filterOrder", filterOrder);
                 startActivity(intent);
             }
         } catch (Exception e) {
@@ -168,17 +188,6 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-
-    private String getCurrentDateTime() {
-        // Get the current date and time
-        Date currentDate = new Date();
-
-        // Create a SimpleDateFormat object with the desired format
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
-
-        // Format the date as a string
-        return sdf.format(currentDate);
-    }
     private String generateUUID() {
         // Generate a unique searchHistoryId using UUID
         return UUID.randomUUID().toString();
