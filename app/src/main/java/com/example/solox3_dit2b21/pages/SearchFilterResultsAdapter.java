@@ -4,18 +4,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.Category;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -40,6 +50,26 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.bookTitle.setText(book.getTitle());
+        loadBookImage(book.getImage(), holder.bookImage);
+        holder.bookAuthor.setText(book.getAuthorId());
+        holder.bookDescription.setText(book.getDescription());
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
+        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@org.checkerframework.checker.nullness.qual.NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Category category = dataSnapshot.getValue(Category.class);
+                    if (category != null) {
+                        holder.bookCategoryButton.setText(category.getCategoryName());
+                        Log.d("Firebase", "Category Reference: " + category.getCategoryId());
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@org.checkerframework.checker.nullness.qual.NonNull DatabaseError databaseError) {
+                Log.e("Firebase", "Error fetching category data", databaseError.toException());
+            }
+        });
     }
 
     @Override
@@ -50,11 +80,18 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView bookTitle;
         ImageView bookImage;
+        TextView bookAuthor;
+        TextView bookDescription;
+        Button bookCategoryButton;
+        LinearLayout viewBookDetails;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             bookImage = itemView.findViewById(R.id.bookCoverImage);
             bookTitle = itemView.findViewById(R.id.bookTitle);
-            // Initialize other views
+            bookAuthor = itemView.findViewById(R.id.bookAuthor);
+            bookDescription = itemView.findViewById(R.id.bookDescription);
+            bookCategoryButton = itemView.findViewById(R.id.bookCategoryButton);
+            viewBookDetails = itemView.findViewById(R.id.viewBookDetails);
         }
     }
 

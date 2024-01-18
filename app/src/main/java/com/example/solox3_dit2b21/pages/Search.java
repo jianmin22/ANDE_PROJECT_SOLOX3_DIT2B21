@@ -143,13 +143,12 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
                 Intent intent = new Intent(Search.this, SearchFilterResults.class);
                 intent.putExtra("search", mainSearchField.getText().toString().trim());
                 String searchOrder="1";
-                String filterOrder=null;
+                String filterOrder="2";
                 Bundle getData = getIntent().getExtras();
                 if (getData != null) {
                     String filter = getData.getString("filter");
                     String filterOrderPassed = getData.getString("filterOrder");
                     if(filter != null){
-                        filterOrder="2";
                         intent.putExtra("filter", filter);
                         if(filterOrderPassed.equals("1")){
                             filterOrder="1";

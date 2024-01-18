@@ -74,7 +74,6 @@ public class SearchFilterResults extends AppCompatActivity {
                                 bookList.add(book);
                             }
                         } else if (search != null && filter == null) {
-                            // New logic for only search provided
                             if (book.getTitle().contains(search)) {
                                 bookList.add(book);
                             }
