@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
@@ -63,29 +64,36 @@ public class SearchFilterResults extends AppCompatActivity {
                             if (searchOrder.equals("1") && filterOrder.equals("2")) {
                                 if (book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
                                     bookList.add(book);
+                                    Log.d("book with id",book.getBookId());
                                 }
                             } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
                                 if (matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
                                     bookList.add(book);
+                                    Log.d("book with id",book.getBookId());
                                 }
                             }
                         } else if (search == null && filter != null) {
                             if (matchesFilter(book.getCategoryId(), filter)) {
                                 bookList.add(book);
+                                Log.d("book with id",book.getBookId());
                             }
-                        } else if (search != null && filter == null) {
+                        } else if (search != null) {
                             if (book.getTitle().contains(search)) {
                                 bookList.add(book);
+                                Log.d("book with id",book.getBookId());
                             }
                         }
+
                     }
                 }
+
                 adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(SearchFilterResults.this, "Error fetching data", Toast.LENGTH_SHORT).show();
+                finish();
             }
         };
 
