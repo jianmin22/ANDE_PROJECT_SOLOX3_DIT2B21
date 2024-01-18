@@ -13,6 +13,7 @@ public class Book {
     private String publishedDate;
     private String createdDate;
     private String lastUpdated;
+    private String authorId;
 
     private int numberOfReads;
     public Book() {
@@ -20,7 +21,7 @@ public class Book {
 
 
     public Book(String bookId, String title, String description, String categoryId, double rating,
-                String image, String publishedDate, int numberOfReads, String createdDate, String lastUpdated) {
+                String image, String publishedDate, int numberOfReads, String createdDate, String lastUpdated, String authorId) {
         this.bookId = bookId;
         this.title = title;
         this.description = description;
@@ -30,6 +31,15 @@ public class Book {
         this.numberOfReads=numberOfReads;
         this.createdDate = createdDate;
         this.lastUpdated = lastUpdated;
+        this.authorId=authorId;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getBookId() {
