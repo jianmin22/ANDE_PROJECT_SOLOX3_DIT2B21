@@ -3,6 +3,7 @@ package com.example.solox3_dit2b21.pages;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,6 +55,14 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
         holder.bookAuthor.setText(book.getAuthorId());
         holder.bookDescription.setText(book.getDescription());
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
+        holder.viewBookDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, BookDetails.class);
+                intent.putExtra("bookId", book.getBookId());
+                context.startActivity(intent);
+            }
+        });
         categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@org.checkerframework.checker.nullness.qual.NonNull DataSnapshot dataSnapshot) {
