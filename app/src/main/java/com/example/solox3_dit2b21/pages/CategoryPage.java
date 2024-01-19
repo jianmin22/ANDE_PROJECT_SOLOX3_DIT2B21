@@ -121,7 +121,16 @@ public class CategoryPage extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     // Handle category item click here
-                    navigateToFilterResult(category.getCategoryId()); // You can pass the category ID or other relevant data
+                    Bundle getData = getIntent().getExtras();
+                    String filter = category.getCategoryId();
+
+                    if (getData != null) {
+                        String isFilterExist = getData.getString("filter");
+                        if (isFilterExist != null) {
+                            filter += "," + isFilterExist;
+                        }
+                    }
+                    navigateToFilterResult(filter); // You can pass the category ID or other relevant data
                 }
             });
 
@@ -132,12 +141,26 @@ public class CategoryPage extends AppCompatActivity {
         }
     }
     private void navigateToFilterResult(String categoryId) {
-        // Implement the logic to navigate to the filter_result page
-        // You can use Intent to start the new activity and pass the category ID
-        // Example:
-         Intent intent = new Intent(CategoryPage.this, SearchFilterResults.class);
-         intent.putExtra("CATEGORY_ID", categoryId);
-         startActivity(intent);
+        Intent intent = new Intent(CategoryPage.this, SearchFilterResults.class);
+        intent.putExtra("filter", categoryId);
+        String searchOrder="2";
+        String filterOrder="1";
+        Bundle getData = getIntent().getExtras();
+        if (getData != null) {
+            String search = getData.getString("search");
+            String searchOrderPassed = getData.getString("searchOrder");
+            if(search != null){
+                searchOrder="1";
+                intent.putExtra("search", search);
+                if(searchOrderPassed.equals("1")){
+                    filterOrder="2";
+                    searchOrder="1";
+                }
+            }
+        }
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder", filterOrder);
+        startActivity(intent);
     }
 
 
