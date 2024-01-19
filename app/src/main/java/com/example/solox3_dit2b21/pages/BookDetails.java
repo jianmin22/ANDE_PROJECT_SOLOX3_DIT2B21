@@ -101,7 +101,6 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             adapter = new CommentsAdapter(twoCommentsForBook);
             recyclerView.setAdapter(adapter);
-            bookImage = findViewById(R.id.bookImage);
             bookTitle = findViewById(R.id.bookTitle);
             bookRating = findViewById(R.id.rating);
             bookCategoryButton= findViewById(R.id.categoryButton);
