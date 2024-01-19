@@ -122,11 +122,13 @@ public class CategoryPage extends AppCompatActivity {
                 public void onClick(View v) {
                     // Handle category item click here
                     Bundle getData = getIntent().getExtras();
-                    assert getData != null;
-                    String isFilterExist = getData.getString("filter");
                     String filter = category.getCategoryId();
-                    if(isFilterExist != null){
-                        filter += ","+isFilterExist;
+
+                    if (getData != null) {
+                        String isFilterExist = getData.getString("filter");
+                        if (isFilterExist != null) {
+                            filter += "," + isFilterExist;
+                        }
                     }
                     navigateToFilterResult(filter); // You can pass the category ID or other relevant data
                 }
@@ -158,7 +160,7 @@ public class CategoryPage extends AppCompatActivity {
         }
         intent.putExtra("searchOrder",searchOrder);
         intent.putExtra("filterOrder", filterOrder);
-         startActivity(intent);
+        startActivity(intent);
     }
 
 

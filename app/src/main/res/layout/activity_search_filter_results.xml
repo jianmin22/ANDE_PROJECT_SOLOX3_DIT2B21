@@ -43,15 +43,69 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/filterChipContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backAndSearch">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Filtered: " />
+
+        <!-- This space-filling view will push the ImageView to the end -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:onClick="onClick"/>
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            app:srcCompat="@drawable/filter_icon" />
+    </LinearLayout>
+
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filterChipContainer">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/flexboxLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:alignContent="center"
+            app:flexWrap="wrap">
+
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </ScrollView>
+
     <TextView
         android:id="@+id/resultsFound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
         android:text="Results Found"
-        app:layout_constraintTop_toBottomOf="@id/backAndSearch"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="20dp"/>
-
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView3" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchAndFilterResult"
