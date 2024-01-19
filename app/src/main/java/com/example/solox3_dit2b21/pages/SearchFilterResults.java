@@ -74,20 +74,20 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
                     if (book != null) {
                         if (search != null && filter != null) {
                             if (searchOrder.equals("1") && filterOrder.equals("2")) {
-                                if (book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
                                     bookList.add(book);
                                 }
                             } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
-                                if (matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
                                     bookList.add(book);
                                 }
                             }
                         } else if (search == null && filter != null) {
-                            if (matchesFilter(book.getCategoryId(), filter)) {
+                            if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter)) {
                                 bookList.add(book);
                             }
                         } else if (search != null) {
-                            if (book.getTitle().contains(search)) {
+                            if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search)) {
                                 bookList.add(book);
                             }
                         }

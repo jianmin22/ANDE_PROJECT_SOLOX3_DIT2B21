@@ -123,14 +123,16 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     booksPopular.clear();
 
-                    // Create a list to hold the books with their reads count
                     List<Book> booksWithReads = new ArrayList<>();
 
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         Book book = snapshot.getValue(Book.class);
 
                         if (book != null) {
-                            booksWithReads.add(book);
+                            if (Boolean.parseBoolean(book.getIsPublished())){
+                                booksWithReads.add(book);
+                            }
+
                         }
 
                         Log.d("Firebase", "Books Reference:nnn " + book.getBookId());
@@ -180,7 +182,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                         Book book = snapshot.getValue(Book.class);
 
                         if (book != null) {
-                            booksWithPublishedDate.add(book);
+                            if(Boolean.parseBoolean(book.getIsPublished())){
+                                booksWithPublishedDate.add(book);
+                            }
                         }
 
                         Log.d("Firebase", "Books Reference:nnn " + book.getBookId());
@@ -216,15 +220,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v){
         if(v.getId() == R.id.mainSearchField) {
             Intent intent = new Intent(Home.this, Search.class);
-            startActivity(intent);}
-//        }else if (v.getId()==R.id.categoryBtn){
-//            Intent intent = new Intent(Home.this, CategoryPage.class);
-//            startActivity(intent);
-//        } else if (v.getId()==R.id.profileBtn){
-//            Intent intent = new Intent(Home.this, Reading.class);
-//            startActivity(intent);
-//        }
-
+            startActivity(intent);
+        }
     }
 
 
