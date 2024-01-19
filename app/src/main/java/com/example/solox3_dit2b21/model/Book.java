@@ -15,13 +15,15 @@ public class Book {
     private String lastUpdated;
     private String authorId;
 
+    private String isPublished;
+
     private int numberOfReads;
     public Book() {
     }
 
 
     public Book(String bookId, String title, String description, String categoryId, double rating,
-                String image, String publishedDate, int numberOfReads, String createdDate, String lastUpdated, String authorId) {
+                String image, String publishedDate, int numberOfReads, String createdDate, String lastUpdated, String authorId, String isPublished) {
         this.bookId = bookId;
         this.title = title;
         this.description = description;
@@ -32,6 +34,15 @@ public class Book {
         this.createdDate = createdDate;
         this.lastUpdated = lastUpdated;
         this.authorId=authorId;
+        this.isPublished=isPublished;
+    }
+
+    public String getIsPublished() {
+        return isPublished;
+    }
+
+    public void setIsPublished(String isPublished) {
+        this.isPublished = isPublished;
     }
 
     public String getAuthorId() {
