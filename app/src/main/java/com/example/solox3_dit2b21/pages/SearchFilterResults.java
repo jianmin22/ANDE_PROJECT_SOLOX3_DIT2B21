@@ -6,13 +6,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.Category;
+import com.example.solox3_dit2b21.model.SearchHistory;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,10 +26,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SearchFilterResults extends AppCompatActivity implements View.OnClickListener{
-
+    private ValueEventListener eventListener;
     private RecyclerView recyclerView;
     private SearchFilterResultsAdapter adapter;
     private List<Book> bookList = new ArrayList<>();
@@ -55,6 +62,70 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
             TextView searchHolder = findViewById(R.id.mainSearchField);
             searchHolder.setHint(search);
         }
+        List<String> filterList;
+        if (filter != null) {
+            String[] filters = filter.split(",");
+            filterList = new ArrayList<>(Arrays.asList(filters));
+            FlexboxLayout flexboxLayout = findViewById(R.id.flexboxLayout3);
+
+            for (String filterItem : filterList) {
+                DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(filterItem);
+                View customButtonView = LayoutInflater.from(this).inflate(R.layout.searchhistorybutton, flexboxLayout, false);
+                TextView buttonText = customButtonView.findViewById(R.id.buttonText);
+                ImageView removeIcon = customButtonView.findViewById(R.id.removeIcon);
+
+                // Define layout params for the filter tag
+                FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                        FlexboxLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(10, 10, 10, 10);
+                customButtonView.setLayoutParams(layoutParams);
+
+                // Set click listener for the remove icon, if needed
+                // Set click listener for the remove icon, if needed
+                removeIcon.setOnClickListener(v -> {
+                    // Remove the filter item from the list
+                    filterList.remove(filterItem);
+                    // Remove the customButtonView from the FlexboxLayout
+                    flexboxLayout.removeView(customButtonView);
+                    // Update the filter string by joining the list back into a string
+                    filter = TextUtils.join(",", filterList);
+
+                    // Refresh the search and filter results
+                    fetchAndFilterBooks(search, filter, searchOrder, filterOrder); // Call the method to refresh results
+
+                    // You may also want to update some other UI elements or logic to reflect the filter removal
+                    // ...
+                });
+
+                // Fetch the category name using the category ID
+                categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Check if the dataSnapshot contains data
+                        if (dataSnapshot.exists()) {
+                            // Assuming the category name is stored under a "name" field
+                            Category category = dataSnapshot.getValue(Category.class);
+                            buttonText.setText(category.getCategoryName() != null ? category.getCategoryName() : "Unknown Category");
+                        } else {
+                            buttonText.setText("Unknown Category");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w("TAG", "loadCategory:onCancelled", databaseError.toException());
+                        buttonText.setText("Error");
+                    }
+                });
+
+                // Add the custom layout to the FlexboxLayout
+                flexboxLayout.addView(customButtonView);
+            }
+        } else {
+            filterList = new ArrayList<>();
+        }
+
 
         fetchAndFilterBooks(search, filter, searchOrder, filterOrder);
 
@@ -65,7 +136,9 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
     private void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
 
-        ValueEventListener eventListener = new ValueEventListener() {
+
+        eventListener = new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 bookList.clear();
@@ -144,7 +217,10 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
     public void onClick(View v){
         if(v.getId() == R.id.mainSearchField) {
             navigateToSearch();
-        }else if(v.getId()==R.id.back){
+        }else if(v.getId() == R.id.fillteredIcon){
+            navigateToFilter();
+        }
+        else if(v.getId()==R.id.back){
             finish();
         }
     }
