@@ -1,6 +1,5 @@
 package com.example.solox3_dit2b21.pages;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,17 +30,8 @@ import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.example.solox3_dit2b21.model.Comment;
-import com.example.solox3_dit2b21.model.UserRating;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class AuthorBookDetails extends AppCompatActivity implements View.OnClickListener {
@@ -68,7 +58,7 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
 
 
     private RecyclerView recyclerView;
-    private CommentsAdapter adapter;
+    private CommentAdapter adapter;
 
     private BookDao bookDao = new FirebaseBookDao();
     private CommentDao commentDao = new FirebaseCommentDao();
@@ -90,7 +80,7 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
             bookImage = findViewById(R.id.bookImage);
             recyclerView = findViewById(R.id.recyclerViewLatestComments);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            adapter = new CommentsAdapter(twoCommentsForBook);
+            adapter = new CommentAdapter(twoCommentsForBook);
             recyclerView.setAdapter(adapter);
             bookTitle = findViewById(R.id.bookTitle);
             bookRating = findViewById(R.id.rating);
@@ -194,6 +184,7 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
             @Override
             public void onError(Exception exception) {
                 Log.e("Firebase", "Failed to get user favourite", exception);
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
         });

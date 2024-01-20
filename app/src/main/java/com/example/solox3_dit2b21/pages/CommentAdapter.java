@@ -14,12 +14,12 @@ import com.example.solox3_dit2b21.model.Comment;
 
 import java.util.List;
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentsViewHolder> {
+public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentsViewHolder> {
 
-    private List<Comment> commentsList;
+    private List<Comment> commentList;
 
-    public CommentsAdapter(List<Comment> commentsList) {
-        this.commentsList = commentsList;
+    public CommentAdapter(List<Comment> commentList) {
+        this.commentList = commentList;
     }
 
     @NonNull
@@ -31,11 +31,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @Override
     public void onBindViewHolder(@NonNull CommentsViewHolder holder, int position) {
-        Comment comment = commentsList.get(position);
+        Comment comment = commentList.get(position);
 
         // Set data to views
         holder.usernameTextView.setText(comment.getUserId());
-        holder.commentTextView.setText(comment.getCommentsText());
+        holder.commentTextView.setText(comment.getCommentText());
         // Format and set the timestamp
         String formattedDate = FormatDateUtils.formatDateString(comment.getDate());
         holder.timestampTextView.setText(formattedDate);
@@ -43,7 +43,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     @Override
     public int getItemCount() {
-        return commentsList.size();
+        return commentList.size();
     }
 
     static class CommentsViewHolder extends RecyclerView.ViewHolder {

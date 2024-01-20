@@ -23,7 +23,7 @@ import java.util.List;
 public class AllComments extends AppCompatActivity {
     private String bookId;
     private RecyclerView recyclerView;
-    private CommentsAdapter adapter;
+    private CommentAdapter adapter;
     private List<Comment> allComments = new ArrayList<>();
 
     @Override
@@ -34,7 +34,7 @@ public class AllComments extends AppCompatActivity {
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recycler_view_all_comments);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new CommentsAdapter(allComments);
+        adapter = new CommentAdapter(allComments);
         recyclerView.setAdapter(adapter);
 
         // Retrieve comments from Firebase

@@ -96,5 +96,57 @@ public class FirebaseBookDao implements BookDao {
             }
         });
     }
+    @Override
+    public void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Book> bookList = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+                    if (book != null) {
+                        if (search != null && filter != null) {
+                            if (searchOrder.equals("1") && filterOrder.equals("2")) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
+                                    bookList.add(book);
+                                }
+                            } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
+                                    bookList.add(book);
+                                }
+                            }
+                        } else if (search == null && filter != null) {
+                            if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter)) {
+                                bookList.add(book);
+                            }
+                        } else if (search != null) {
+                            if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search)) {
+                                bookList.add(book);
+                            }
+                        }
+
+                    }
+                }
+                callback.onDataReceived(bookList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    private boolean matchesFilter(String categoryId, String filter) {
+        String[] filters = filter.split(",");
+        for (String f : filters) {
+            if (categoryId.equals(f.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
 

@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.CategoryDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
@@ -26,13 +29,13 @@ import java.util.List;
 import com.google.firebase.storage.FirebaseStorage;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;
-    private FirebaseStorage storage;
+    private CategoryDao categoryDao = new FirebaseCategoryDao();
+
 
     private MyRecyclerViewItemClickListener mItemClickListener;
     public HomeAdapter(List<Book> allBooks, MyRecyclerViewItemClickListener itemClickListener) {
         this.allBooks = allBooks;
         this.mItemClickListener = itemClickListener;
-        storage = FirebaseStorage.getInstance();
     }
 
     @Override
@@ -49,30 +52,26 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         });
         return viewHolder;
     }
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Book book = allBooks.get(position);
         holder.bookTitle.setText(book.getTitle());
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
-        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Category category = dataSnapshot.getValue(Category.class);
-                    if (category != null) {
-                        holder.category.setText(category.getCategoryName());
-                        Log.d("Firebase", "Category Reference: " + category.getCategoryId());
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error fetching category data", databaseError.toException());
-            }
-        });
         LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookId.setText(book.getBookId());
+
+        categoryDao.loadBookCategory(book.getCategoryId(), new DataCallback<Category>() {
+            @Override
+            public void onDataReceived(Category category) {
+                if (category != null) {
+                    holder.category.setText(category.getCategoryName());
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Error fetching category data", exception);
+            }
+        });
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.example.solox3_dit2b21.pages;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +20,7 @@ import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.CategoryDao;
 import com.example.solox3_dit2b21.dao.CommentDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.UserFavouriteBookDao;
 import com.example.solox3_dit2b21.dao.UserRatingDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
@@ -34,21 +34,12 @@ import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.example.solox3_dit2b21.model.UserRating;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.OnFailureListener;
 
 
 public class BookDetails extends AppCompatActivity implements View.OnClickListener {
@@ -86,7 +77,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     EditText addCommentsInputField;
 
     private RecyclerView recyclerView;
-    private CommentsAdapter adapter;
+    private CommentAdapter adapter;
 
     private boolean addedToFavourite=false;
     private boolean rated=false;
@@ -114,7 +105,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             bookImage = findViewById(R.id.bookImage);
             recyclerView = findViewById(R.id.recyclerViewLatestComments);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            adapter = new CommentsAdapter(twoCommentsForBook);
+            adapter = new CommentAdapter(twoCommentsForBook);
             recyclerView.setAdapter(adapter);
             bookTitle = findViewById(R.id.bookTitle);
             bookRating = findViewById(R.id.rating);
@@ -184,7 +175,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onDataReceived(Double rating) {
                 calculatedUserRating = rating;
-                bookRating.setText(String.valueOf(calculatedUserRating));
+                bookRating.setText(String.format("%.1f", calculatedUserRating));
             }
 
             @Override
@@ -227,72 +218,43 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onError(Exception exception) {
                 Log.e("Firebase", "Failed to get user favourite", exception);
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
     }
 
     private void deleteUserFavourite() {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
-
-        Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
-        deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userFavouriteBookDao.deleteUserFavourite(bookId, userId, new DataStatusCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
-
-                    if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
-                        snapshot.getRef().removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                addedToFavourite = false;
-                                addToFavouriteStarImage.setImageResource(R.drawable.starnocolor);
-                                loadUserFavourite(bookId);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("Firebase", "Failed to delete user favourite", e);
-                                // Handle the failure case here
-                            }
-                        });
-                        break;
-                    }
-                }
+            public void onSuccess() {
+                addedToFavourite = false;
+                addToFavouriteStarImage.setImageResource(R.drawable.starnocolor);
+                loadUserFavourite(bookId);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to delete user favourite", databaseError.toException());
+            public void onFailure(Exception exception) {
+                Log.e("Firebase", "Failed to delete user favourite", exception);
             }
         });
     }
 
-
-
     private void insertUserFavourite() {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         UserFavouriteBook userFavouriteBook = new UserFavouriteBook(userId, bookId);
+        userFavouriteBookDao.insertUserFavourite(userFavouriteBook, new DataStatusCallback() {
+            @Override
+            public void onSuccess() {
+                addedToFavourite = true;
+                addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                loadUserFavourite(bookId);
+            }
 
-        // Insert the new UserFavouriteBook into the database
-        userFavouriteRef.push().setValue(userFavouriteBook)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Successfully added to the database
-                        addedToFavourite = true;
-                        addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
-                        loadUserFavourite(bookId);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Failed to add to the database
-                        Log.e("Firebase", "Failed to insert user favourite", e);
-                    }
-                });
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e("Firebase", "Failed to insert user favourite", exception);
+            }
+        });
     }
 
 
@@ -317,108 +279,60 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
         }
     }
-
     private void deleteRating() {
-        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
-        Query deleteQuery = userRatingRef.orderByChild("bookId").equalTo(bookId);
-        deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRatingDao.deleteUserRating(bookId, userId, new DataStatusCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    UserRating userRating = snapshot.getValue(UserRating.class);
-                    if (userRating != null && userRating.getUserId().equals(userId)) {
-                        snapshot.getRef().removeValue();
-                        rated = false;
-                        if(rateGiveByCurrentUser==1){
-                            sadEmojiImage.setImageResource(R.drawable.sadnocolor);
-                            loadUserRating(bookId);
-                        }else if(rateGiveByCurrentUser==3){
-                            neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
-                            loadUserRating(bookId);
-                        }else{
-                            happyEmojiImage.setImageResource(R.drawable.happynocolor);
-                            loadUserRating(bookId);
-                        }
-                        rateGiveByCurrentUser = 0.0;
-                        break;
-                    }
-                }
+            public void onSuccess() {
+                rated = false;
+                resetEmojiImages();
+                rateGiveByCurrentUser = 0.0;
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to delete user rating", databaseError.toException());
+            public void onFailure(Exception exception) {
+                Log.e("Firebase", "Failed to delete user rating", exception);
             }
         });
     }
 
-
     private void updateRating(double newRating) {
-        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
-
-        // Find the rating entry with the userId and bookId and update it
-        Query updateQuery = userRatingRef.orderByChild("bookId").equalTo(bookId);
-        updateQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRatingDao.updateUserRating(bookId, userId, newRating, new DataStatusCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    UserRating userRating = snapshot.getValue(UserRating.class);
-                    if (userRating != null && userRating.getUserId().equals(userId) ) {
-                        snapshot.getRef().child("rating").setValue(newRating);
-                        if(rateGiveByCurrentUser==1){
-                            sadEmojiImage.setImageResource(R.drawable.sadnocolor);
-                            loadUserRating(bookId);
-                        }else if(rateGiveByCurrentUser==3){
-                            neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
-                            loadUserRating(bookId);
-                        }else{
-                            happyEmojiImage.setImageResource(R.drawable.happynocolor);
-                            loadUserRating(bookId);
-                        }
-                        rateGiveByCurrentUser = newRating;
-                        if(rateGiveByCurrentUser==1){
-                            sadEmojiImage.setImageResource(R.drawable.sadyellow);
-                            loadUserRating(bookId);
-                        }else if(rateGiveByCurrentUser==3){
-                            neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
-                            loadUserRating(bookId);
-                        }else{
-                            happyEmojiImage.setImageResource(R.drawable.happyyellow);
-                            loadUserRating(bookId);
-                        }
-                        break;
-                    }
-                }
+            public void onSuccess() {
+                resetEmojiImages();
+                rateGiveByCurrentUser = newRating;
+                updateEmojiImage(newRating);
+                loadUserRating(bookId);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to update user rating", databaseError.toException());
+            public void onFailure(Exception exception) {
+                Log.e("Firebase", "Failed to update user rating", exception);
             }
         });
     }
 
     private void insertRating(double newRating) {
         String currentDateTime = CurrentDateUtils.getCurrentDateTime();
-        DatabaseReference userRatingRef = FirebaseDatabase.getInstance().getReference("UserRating");
-        UserRating userRating = new UserRating(generateUUID(),newRating,currentDateTime,bookId,userId);
-        userRatingRef.push().setValue(userRating)
-                .addOnSuccessListener(aVoid -> {
-                    rated = true;
-                    rateGiveByCurrentUser = newRating;
-                    if(rateGiveByCurrentUser==1){
-                        sadEmojiImage.setImageResource(R.drawable.sadyellow);
-                        loadUserRating(bookId);
-                    }else if(rateGiveByCurrentUser==3){
-                        neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
-                        loadUserRating(bookId);
-                    }else{
-                        happyEmojiImage.setImageResource(R.drawable.happyyellow);
-                        loadUserRating(bookId);
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firebase", "Failed to insert user rating", e));
+        UserRating userRating = new UserRating(generateUUID(), newRating, currentDateTime, bookId, userId);
+
+        userRatingDao.insertUserRating(userRating, new DataStatusCallback() {
+            @Override
+            public void onSuccess() {
+                rated = true;
+                rateGiveByCurrentUser = newRating;
+                updateEmojiImage(rateGiveByCurrentUser);
+                loadUserRating(bookId);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Log.e("Firebase", "Failed to insert user rating", exception);
+            }
+        });
     }
+
+
 
     private void addComment() {
         String commentText = addCommentsInputField.getText().toString().trim();
@@ -431,21 +345,43 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
         Comment newComment = new Comment(commentId, bookId, commentText, userId, currentDate);
 
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
-        commentsRef.child(commentId).setValue(newComment)
-                .addOnSuccessListener(aVoid -> {
-                    addCommentsInputField.setText("");
-                    loadComments(bookId);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(BookDetails.this, "Failed to add comment, Try again later", Toast.LENGTH_SHORT).show();
-                });
+        commentDao.addComment(newComment, new DataStatusCallback() {
+            @Override
+            public void onSuccess() {
+                addCommentsInputField.setText("");
+                loadComments(bookId);
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                Toast.makeText(BookDetails.this, "Failed to add comment, Try again later", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
     private String generateUUID() {
-        // Generate a unique searchHistoryId using UUID
         return UUID.randomUUID().toString();
+    }
+
+    private void resetEmojiImages() {
+        sadEmojiImage.setImageResource(R.drawable.sadnocolor);
+        neutralEmojiImage.setImageResource(R.drawable.neutralnocolor);
+        happyEmojiImage.setImageResource(R.drawable.happynocolor);
+    }
+
+    private void updateEmojiImage(double rating) {
+        switch ((int)rating) {
+            case 1:
+                sadEmojiImage.setImageResource(R.drawable.sadyellow);
+                break;
+            case 3:
+                neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
+                break;
+            default:
+                happyEmojiImage.setImageResource(R.drawable.happyyellow);
+                break;
+        }
     }
 
     @Override
