@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
-import com.bumptech.glide.Glide;
+
 import com.google.firebase.storage.FirebaseStorage;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Book> allBooks;
@@ -70,7 +71,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 Log.e("Firebase", "Error fetching category data", databaseError.toException());
             }
         });
-        loadBookImage(book.getImage(), holder.bookImage);
+        LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookId.setText(book.getBookId());
     }
 
@@ -98,12 +99,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     //RecyclerView Click Listener
     public interface MyRecyclerViewItemClickListener {
         void onItemClicked(Book book);
-    }
-    private void loadBookImage(String imageUrl, ImageView imageView) {
-        // Load image into ImageView using Glide
-        Glide.with(imageView.getContext())
-                .load(imageUrl)
-                .into(imageView);
     }
 
 

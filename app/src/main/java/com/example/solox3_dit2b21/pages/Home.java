@@ -3,23 +3,20 @@ package com.example.solox3_dit2b21.pages;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
@@ -30,6 +27,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     HomeAdapter adapter2;
     private List<Book> booksPopular = new ArrayList<>();
     private List<Book> booksLatest = new ArrayList<>();
+
+    private FirebaseBookDao bookDao = new FirebaseBookDao();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +41,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
+
                 // Navigate to Bookshelf activity
                 // Replace CategoryPage.class with the correct Activity class for Bookshelf
                 // if (this is not instance of BookshelfActivity) {
@@ -111,109 +111,40 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+
+
     private void bindDataForPopular() {
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        bookDao.getPopularBooks(new DataCallback<List<Book>>() {
+            @Override
+            public void onDataReceived(List<Book> books) {
+                booksPopular.clear();
+                booksPopular.addAll(books);
+                adapter1.notifyDataSetChanged();
+            }
 
-        try {
-            DatabaseReference ref = database.getReference("Book");
-
-            Log.d("Firebase", "Books Reference: " + ref.toString());
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    booksPopular.clear();
-
-                    List<Book> booksWithReads = new ArrayList<>();
-
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Book book = snapshot.getValue(Book.class);
-
-                        if (book != null) {
-                            if (Boolean.parseBoolean(book.getIsPublished())){
-                                booksWithReads.add(book);
-                            }
-
-                        }
-
-                        Log.d("Firebase", "Books Reference:nnn " + book.getBookId());
-                    }
-
-                    // Sort the list based on reads in descending order
-                    Collections.sort(booksWithReads, new Comparator<Book>() {
-                        @Override
-                        public int compare(Book book1, Book book2) {
-                            return Integer.compare(book2.getNumberOfReads(), book1.getNumberOfReads());
-                        }
-                    });
-
-                    // Display only the top 5 books
-                    for (int i = 0; i < Math.min(5, booksWithReads.size()); i++) {
-                        booksPopular.add(booksWithReads.get(i));
-                    }
-
-                    adapter1.notifyDataSetChanged();
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForPopular", "Error fetching popular books", exception);
+                Toast.makeText(Home.this, "Error fetching popular data.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void bindDataForLatest() {
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        bookDao.getLatestBooks(new DataCallback<List<Book>>() {
+            @Override
+            public void onDataReceived(List<Book> books) {
+                booksLatest.clear();
+                booksLatest.addAll(books);
+                adapter2.notifyDataSetChanged();
+            }
 
-        try {
-            DatabaseReference ref = database.getReference("Book");
-
-            Log.d("Firebase", "Books Reference: " + ref.toString());
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    booksLatest.clear();
-
-                    // Create a list to hold the books with their published date
-                    List<Book> booksWithPublishedDate = new ArrayList<>();
-
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Book book = snapshot.getValue(Book.class);
-
-                        if (book != null) {
-                            if(Boolean.parseBoolean(book.getIsPublished())){
-                                booksWithPublishedDate.add(book);
-                            }
-                        }
-
-                        Log.d("Firebase", "Books Reference:nnn " + book.getBookId());
-                    }
-
-                    // Sort the list based on published date in descending order
-                    Collections.sort(booksWithPublishedDate, new Comparator<Book>() {
-                        @Override
-                        public int compare(Book book1, Book book2) {
-                            return book2.getPublishedDate().compareTo(book1.getPublishedDate());
-                        }
-                    });
-
-                    // Display only the latest 5 books
-                    for (int i = 0; i < Math.min(5, booksWithPublishedDate.size()); i++) {
-                        booksLatest.add(booksWithPublishedDate.get(i));
-                    }
-
-                    adapter2.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForLatest", "Error fetching latest books", exception);
+                Toast.makeText(Home.this, "Error fetching latest books.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

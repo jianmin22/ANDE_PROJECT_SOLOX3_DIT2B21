@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
@@ -51,7 +52,7 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.bookTitle.setText(book.getTitle());
-        loadBookImage(book.getImage(), holder.bookImage);
+        LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookAuthor.setText(book.getAuthorId());
         holder.bookDescription.setText(book.getDescription());
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
@@ -104,10 +105,4 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
         }
     }
 
-    private void loadBookImage(String imageUrl, ImageView imageView) {
-        // Load image into ImageView using Glide
-        Glide.with(imageView.getContext())
-                .load(imageUrl)
-                .into(imageView);
-    }
 }

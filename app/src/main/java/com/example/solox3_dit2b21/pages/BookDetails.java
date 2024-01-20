@@ -15,8 +15,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.BookDao;
+import com.example.solox3_dit2b21.dao.CategoryDao;
+import com.example.solox3_dit2b21.dao.CommentDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.UserFavouriteBookDao;
+import com.example.solox3_dit2b21.dao.UserRatingDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserFavouriteBookDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.example.solox3_dit2b21.model.Comment;
@@ -30,13 +41,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -84,6 +92,13 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private boolean rated=false;
     private double rateGiveByCurrentUser=0.0;
 
+    private BookDao bookDao = new FirebaseBookDao();
+    private CommentDao commentDao = new FirebaseCommentDao();
+    private UserRatingDao userRatingDao = new FirebaseUserRatingDao();
+
+    private CategoryDao categoryDao = new FirebaseCategoryDao();
+    private UserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
+
 
 
     @Override
@@ -115,15 +130,12 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             currentUserName=findViewById(R.id.currentUserName);
             addCommentsInputField=findViewById(R.id.addCommentsInputField);
 
-            DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("Book").child(bookId);
-
-            bookRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            bookDao.loadBookDetailsById(bookId, new DataCallback<Book>() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-
-                        bookDetails = dataSnapshot.getValue(Book.class);
-                        loadBookImage(bookDetails.getImage(), bookImage);
+                public void onDataReceived(Book returnedBookDetails) {
+                    if (returnedBookDetails!=null) {
+                        bookDetails = returnedBookDetails;
+                        LoadImageURL.loadImageURL(bookDetails.getImage(),bookImage);
                         bookTitle.setText(bookDetails.getTitle());
                         descriptionContent.setText(bookDetails.getDescription());
                         loadCategory(bookDetails.getCategoryId());
@@ -133,15 +145,15 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
                         loadUserFavourite(bookId);
                     } else {
-                        Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("Firebase", "Failed to get book details", databaseError.toException());
+                public void onError(Exception exception) {
                     Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                    Log.e("Firebase", "Failed to get book details", exception);
                     finish();
                 }
             });
@@ -150,41 +162,17 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
 
     private void loadComments(String bookId) {
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
-        Query commentsQuery = commentsRef.orderByChild("bookId").equalTo(bookId);
-
-        commentsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        commentDao.loadLatest2Comments(bookId, new DataCallback<List<Comment>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot commentSnapshot) {
-                if (commentSnapshot.exists()) {
-                    List<Comment> commentsList = new ArrayList<>();
-
-                    for (DataSnapshot commentData : commentSnapshot.getChildren()) {
-                        Comment comment = commentData.getValue(Comment.class);
-                        Log.d("comment",comment.getCommentsId());
-                        commentsList.add(comment);
-                    }
-
-                    Collections.sort(commentsList, new Comparator<Comment>() {
-                        @Override
-                        public int compare(Comment c1, Comment c2) {
-                            return c2.getDate().compareTo(c1.getDate());
-                        }
-                    });
-
-                    twoCommentsForBook.clear();
-                    int count = Math.min(commentsList.size(), 2);
-                    for (int i = 0; i < count; i++) {
-                        twoCommentsForBook.add(commentsList.get(i));
-                    }
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Log.d("NOT FOUND", "No comments found for the book");
-                }
+            public void onDataReceived(List<Comment> comments) {
+                twoCommentsForBook.clear();
+                twoCommentsForBook.addAll(comments);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onError(Exception exception) {
+                Log.e("loadComments", "Failed to get comments", exception);
                 Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -192,74 +180,36 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void loadUserRating(String bookId) {
-        DatabaseReference userRating = FirebaseDatabase.getInstance().getReference("UserRating");
-        Query userRatingQuery = userRating.orderByChild("bookId").equalTo(bookId);
-
-        userRatingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRatingDao.loadUserRatingForBook(bookId, new DataCallback<Double>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot userRatingSnapshot) {
-                if (userRatingSnapshot.exists()) {
-                    double sumOfRating=0;
-                    int countOfRating=0;
-                    for (DataSnapshot userRating : userRatingSnapshot.getChildren()) {
-                        UserRating userRatingValue = userRating.getValue(UserRating.class);
-                        if(userRatingValue.getUserId().equals(userId)){
-                            rated=true;
-                            rateGiveByCurrentUser=userRatingValue.getRating();
-                            if(rateGiveByCurrentUser==1){
-                                sadEmojiImage.setImageResource(R.drawable.sadyellow);
-                            }else if(rateGiveByCurrentUser==3){
-                                neutralEmojiImage.setImageResource(R.drawable.neutralyellow);
-                            }else if(rateGiveByCurrentUser==5){
-                                happyEmojiImage.setImageResource(R.drawable.happyyellow);
-                            }else {
-                                rated=false;
-                                rateGiveByCurrentUser=0;
-                            }
-                        }
-                        countOfRating+=1;
-                        sumOfRating+=userRatingValue.getRating();
-                    }
-                    if (countOfRating > 0) {
-                        calculatedUserRating = sumOfRating / countOfRating;
-                    } else {
-                        // No ratings available
-                        calculatedUserRating = 0;
-                    }
-
-                    bookRating.setText(String.valueOf(calculatedUserRating));
-                } else {
-                    Log.d("NOT FOUND", "No user Rating found for the book");
-                }
+            public void onDataReceived(Double rating) {
+                calculatedUserRating = rating;
+                bookRating.setText(String.valueOf(calculatedUserRating));
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to get user rating", databaseError.toException());
+            public void onError(Exception exception) {
+                Log.e("loadUserRating", "Failed to get user rating", exception);
                 Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
     }
-
     private void loadCategory(String categoryId) {
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(categoryId);
-        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        categoryDao.loadBookCategory(categoryId, new DataCallback<Category>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Category category = dataSnapshot.getValue(Category.class);
-                    if (category != null) {
-                        bookCategory=category;
-                        bookCategoryButton.setText(category.getCategoryName());
-                    }
-                }else {
+            public void onDataReceived(Category category) {
+                if (category != null) {
+                    bookCategory = category;
+                    bookCategoryButton.setText(category.getCategoryName());
+                } else {
                     Log.d("NOT FOUND", "No Category found for the book");
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error fetching category data", databaseError.toException());
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Error fetching category data", exception);
                 Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -267,33 +217,16 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void loadUserFavourite(String bookId) {
-        DatabaseReference userFavourite = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
-        Query userFavouriteQuery = userFavourite.orderByChild("bookId").equalTo(bookId);
-        userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        userFavouriteBookDao.loadNumberOfUserFavouriteBook(bookId, new DataCallback<Integer>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot userFavouriteSnapshot) {
-                if (userFavouriteSnapshot.exists()) {
-                    noOfUserFavouriteBook = (int) userFavouriteSnapshot.getChildrenCount();
-                    addToFavouriteText.setText(String.valueOf(noOfUserFavouriteBook));
-                    for (DataSnapshot snapshot : userFavouriteSnapshot.getChildren()) {
-                        UserFavouriteBook userFavourite = snapshot.getValue(UserFavouriteBook.class);
-                        if (userFavourite != null && userId.equals(userFavourite.getUserId())) {
-                            addedToFavourite = true;
-                            addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
-                            break;
-                        }
-                    }
-                } else {
-                    noOfUserFavouriteBook = 0;
-                    Log.d("NOT FOUND", "No user favourite found for the book");
-                }
+            public void onDataReceived(Integer count) {
+                noOfUserFavouriteBook = count;
+                addToFavouriteText.setText(String.valueOf(noOfUserFavouriteBook));
             }
 
-
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Failed to get user favourite", databaseError.toException());
-                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Failed to get user favourite", exception);
                 finish();
             }
         });
@@ -509,14 +442,6 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 });
     }
 
-
-
-    private void loadBookImage(String imageUrl, ImageView imageView) {
-        // Load image into ImageView using Glide
-        Glide.with(imageView.getContext())
-                .load(imageUrl)
-                .into(imageView);
-    }
 
     private String generateUUID() {
         // Generate a unique searchHistoryId using UUID

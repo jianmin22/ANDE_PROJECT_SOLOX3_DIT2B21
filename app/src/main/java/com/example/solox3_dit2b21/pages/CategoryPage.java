@@ -11,8 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import com.bumptech.glide.Glide;
+
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
@@ -102,7 +103,7 @@ public class CategoryPage extends AppCompatActivity {
             TextView categoryNameTextView = categoryItemView.findViewById(R.id.CategoryNameTextView);
 
             categoryNameTextView.setText(category.getCategoryName());
-            loadCategoryImage(category.getCategoryImageUrl(), categoryImage);
+            LoadImageURL.loadImageURL(category.getCategoryImageUrl(), categoryImage);
             Log.d(category.getCategoryImageUrl(), "displayCategories: ");
             // Set margins for categoryItemView
             GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
@@ -163,10 +164,4 @@ public class CategoryPage extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-    private void loadCategoryImage(String imageUrl, ImageView imageView) {
-        Glide.with(imageView.getContext())
-                .load(imageUrl)
-                .into(imageView);
-    }
 }
