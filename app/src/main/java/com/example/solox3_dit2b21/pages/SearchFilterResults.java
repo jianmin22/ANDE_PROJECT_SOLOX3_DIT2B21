@@ -15,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.dao.BookDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.example.solox3_dit2b21.model.SearchHistory;
@@ -38,7 +41,7 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
     private String filter;
     private String searchOrder;
     private String filterOrder;
-
+    private BookDao bookDao = new FirebaseBookDao();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,53 +136,24 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
         recyclerView.setAdapter(adapter);
     }
 
+
     private void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
-
-
-        eventListener = new ValueEventListener() {
-
+        bookDao.fetchAndFilterBooks(search, filter, searchOrder, filterOrder, new DataCallback<List<Book>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataReceived(List<Book> books) {
                 bookList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Book book = snapshot.getValue(Book.class);
-                    if (book != null) {
-                        if (search != null && filter != null) {
-                            if (searchOrder.equals("1") && filterOrder.equals("2")) {
-                                if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
-                                    bookList.add(book);
-                                }
-                            } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
-                                if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
-                                    bookList.add(book);
-                                }
-                            }
-                        } else if (search == null && filter != null) {
-                            if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter)) {
-                                bookList.add(book);
-                            }
-                        } else if (search != null) {
-                            if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search)) {
-                                bookList.add(book);
-                            }
-                        }
-
-                    }
-                }
+                bookList.addAll(books);
                 TextView resultsFoundView = findViewById(R.id.resultsFound);
                 resultsFoundView.setText(bookList.size() + " Results Found");
                 adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onError(Exception exception) {
                 Toast.makeText(SearchFilterResults.this, "Error fetching data", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        };
-
-        databaseReference.addListenerForSingleValueEvent(eventListener);
+        });
     }
 
     private void navigateToSearch(){
@@ -201,16 +175,6 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
         intent.putExtra("searchOrder",searchOrder);
         intent.putExtra("filterOrder",filterOrder);
         startActivity(intent);
-    }
-
-    private boolean matchesFilter(String categoryId, String filter) {
-        String[] filters = filter.split(",");
-        for (String f : filters) {
-            if (categoryId.equals(f.trim())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

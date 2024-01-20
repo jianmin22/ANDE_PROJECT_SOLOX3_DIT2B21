@@ -1,28 +1,28 @@
 package com.example.solox3_dit2b21.model;
 
 public class Comment {
-    private String commentsId;
+    private String commentId;
     private String bookId;
-    private String commentsText;
+    private String commentText;
     private String userId;
     private String date;
     public Comment(){
 
     }
-    public Comment(String commentsId, String bookId, String commentsText, String userId, String date) {
-        this.commentsId = commentsId;
+    public Comment(String commentId, String bookId, String commentText, String userId, String date) {
+        this.commentId = commentId;
         this.bookId = bookId;
-        this.commentsText = commentsText;
+        this.commentText = commentText;
         this.userId = userId;
         this.date = date;
     }
 
-    public String getCommentsId() {
-        return commentsId;
+    public String getCommentId() {
+        return commentId;
     }
 
-    public void setCommentsId(String commentsId) {
-        this.commentsId = commentsId;
+    public void setCommentId(String commentsId) {
+        this.commentId = commentsId;
     }
 
     public String getBookId() {
@@ -33,12 +33,12 @@ public class Comment {
         this.bookId = bookId;
     }
 
-    public String getCommentsText() {
-        return commentsText;
+    public String getCommentText() {
+        return commentText;
     }
 
-    public void setCommentsText(String commentsText) {
-        this.commentsText = commentsText;
+    public void setCommentText(String commentsText) {
+        this.commentText = commentsText;
     }
 
     public String getUserId() {

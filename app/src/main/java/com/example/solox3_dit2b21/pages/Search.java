@@ -9,11 +9,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.dao.SearchHistoryDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseSearchHistoryDao;
 import com.example.solox3_dit2b21.model.SearchHistory;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -37,13 +42,14 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     private FlexboxLayout flexboxLayout;
     private EditText mainSearchField;
     private String userId = "user1";
+
+    private SearchHistoryDao searchHistoryDao = new FirebaseSearchHistoryDao();
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        // Initialize your FlexboxLayout
         flexboxLayout = findViewById(R.id.flexboxLayout3);
         mainSearchField = findViewById(R.id.mainSearchField);
 
@@ -58,140 +64,83 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
-        try {
-            DatabaseReference ref = database.getReference("SearchHistory");
-            Query searchHistoryQuery = ref.orderByChild("userId").equalTo(userId);
+        loadSearchHistory();
+    }
 
-            searchHistoryQuery.addValueEventListener(new ValueEventListener() {
+    private void loadSearchHistory() {
+        searchHistoryDao.getUserSearchHistory(userId, new DataCallback<List<SearchHistory>>() {
+            @Override
+            public void onDataReceived(List<SearchHistory> searchHistoryList) {
+                displaySearchHistory(searchHistoryList);
+            }
+            @Override
+            public void onError(Exception exception) {
+                Toast.makeText(Search.this, "Error loading search history.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void displaySearchHistory(List<SearchHistory> searchHistoryList) {
+        flexboxLayout.removeAllViews();
+        Collections.sort(searchHistoryList, (o1, o2) -> o2.getLastSearch().compareTo(o1.getLastSearch()));
+
+        for (SearchHistory item : searchHistoryList) {
+            View customButtonView = LayoutInflater.from(this).inflate(R.layout.searchhistorybutton, null);
+            TextView buttonText = customButtonView.findViewById(R.id.buttonText);
+            ImageView removeIcon = customButtonView.findViewById(R.id.removeIcon);
+
+            buttonText.setTag(item.getSearchId());
+            removeIcon.setTag(item.getSearchId());
+            buttonText.setText(item.getSearch());
+            FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
+                    FlexboxLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(10, 10, 10, 10);
+            customButtonView.setLayoutParams(layoutParams);
+
+            flexboxLayout.addView(customButtonView);
+        }
+    }
+
+    private void insertOrUpdateSearchHistory(String search) {
+        if (!search.isEmpty()) {
+            searchHistoryDao.insertOrUpdateSearchHistory(userId, search, new DataStatusCallback() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Clear existing buttons
-                    flexboxLayout.removeAllViews();
-
-                    // Iterate through the search history data
-                    List<SearchHistory> searchHistoryList = new ArrayList<>();
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        SearchHistory searchHistoryItem = snapshot.getValue(SearchHistory.class);
-                        searchHistoryList.add(searchHistoryItem);
-                    }
-
-                    // Sort the search history by date (latest to oldest)
-                    Collections.sort(searchHistoryList, new Comparator<SearchHistory>() {
-                        @Override
-                        public int compare(SearchHistory o1, SearchHistory o2) {
-                            // Assuming the date is in ISO 8601 format
-                            return o2.getLastSearch().compareTo(o1.getLastSearch());
-                        }
-                    });
-
-                    for (SearchHistory item : searchHistoryList) {
-                        View customButtonView = LayoutInflater.from(Search.this).inflate(R.layout.searchhistorybutton, null);
-                        TextView buttonText = customButtonView.findViewById(R.id.buttonText);
-                        ImageView removeIcon = customButtonView.findViewById(R.id.removeIcon);
-
-                        buttonText.setTag(item.getSearchId());
-                        removeIcon.setTag(item.getSearchId());
-                        buttonText.setText(item.getSearch());
-                        FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
-                                FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                                FlexboxLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(10, 10, 10, 10);
-                        customButtonView.setLayoutParams(layoutParams);
-
-                        // Add the button to FlexboxLayout
-                        flexboxLayout.addView(customButtonView);
-                    }
-
+                public void onSuccess() {
+                    navigateToSearchFilterResults(search);
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Handle errors
+                public void onFailure(Exception exception) {
+                    Log.e("SearchActivity", "Failed to insert or update search history", exception);
                 }
             });
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
-    private void insertOrUpdateSearchHistory(String search) {
-        try {
-            if (search.length() != 0) {
-                final String userId = "user1";
-                DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
-                Query searchQuery = searchHistoryRef.orderByChild("search").equalTo(search);
 
-                searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String currentDateTime = CurrentDateUtils.getCurrentDateTime();
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                String searchId = snapshot.getKey();
-                                updateLastSearch(searchId, currentDateTime);
-                            }
-                        } else {
-                            String searchHistoryId = generateUUID();
-                            insertNewSearchHistory(searchHistoryId, userId, search, currentDateTime);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d("NOT FOUND", "Insert or update search history failed");
-                    }
-                });
-                Intent intent = new Intent(Search.this, SearchFilterResults.class);
-                intent.putExtra("search", search);
-                String searchOrder="1";
-                String filterOrder="2";
-                Bundle getData = getIntent().getExtras();
-                if (getData != null) {
-                    String filter = getData.getString("filter");
-                    String filterOrderPassed = getData.getString("filterOrder");
-                    if(filter != null){
-                        intent.putExtra("filter", filter);
-                        if(filterOrderPassed.equals("1")){
-                            filterOrder="1";
-                            searchOrder="2";
-                        }
-                    }
+    private void navigateToSearchFilterResults(String search) {
+        Intent intent = new Intent(Search.this, SearchFilterResults.class);
+        intent.putExtra("search", search);
+        String searchOrder="1";
+        String filterOrder="2";
+        Bundle getData = getIntent().getExtras();
+        if (getData != null) {
+            String filter = getData.getString("filter");
+            String filterOrderPassed = getData.getString("filterOrder");
+            if(filter != null){
+                intent.putExtra("filter", filter);
+                if(filterOrderPassed.equals("1")){
+                    filterOrder="1";
+                    searchOrder="2";
                 }
-                intent.putExtra("searchOrder",searchOrder);
-                intent.putExtra("filterOrder", filterOrder);
-                mainSearchField.setText("");
-                startActivity(intent);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder", filterOrder);
+        mainSearchField.setText("");
+        startActivity(intent);
     }
 
-
-    private void updateLastSearch(String searchId, String lastSearch) {
-        try {
-            DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory").child(searchId);
-            searchHistoryRef.child("lastSearch").setValue(lastSearch);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void insertNewSearchHistory(String searchHistoryId, String userId, String search, String lastSearch) {
-        try {
-            DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
-
-            SearchHistory searchHistoryItem = new SearchHistory(searchHistoryId, userId, search, lastSearch);
-
-            searchHistoryRef.child(searchHistoryId).setValue(searchHistoryItem);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String generateUUID() {
-        // Generate a unique searchHistoryId using UUID
-        return UUID.randomUUID().toString();
-    }
     @Override
     public void onClick(View v){
         if(v.getId() == R.id.searchButton) {
