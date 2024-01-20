@@ -316,7 +316,6 @@
                 android:maxWidth="15dp"
                 android:maxHeight="15dp"/>
 
-
             <ImageButton
                 android:id="@+id/action_insert_checkbox"
                 android:layout_width="40dp"
