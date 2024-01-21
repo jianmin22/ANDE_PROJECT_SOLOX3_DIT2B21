@@ -95,7 +95,7 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
                     filter = TextUtils.join(",", filterList);
 
                     // Refresh the search and filter results
-                    fetchAndFilterBooks(search, filter, searchOrder, filterOrder); // Call the method to refresh results
+                    fetchSearchAndFilterBooks(search, filter, searchOrder, filterOrder); // Call the method to refresh results
 
                     // You may also want to update some other UI elements or logic to reflect the filter removal
                     // ...
@@ -130,15 +130,15 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
         }
 
 
-        fetchAndFilterBooks(search, filter, searchOrder, filterOrder);
+        fetchSearchAndFilterBooks(search, filter, searchOrder, filterOrder);
 
         adapter = new SearchFilterResultsAdapter(this, bookList);
         recyclerView.setAdapter(adapter);
     }
 
 
-    private void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
-        bookDao.fetchAndFilterBooks(search, filter, searchOrder, filterOrder, new DataCallback<List<Book>>() {
+    private void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
+        bookDao.fetchSearchAndFilterBooks(search, filter, searchOrder, filterOrder, new DataCallback<List<Book>>() {
             @Override
             public void onDataReceived(List<Book> books) {
                 bookList.clear();
