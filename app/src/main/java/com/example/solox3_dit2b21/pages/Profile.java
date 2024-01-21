@@ -5,20 +5,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.model.Book;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Profile extends AppCompatActivity {
 
+    private TextView textPublished, textDraft;
+    FirebaseAuth auth;
+    FirebaseUser user;
     private RecyclerView recyclerViewProfile;
     private ProfileAdapter profileAdapter;
     private List<Book> booksProfile = new ArrayList<>();
@@ -28,8 +36,40 @@ public class Profile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        bindDataForProfile();
+
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+
+        textPublished = findViewById(R.id.textPublished);
+        textDraft = findViewById(R.id.textDraft);
+
+        setSelectedTab(textPublished);
+
+        textPublished.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSelectedTab(textPublished);
+                bindDataForProfile(user.getUid(), true);
+            }
+        });
+
+        textDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSelectedTab(textDraft);
+                bindDataForProfile(user.getUid(), false);
+            }
+        });
+
+//        bindDataForProfile(user.getUid(), true);
         setUIRef();
+    }
+
+    private void setSelectedTab(TextView selectedTab) {
+        textPublished.setTextColor(Color.parseColor("000000"));
+        textDraft.setTextColor(Color.parseColor("000000"));
+        
+        selectedTab.setTextColor(Color.parseColor("F4D163"));
     }
 
     private void setUIRef()
@@ -52,10 +92,9 @@ public class Profile extends AppCompatActivity {
 
     }
 
+    private void bindDataForProfile(String userId, Boolean published) {
 
-
-    private void bindDataForProfile() {
-        bookDao.getPopularBooks(new DataCallback<List<Book>>() {
+        bookDao.getUserBooks(new DataCallback<List<Book>>() {
             @Override
             public void onDataReceived(List<Book> books) {
                 booksProfile.clear();
@@ -65,9 +104,9 @@ public class Profile extends AppCompatActivity {
 
             @Override
             public void onError(Exception exception) {
-                Log.e("bindDataForPopular", "Error fetching popular books", exception);
-                Toast.makeText(Profile.this, "Error fetching popular data.", Toast.LENGTH_SHORT).show();
+                Log.e("bindDataForProfile", "Error fetching user books", exception);
+                Toast.makeText(Profile.this, "Error fetching profile data.", Toast.LENGTH_SHORT).show();
             }
-        });
+        }, userId, published);
     }
 }

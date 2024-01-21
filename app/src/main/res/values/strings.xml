@@ -12,4 +12,6 @@
     <string name="login_now"><u>Login here.</u></string>
     <string name="password_check">Re-enter your password</string>
     <string name="book">Book</string>
+    <string name="published">Published</string>
+    <string name="drafts">Drafts</string>
 </resources>
