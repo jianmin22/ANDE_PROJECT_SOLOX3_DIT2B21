@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="selected_color">#8A0D16</color> <!-- Example color for selected state -->
+    <color name="unselected_color">#848484</color> <!-- Example color for unselected state -->
+
 </resources>

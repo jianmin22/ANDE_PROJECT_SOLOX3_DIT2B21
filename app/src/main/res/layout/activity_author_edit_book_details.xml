@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".pages.AuthorEditBookDetails">
+
+    <!-- Back icon at the top left -->
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="onClick"
+        android:src="@drawable/back" />
+
+    <!-- Book Image -->
+    <ImageView
+        android:id="@+id/bookImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@id/back"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:onClick="onClick"
+        android:src="@drawable/bookplaceholder" />
+
+    <!-- Click to Upload Image -->
+    <TextView
+        android:id="@+id/uploadImageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bookImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:onClick="onClick"
+        android:text="Upload Image"
+        android:textAllCaps="false"
+        android:textColor="#2A5AF1" />
+
+
+    <!-- Edit Text for Book Title -->
+    <EditText
+        android:id="@+id/bookTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/uploadImageTextView"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_border"
+        android:hint="Enter Book Title"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- Dropdown for Category -->
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bookTitleEditText"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Line Border -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/categorySpinner"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="#D8A57A" />
+
+    <!-- Description Heading -->
+    <TextView
+        android:id="@+id/descriptionHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/categorySpinner"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Description"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/descriptionEditText"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_below="@id/descriptionHeading"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_border"
+        android:padding="3dp"/>
+
+    <!-- Buttons for Save and Cancel -->
+    <LinearLayout
+        android:id="@+id/cancelSaveView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/descriptionEditText"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/saveBookDetailsButton"
+            android:layout_width="148dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:backgroundTint="#D8A57A"
+            android:text="Save Book Details"
+            android:onClick="onClick"
+            app:cornerRadius="15dp" />
+
+        <Button
+            android:id="@+id/proceedEditChapterButton"
+            android:layout_width="184dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#8A0D16"
+            android:text="Proceed Chapter Page"
+            android:onClick="onClick"
+            app:cornerRadius="15dp" />
+    </LinearLayout>
+
+</RelativeLayout>
