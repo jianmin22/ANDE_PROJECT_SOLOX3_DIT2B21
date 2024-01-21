@@ -182,7 +182,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
             finish();
         } else if (v.getId() == R.id.proceedEditChapterButton) {
             if (bookId!=null&&!bookId.equals("")){
-                Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.this);
+                Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.class);
                 intent.putExtra("bookId", bookId);
                 startActivity(intent);
             }else{
