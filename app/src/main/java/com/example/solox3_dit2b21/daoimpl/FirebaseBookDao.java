@@ -2,6 +2,7 @@ package com.example.solox3_dit2b21.daoimpl;
 
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.model.Book;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,6 +13,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class FirebaseBookDao implements BookDao {
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -97,7 +99,7 @@ public class FirebaseBookDao implements BookDao {
         });
     }
     @Override
-    public void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback) {
+    public void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback) {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -108,11 +110,11 @@ public class FirebaseBookDao implements BookDao {
                     if (book != null) {
                         if (search != null && filter != null) {
                             if (searchOrder.equals("1") && filterOrder.equals("2")) {
-                                if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search) && matchesFilter(book.getCategoryId(), filter)) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().toLowerCase().contains(search.toLowerCase()) && matchesFilter(book.getCategoryId(), filter)) {
                                     bookList.add(book);
                                 }
                             } else if (searchOrder.equals("2") && filterOrder.equals("1")) {
-                                if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter) && book.getTitle().contains(search)) {
+                                if (Boolean.parseBoolean(book.getIsPublished()) && matchesFilter(book.getCategoryId(), filter) && book.getTitle().toLowerCase().contains(search.toLowerCase())) {
                                     bookList.add(book);
                                 }
                             }
@@ -121,7 +123,7 @@ public class FirebaseBookDao implements BookDao {
                                 bookList.add(book);
                             }
                         } else if (search != null) {
-                            if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().contains(search)) {
+                            if (Boolean.parseBoolean(book.getIsPublished()) && book.getTitle().toLowerCase().contains(search.toLowerCase())) {
                                 bookList.add(book);
                             }
                         }
@@ -137,6 +139,25 @@ public class FirebaseBookDao implements BookDao {
             }
         });
     }
+
+    @Override
+    public void insertBook(Book book, DataStatusCallback callback) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
+        databaseReference.child(book.getBookId()).setValue(book)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
+    public void updateBookDetails(Book book, DataStatusCallback callback) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
+        Map<String, Object> bookUpdates = book.toMap();
+        databaseReference.child(book.getBookId()).updateChildren(bookUpdates)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
 
     private boolean matchesFilter(String categoryId, String filter) {
         String[] filters = filter.split(",");

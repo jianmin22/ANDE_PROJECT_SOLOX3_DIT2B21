@@ -8,6 +8,8 @@ public interface BookDao {
     void getPopularBooks(DataCallback callback);
     void getLatestBooks(DataCallback callback);
     void loadBookDetailsById(String bookId, DataCallback<Book> callback);
-    void fetchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback);
+    void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback);
+    void insertBook(Book book, DataStatusCallback callback);
+    void updateBookDetails(Book book, DataStatusCallback callback);
 }
 
