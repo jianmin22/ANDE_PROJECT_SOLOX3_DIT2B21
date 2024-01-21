@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,11 +17,13 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.FirebaseStorageManager;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.CategoryDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Book;
@@ -28,10 +31,13 @@ import com.example.solox3_dit2b21.model.Category;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class AuthorEditBookDetails extends AppCompatActivity implements View.OnClickListener{
     private String bookId;
+    private String userId="userId";
     private static final int PICK_IMAGE_REQUEST = 1;
     CategoryDao categoryDao = new FirebaseCategoryDao();
     BookDao bookDao = new FirebaseBookDao();
@@ -41,7 +47,8 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     Spinner categorySpinner;
     EditText descriptionEditText;
     String imageURL;
-
+    String categoryId;
+    List<Category> categoriesList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +61,37 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         categoryDao.loadAllCategories(new DataCallback<List<Category>>() {
             @Override
             public void onDataReceived(List<Category> categories) {
-                ArrayAdapter<Category> adapter = new ArrayAdapter<>(AuthorEditBookDetails.this, android.R.layout.simple_spinner_item, categories);
+                List<String> categoryNames = new ArrayList<>();
+                categoriesList=categories;
+                for (Category category : categories) {
+                    categoryNames.add(category.getCategoryName());
+
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(AuthorEditBookDetails.this, android.R.layout.simple_spinner_item, categoryNames);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 categorySpinner.setAdapter(adapter);
+
+                categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        // Get the selected category name
+                        String selectedCategoryName = categoryNames.get(position);
+
+                        // Find the corresponding Category object and retrieve its ID
+                        for (Category category : categories) {
+                            if (category.getCategoryName().equals(selectedCategoryName)) {
+                                categoryId = category.getCategoryId();
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        categoryId=null;
+                    }
+                });
             }
 
             @Override
@@ -66,6 +101,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 finish();
             }
         });
+
 
         Bundle getData = getIntent().getExtras();
 
@@ -79,6 +115,20 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                     bookTitleEditText.setText(bookDetails.getTitle());
                     descriptionEditText.setText(bookDetails.getDescription());
                     imageURL=bookDetails.getImage();
+                    categoryId=bookDetails.getCategoryId();
+                    if (categoryId != null) {
+                        int selectedIndex = -1;
+                        for (int i = 0; i < categoriesList.size(); i++) {
+                            if (categoriesList.get(i).getCategoryId().equals(categoryId)) {
+                                selectedIndex = i;
+                                break;
+                            }
+                        }
+
+                        if (selectedIndex != -1) {
+                            categorySpinner.setSelection(selectedIndex);
+                        }
+                    }
                 }
 
                 @Override
@@ -131,10 +181,57 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         if (v.getId() == R.id.back) {
             finish();
         } else if (v.getId() == R.id.proceedEditChapterButton) {
+            if (bookId!=null&&!bookId.equals("")){
+                Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.this);
+                intent.putExtra("bookId", bookId);
+                startActivity(intent);
+            }else{
+                Toast.makeText(AuthorEditBookDetails.this, "Please Save Your Book Details First.",Toast.LENGTH_SHORT).show();
+            }
 
-        } else if (v.getId() ==R.id.saveBookDetailsButton){
-//            if(bookId!=null)
-        }else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.bookImage) {
+        } else if (v.getId() == R.id.saveBookDetailsButton) {
+            String title = bookTitleEditText.getText().toString();
+            String description = descriptionEditText.getText().toString();
+
+            if (!categoryId.isEmpty() && !title.isEmpty() && !description.isEmpty()) {
+                Book book;
+                if (bookId != null && !bookId.isEmpty()) {
+                    book = bookDetails;
+                    book.setTitle(title);
+                    book.setDescription(description);
+                    book.setCategoryId(categoryId);
+                    book.setImage(imageURL);
+                    bookDao.updateBookDetails(book, new DataStatusCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(AuthorEditBookDetails.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e("Update Book Failed", exception.getMessage());
+                            Toast.makeText(AuthorEditBookDetails.this, "Failed to save book details!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    book = new Book(UUID.randomUUID().toString(), title, description, categoryId, 0,imageURL, null, 0, CurrentDateUtils.getCurrentDateTime(), CurrentDateUtils.getCurrentDateTime(), userId, "false");
+                    bookDao.insertBook(book, new DataStatusCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(AuthorEditBookDetails.this, "Book saved successfully", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(Exception exception) {
+                            Log.e("Insert Book Failed", exception.getMessage());
+                            Toast.makeText(AuthorEditBookDetails.this, "Failed to save book details!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            } else {
+                Toast.makeText(AuthorEditBookDetails.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            }
+        } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.bookImage) {
             if (imageURL != null && !imageURL.equals("")) {
                 FirebaseStorageManager storageManager = new FirebaseStorageManager();
                 storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
