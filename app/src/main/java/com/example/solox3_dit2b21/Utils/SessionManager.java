@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.Utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.solox3_dit2b21.pages.Login;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

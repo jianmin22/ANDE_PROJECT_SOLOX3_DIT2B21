@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,13 +16,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.solox3_dit2b21.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.appcheck.AppCheckToken;
 import com.google.firebase.appcheck.FirebaseAppCheck;
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 import com.google.firebase.auth.AuthResult;
@@ -45,7 +41,7 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Home.class);
+            Intent intent = new Intent(getApplicationContext(), com.example.solox3_dit2b21.Home.class);
             startActivity(intent);
             finish();
         }
@@ -64,7 +60,6 @@ public class Login extends AppCompatActivity {
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         ImageView imageViewShowHidePassword = findViewById(R.id.show_hide_password);
-        imageViewShowHidePassword.setImageResource(R.drawable.eye_checked);
         imageViewShowHidePassword
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -96,8 +91,8 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email, password;
-                email = editTextEmail.getText().toString();
-                password = editTextPassword.getText().toString();
+                email = editTextEmail.getText().toString().trim();
+                password = editTextPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(Login.this, "Enter email", Toast.LENGTH_SHORT).show();

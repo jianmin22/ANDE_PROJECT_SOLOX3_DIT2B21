@@ -1,4 +1,4 @@
-package com.example.solox3_dit2b21;
+package com.example.solox3_dit2b21.pages;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,10 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.solox3_dit2b21.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -69,7 +68,6 @@ public class Register extends AppCompatActivity {
                 });
         editTextPasswordCheck = findViewById(R.id.password_check);
         ImageView imageViewShowHidePasswordCheck = findViewById(R.id.show_hide_password_check);
-        imageViewShowHidePasswordCheck.setImageResource(R.drawable.eye_checked);
         imageViewShowHidePasswordCheck
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -101,9 +99,9 @@ public class Register extends AppCompatActivity {
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email, password, passwordCheck;
-                email = editTextEmail.getText().toString();
-                password = editTextPassword.getText().toString();
-                passwordCheck = editTextPasswordCheck.getText().toString();
+                email = editTextEmail.getText().toString().trim();
+                password = editTextPassword.getText().toString().trim();
+                passwordCheck = editTextPasswordCheck.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
