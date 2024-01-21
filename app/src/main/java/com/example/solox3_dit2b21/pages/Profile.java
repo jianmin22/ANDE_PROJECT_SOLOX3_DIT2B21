@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import java.util.List;
 public class Profile extends AppCompatActivity {
 
     private TextView textPublished, textDraft;
+    private ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
     private RecyclerView recyclerViewProfile;
@@ -42,6 +44,18 @@ public class Profile extends AppCompatActivity {
 
         textPublished = findViewById(R.id.textPublished);
         textDraft = findViewById(R.id.textDraft);
+        profilePic = findViewById(R.id.profilePic);
+//        implementation 'com.squareup.picasso:picasso:2.71828'
+//        if (user != null) {
+//            String photoUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
+//
+//            if (photoUrl != null && !photoUrl.isEmpty()) {
+//                Picasso.get().load(photoUrl).into(profilePic);
+//            } else {
+//                // Set a default image if the photo URL is not available
+//                profilePic.setImageResource(R.drawable.default_profile_image);
+//            }
+//        }
 
         setSelectedTab(textPublished);
 
@@ -68,7 +82,7 @@ public class Profile extends AppCompatActivity {
     private void setSelectedTab(TextView selectedTab) {
         textPublished.setTextColor(Color.parseColor("000000"));
         textDraft.setTextColor(Color.parseColor("000000"));
-        
+
         selectedTab.setTextColor(Color.parseColor("F4D163"));
     }
 
