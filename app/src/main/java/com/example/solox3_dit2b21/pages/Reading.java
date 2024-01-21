@@ -135,25 +135,27 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
                                 Chapter chapter = chapterSnapshot.getValue(Chapter.class);
                                 if (chapter != null) {
                                     chapters.add(chapter); // Add chapter to list
-                                    if (chapter.getSubChapters() != null && !chapter.getSubChapters().isEmpty()) {
-                                        // Assuming you want to display the first subchapter initially
-                                        SubChapter firstSubChapter = chapter.getSubChapters().values().iterator().next();
-
-                                        // Update the UI with the first subchapter content
-                                        TextView chapterTitle = findViewById(R.id.ChapterTitle);
-                                        chapterTitle.setText(firstSubChapter.getTitle());
-
-                                        // Split the first subchapter content into pages
-                                        List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
-                                        setupViewPager(pages);
-                                    }
                                 }
                             }
-                            populateDrawerMenu(chapters); // Populate the drawer menu with the chapters
-                            return; // Exit loop after processing the found book chapter
+                            // No need to return here, let the loop finish
                         }
                     }
-                    Log.e("ReadingActivity", "No matching bookId found in chapters");
+
+                    if (!chapters.isEmpty()) {
+                        // Handle the first chapter and its subchapters
+                        Chapter firstChapter = chapters.get(0);
+                        if (firstChapter.getSubChapters() != null && !firstChapter.getSubChapters().isEmpty()) {
+                            // Display the first subchapter of the first chapter
+                            SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
+                            TextView chapterTitle = findViewById(R.id.ChapterTitle);
+                            chapterTitle.setText(firstSubChapter.getTitle());
+                            List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
+                            setupViewPager(pages);
+                        }
+                        populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
+                    } else {
+                        Log.e("ReadingActivity", "No matching bookId found in chapters");
+                    }
                 } else {
                     Log.e("ReadingActivity", "No chapters available");
                 }
@@ -165,6 +167,7 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             }
         });
     }
+
 
     private void populateDrawerMenu(List<Chapter> chapters) {
         NavigationView navigationView = findViewById(R.id.nav_view);
