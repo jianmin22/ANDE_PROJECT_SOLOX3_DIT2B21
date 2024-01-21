@@ -16,7 +16,7 @@ import jp.wasabeef.richeditor.RichEditor;
 public class EditorSpace extends AppCompatActivity {
 
     private RichEditor mEditor;
-    private TextView mPreview;
+//    private TextView mPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,17 +25,17 @@ public class EditorSpace extends AppCompatActivity {
         mEditor = (RichEditor) findViewById(R.id.editor);
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
-        mEditor.setEditorFontColor(Color.RED);
+        mEditor.setEditorFontColor(Color.BLACK);
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setPlaceholder("Insert text here...");
 
-        mPreview = (TextView) findViewById(R.id.preview);
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            @Override
-            public void onTextChange(String text) {
-                mPreview.setText(text);
-            }
-        });
+//        mPreview = (TextView) findViewById(R.id.preview);
+//        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+//            @Override
+//            public void onTextChange(String text) {
+//                mPreview.setText(text);
+//            }
+//        });
 
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
