@@ -2,16 +2,12 @@ package com.example.solox3_dit2b21;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -45,7 +41,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
         // Initialize your FlexboxLayout
         flexboxLayout = findViewById(R.id.flexboxLayout3);
-        mainSearchField = findViewById(R.id.MainSearchField);
+        mainSearchField = findViewById(R.id.mainSearchField);
 
         mainSearchField.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -191,15 +187,8 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v){
         if(v.getId() == R.id.searchButton) {
             insertOrUpdateSearchHistory(mainSearchField.getText().toString().trim());
-        }else if (v.getId() == R.id.backButton){
-            Bundle getData = getIntent().getExtras();
-            if (getData != null){
-                String fromPage = getData.getString("from");
-                Intent intent = new Intent(Search.this, fromPage.getClass());
-                startActivity(intent);
-            }else{
-                Log.d("Back Button", "Error Occurred");
-            }
+        }else if (v.getId() == R.id.back){
+                finish();
         }else if (v.getId() == R.id.buttonText) {
             TextView buttonText = v.findViewById(R.id.buttonText);
 

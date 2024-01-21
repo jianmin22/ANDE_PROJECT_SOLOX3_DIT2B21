@@ -1,42 +1,41 @@
 package com.example.solox3_dit2b21;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.util.Log;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.NonNull;
 
-public class SessionManager extends AppCompatActivity {
-    final Session session = new ViewModelProvider(this).get(Session.class);
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        session.getUser().observe(this, new Observer<User>() {
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+
+public class SessionManager {
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    public SessionManager (final Context context) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onChanged(@Nullable User data) {
-                // update ui.
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = auth.getCurrentUser();
+                Log.d("User: ", user.toString());
+                if (user == null) {
+                    Intent intent = new Intent(context, Login.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    context.startActivity(intent);
+                }
             }
+        };
 
-        });
+//        auth.addAuthStateListener(mAuthListener);
     }
 
-    public void checkAuthenticationAndNavigate(Context context, Class<?> targetActivity) {
-        if (session.getUser() == null) {
-            navigateTo(context, Login.class);
-        } else {
-            navigateTo(context, targetActivity);
-        }
+    public void addAuthStateListener(FirebaseAuth firebaseAuth) {
+        firebaseAuth.addAuthStateListener(mAuthListener);
     }
 
-    private void navigateTo(Context context, Class<?> targetActivity) {
-        Intent intent = new Intent(context, targetActivity);
-        context.startActivity(intent);
-        if (context instanceof Activity) {
-            ((Activity) context).finish(); // Finish the current activity to prevent going back
-        }
+    public void removeAuthStateListener(FirebaseAuth firebaseAuth) {
+        firebaseAuth.removeAuthStateListener(mAuthListener);
     }
+
 }

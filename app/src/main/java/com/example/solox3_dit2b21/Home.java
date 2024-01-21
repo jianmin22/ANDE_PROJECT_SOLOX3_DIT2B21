@@ -27,6 +27,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     FirebaseAuth auth;
     FirebaseUser user;
+    private SessionManager session = new SessionManager(this);
     private RecyclerView recyclerView1;
     private RecyclerView recyclerView2;
     HomeAdapter adapter1;
@@ -38,17 +39,32 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        if (user == null) {
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
-            finish();
-        }
+//        session = new SessionManager(this);
+//        session.addAuthStateListener(FirebaseAuth.getInstance());
+
+//        auth = FirebaseAuth.getInstance();
+//        user = auth.getCurrentUser();
+//        if (user == null) {
+//            Intent intent = new Intent(getApplicationContext(), Login.class);
+//            startActivity(intent);
+//            finish();
+//        }
 
         bindDataForPopular();
         bindDataForLatest();
         setUIRef();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        session.addAuthStateListener(FirebaseAuth.getInstance());
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        session.removeAuthStateListener(FirebaseAuth.getInstance());
     }
 
     private void setUIRef()
@@ -192,15 +208,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        if(v.getId() == R.id.MainSearchField) {
+        if(v.getId() == R.id.mainSearchField) {
             Intent intent = new Intent(Home.this, Search.class);
-            intent.putExtra("from", "Home");
             startActivity(intent);
         }else if (v.getId()==R.id.categoryBtn){
             Intent intent = new Intent(Home.this, CategoryPage.class);
             startActivity(intent);
         } else if (v.getId()==R.id.profileBtn){
-            Intent intent = new Intent(Home.this, AllComments.class);
+            Intent intent = new Intent(Home.this, Reading.class);
             startActivity(intent);
         }
 

@@ -1,22 +1,47 @@
 package com.example.solox3_dit2b21;
 
-public class Chapter {
-    private String chapterId;
-    private String bookId;
-    private int chapterNumber;
-    private String chapterContent;
-    private int chapterOrder;
-    private int subChapterOrder;
+import java.util.Map;
 
-    public Chapter(String chapterId, String bookId, int chapterNumber, String chapterContent,
-                   int chapterOrder, int subChapterOrder) {
-        this.chapterId = chapterId;
-        this.bookId = bookId;
-        this.chapterNumber = chapterNumber;
-        this.chapterContent = chapterContent;
-        this.chapterOrder = chapterOrder;
-        this.subChapterOrder = subChapterOrder;
+public class Chapter {
+    private String bookId;
+    private String title;
+    private int chapterOrder;
+    private Map<String, SubChapter> subChapters;
+
+    // Default constructor is needed for Firebase deserialization
+    public Chapter() {
     }
 
+    // Getters and setters
+    public String getBookId() {
+        return bookId;
+    }
 
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getChapterOrder() {
+        return chapterOrder;
+    }
+
+    public void setChapterOrder(int chapterOrder) {
+        this.chapterOrder = chapterOrder;
+    }
+
+    public Map<String, SubChapter> getSubChapters() {
+        return subChapters;
+    }
+
+    public void setSubChapters(Map<String, SubChapter> subChapters) {
+        this.subChapters = subChapters;
+    }
 }

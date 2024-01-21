@@ -8,14 +8,24 @@ public class UserRating {
 
     private String bookId;
 
+    private String userId;
     public UserRating() {
     }
 
-    public UserRating(String userRatingId, double rating, String date, String bookId) {
+    public UserRating(String userRatingId, double rating, String date, String bookId, String userId) {
         this.userRatingId = userRatingId;
         this.rating = rating;
         this.date = date;
         this.bookId=bookId;
+        this.userId=userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserRatingId() {

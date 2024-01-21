@@ -6,8 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Register extends AppCompatActivity {
 
-    TextInputEditText editTextEmail, editTextPassword, editTextPasswordCheck;
+    EditText editTextEmail, editTextPassword, editTextPasswordCheck;
     Button btnRegister;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
@@ -48,7 +52,38 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
+        ImageView imageViewShowHidePassword = findViewById(R.id.show_hide_password);
+        imageViewShowHidePassword.setImageResource(R.drawable.eye_checked);
+        imageViewShowHidePassword
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (editTextPassword.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                            editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            imageViewShowHidePassword.setImageResource(R.drawable.eye_checked);
+                        } else {
+                            editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            imageViewShowHidePassword.setImageResource(R.drawable.eye_unchecked);
+                        }
+                    }
+                });
         editTextPasswordCheck = findViewById(R.id.password_check);
+        ImageView imageViewShowHidePasswordCheck = findViewById(R.id.show_hide_password_check);
+        imageViewShowHidePasswordCheck.setImageResource(R.drawable.eye_checked);
+        imageViewShowHidePasswordCheck
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (editTextPassword.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                            editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            imageViewShowHidePasswordCheck.setImageResource(R.drawable.eye_checked);
+                        } else {
+                            editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            imageViewShowHidePasswordCheck.setImageResource(R.drawable.eye_unchecked);
+                        }
+                    }
+                });
+
         btnRegister = findViewById(R.id.btn_register);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.loginNow2);
@@ -66,9 +101,9 @@ public class Register extends AppCompatActivity {
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
                 String email, password, passwordCheck;
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
-                passwordCheck = String.valueOf(editTextPasswordCheck.getText());
+                email = editTextEmail.getText().toString();
+                password = editTextPassword.getText().toString();
+                passwordCheck = editTextPasswordCheck.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
@@ -101,7 +136,11 @@ public class Register extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(Register.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+                                    if (task.getException().getMessage().equals("The supplied auth credential is incorrect, malformed or has expired.")) {
+                                        Toast.makeText(Register.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(Register.this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         });

@@ -1,10 +1,13 @@
 package com.example.solox3_dit2b21;
 
+import static java.lang.Thread.sleep;
+
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashScreen extends AppCompatActivity {
     @Override
@@ -12,6 +15,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Launch the layout -> splash.xml
         setContentView(R.layout.activity_splash);
+
         Thread splashThread = new Thread() {
 
             public void run() {
@@ -23,12 +27,9 @@ public class SplashScreen extends AppCompatActivity {
                     e.printStackTrace();
                 } finally {
                     // Launch the login class
-//                    Intent intent = new Intent(SplashScreen.this, Login.class);
-//                    startActivity(intent);
-                    SessionManager sessionManager = new SessionManager();
-                    sessionManager.checkAuthenticationAndNavigate(SplashScreen.this, Login.class);
+                    Intent intent = new Intent(SplashScreen.this, Login.class);
+                    startActivity(intent);
                 }
-
             }
         };
         // To Start the thread
