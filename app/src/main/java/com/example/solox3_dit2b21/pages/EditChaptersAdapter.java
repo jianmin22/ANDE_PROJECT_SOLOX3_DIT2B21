@@ -1,16 +1,17 @@
 package com.example.solox3_dit2b21.pages;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.collection.CircularArray;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.solox3_dit2b21.R;
@@ -22,8 +23,8 @@ import java.util.Map;
 
 public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapter.ChapterViewHolder> {
 
-    private List<Chapter> chapters;
-    private LayoutInflater inflater;
+    private final List<Chapter> chapters;
+    private final LayoutInflater inflater;
 
     public EditChaptersAdapter(Context context, List<Chapter> chapters) {
         this.inflater = LayoutInflater.from(context);
@@ -34,38 +35,83 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
     @Override
     public ChapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = inflater.inflate(R.layout.item_chapter, parent, false);
-        return new ChapterViewHolder(itemView);
+        return new ChapterViewHolder(itemView,(EditChapter) inflater.getContext());
     }
-
 
     @Override
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         Chapter chapter = chapters.get(position);
-        holder.textViewChapterTitle.setText(chapter.getTitle());
+        holder.editTextChapterTitle.setText(chapter.getTitle());
 
-        holder.imageViewExpandToggle.setOnClickListener(v -> {
-            boolean isExpanded = holder.linearLayoutSubchapters.getVisibility() == View.VISIBLE;
-            holder.linearLayoutSubchapters.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
-            holder.imageViewExpandToggle.setImageResource(isExpanded ? R.drawable.ic_expand_more : R.drawable.ic_expand_less);
+        // Set up TextWatcher for chapter title
+        setupChapterTitleTextWatcher(holder, chapter);
+
+        holder.imageViewExpandToggle.setOnClickListener(v -> toggleSubChapterVisibility(holder));
+
+        // Populate subchapters
+        populateSubChapters(holder, chapter);
+    }
+
+    private void setupChapterTitleTextWatcher(ChapterViewHolder holder, Chapter chapter) {
+        holder.editTextChapterTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                // Update the chapter title as it is edited
+                chapter.setTitle(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Not needed
+            }
         });
+    }
 
-        // Clear any existing subchapter views to avoid duplicating views when the list is updated
+    private void toggleSubChapterVisibility(ChapterViewHolder holder) {
+        boolean isExpanded = holder.linearLayoutSubchapters.getVisibility() == View.VISIBLE;
+        holder.linearLayoutSubchapters.setVisibility(isExpanded ? View.GONE : View.VISIBLE);
+        holder.imageViewExpandToggle.setImageResource(isExpanded ? R.drawable.ic_expand_more : R.drawable.ic_expand_less);
+    }
+
+    private void populateSubChapters(ChapterViewHolder holder, Chapter chapter) {
         holder.linearLayoutSubchapters.removeAllViews();
-
-        // Populate subchapters if they exist
         if (chapter.getSubChapters() != null) {
             for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
                 SubChapter subChapter = entry.getValue();
-                TextView subChapterView = new TextView(holder.itemView.getContext());
-                subChapterView.setText(subChapter.getTitle());
-                subChapterView.setTextSize(16);
-                // Padding, margin, and any other layout parameters can be set here
-                // You can also set a click listener to edit/delete the subchapter
-                holder.linearLayoutSubchapters.addView(subChapterView);
+
+                EditText editTextSubChapterTitle = new EditText(holder.itemView.getContext());
+                editTextSubChapterTitle.setText(subChapter.getTitle());
+                editTextSubChapterTitle.setTextSize(16);
+                // Add other styling and layout parameters as needed
+                holder.linearLayoutSubchapters.addView(editTextSubChapterTitle);
+                holder.linearLayoutSubchapters.addView(holder.imageViewAddSubChapterToggle);
+                holder.linearLayoutSubchapters.addView(holder.imageViewDeleteSubChapterToggle);
+                // Set up TextWatcher for subchapter title
+                editTextSubChapterTitle.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+                        // Not needed
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                        // Update the subchapter title as it is edited
+                        subChapter.setTitle(charSequence.toString());
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        // Not needed
+                    }
+                });
             }
         }
     }
-
 
     @Override
     public int getItemCount() {
@@ -73,19 +119,22 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
     }
 
     public static class ChapterViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewChapterTitle;
-        public ImageView imageViewExpandToggle, imageViewDeleteToggle, imageViewAddToggle;
+        public EditText editTextChapterTitle;
+        public ImageView imageViewExpandToggle, imageViewDeleteToggle, imageViewAddToggle,imageViewAddSubChapterToggle,imageViewDeleteSubChapterToggle;
         public LinearLayout linearLayoutSubchapters;
 
-        public ChapterViewHolder(View itemView) {
+        public ChapterViewHolder(View itemView,EditChapter editChapterActivity) {
             super(itemView);
-            textViewChapterTitle = itemView.findViewById(R.id.textView_chapter_title);
+            editTextChapterTitle = itemView.findViewById(R.id.editText_chapter_title);
             imageViewExpandToggle = itemView.findViewById(R.id.imageView_expand_toggle);
             imageViewDeleteToggle = itemView.findViewById(R.id.imageView_delete_toggle);
             imageViewAddToggle = itemView.findViewById(R.id.imageView_add_toggle);
+            imageViewAddToggle.setOnClickListener(v -> {
+                editChapterActivity.addNewChapter();
+            });
+            imageViewAddSubChapterToggle= itemView.findViewById(R.id.imageView_add_subchapter);
+            imageViewDeleteSubChapterToggle= itemView.findViewById(R.id.imageView_delete_subchapter);
             linearLayoutSubchapters = itemView.findViewById(R.id.linearLayout_subchapters);
         }
     }
 }
-
-

@@ -14,6 +14,7 @@
         app:layout_constraintBottom_toTopOf="@id/button_go_to_editor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
         tools:listitem="@layout/item_chapter" />
 
 
