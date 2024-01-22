@@ -9,11 +9,16 @@ import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.CategoryDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +33,9 @@ public class CategoryPage extends AppCompatActivity {
 
     private GridLayout categoryGridLayout;
     private BottomNavigationView bottomNavigationView;
+
+    CategoryDao categoryDao = new FirebaseCategoryDao();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,23 +80,20 @@ public class CategoryPage extends AppCompatActivity {
     private void loadCategories() {
         DatabaseReference categoriesRef = FirebaseDatabase.getInstance().getReference("Category");
 
-        categoriesRef.addValueEventListener(new ValueEventListener() {
+        categoryDao.loadAllCategories(new DataCallback<List<Category>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Category> categories = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Category category = snapshot.getValue(Category.class);
-                    if (category != null) {
-                        categories.add(category);
-                    }
+            public void onDataReceived(List<Category> categories) {
+                if(categories!=null){
+                    displayCategories(categories);
+                }else{
+                    Toast.makeText(getApplicationContext(), "Failed to load categories", Toast.LENGTH_LONG).show();
+                    finish();
                 }
 
-                displayCategories(categories);
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Failed to get book details", exception);
             }
         });
     }
