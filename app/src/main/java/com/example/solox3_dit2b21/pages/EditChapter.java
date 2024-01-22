@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EditChapter extends AppCompatActivity {
@@ -52,6 +53,18 @@ public class EditChapter extends AppCompatActivity {
         btnSave.setOnClickListener(this::saveChapters);
 
 
+    }
+    void addNewChapter() {
+        int newChapterOrder = chapters.size() + 1; // Assuming chapter order starts from 1
+        Chapter newChapter = new Chapter();
+        newChapter.setBookId(bookId);
+        newChapter.setTitle("Chapter " + newChapterOrder);
+        newChapter.setChapterOrder(newChapterOrder);
+        // Initialize empty subChapters map or any other required fields
+        newChapter.setSubChapters(new HashMap<>());
+
+        chapters.add(newChapter);
+        adapter.notifyItemInserted(chapters.size() - 1); // Notify adapter about the new chapter
     }
 
     private void getChaptersData() {

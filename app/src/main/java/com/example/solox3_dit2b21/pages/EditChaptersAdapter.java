@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,7 +35,7 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
     @Override
     public ChapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = inflater.inflate(R.layout.item_chapter, parent, false);
-        return new ChapterViewHolder(itemView);
+        return new ChapterViewHolder(itemView,(EditChapter) inflater.getContext());
     }
 
     @Override
@@ -82,12 +83,14 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
         if (chapter.getSubChapters() != null) {
             for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
                 SubChapter subChapter = entry.getValue();
+
                 EditText editTextSubChapterTitle = new EditText(holder.itemView.getContext());
                 editTextSubChapterTitle.setText(subChapter.getTitle());
                 editTextSubChapterTitle.setTextSize(16);
                 // Add other styling and layout parameters as needed
                 holder.linearLayoutSubchapters.addView(editTextSubChapterTitle);
-
+                holder.linearLayoutSubchapters.addView(holder.imageViewAddSubChapterToggle);
+                holder.linearLayoutSubchapters.addView(holder.imageViewDeleteSubChapterToggle);
                 // Set up TextWatcher for subchapter title
                 editTextSubChapterTitle.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -117,15 +120,20 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
 
     public static class ChapterViewHolder extends RecyclerView.ViewHolder {
         public EditText editTextChapterTitle;
-        public ImageView imageViewExpandToggle, imageViewDeleteToggle, imageViewAddToggle;
+        public ImageView imageViewExpandToggle, imageViewDeleteToggle, imageViewAddToggle,imageViewAddSubChapterToggle,imageViewDeleteSubChapterToggle;
         public LinearLayout linearLayoutSubchapters;
 
-        public ChapterViewHolder(View itemView) {
+        public ChapterViewHolder(View itemView,EditChapter editChapterActivity) {
             super(itemView);
             editTextChapterTitle = itemView.findViewById(R.id.editText_chapter_title);
             imageViewExpandToggle = itemView.findViewById(R.id.imageView_expand_toggle);
             imageViewDeleteToggle = itemView.findViewById(R.id.imageView_delete_toggle);
             imageViewAddToggle = itemView.findViewById(R.id.imageView_add_toggle);
+            imageViewAddToggle.setOnClickListener(v -> {
+                editChapterActivity.addNewChapter();
+            });
+            imageViewAddSubChapterToggle= itemView.findViewById(R.id.imageView_add_subchapter);
+            imageViewDeleteSubChapterToggle= itemView.findViewById(R.id.imageView_delete_subchapter);
             linearLayoutSubchapters = itemView.findViewById(R.id.linearLayout_subchapters);
         }
     }
