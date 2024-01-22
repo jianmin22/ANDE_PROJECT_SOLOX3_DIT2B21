@@ -41,7 +41,7 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), com.example.solox3_dit2b21.Home.class);
+            Intent intent = new Intent(getApplicationContext(), Home.class);
             startActivity(intent);
             finish();
         }
@@ -104,7 +104,7 @@ public class Login extends AppCompatActivity {
                     return;
                 }
 
-                Toast.makeText(getApplicationContext(), "Get Token", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Get Token", Toast.LENGTH_SHORT).show();
 //                firebaseAppCheck
 //                                .getLimitedUseAppCheckToken()
 //                                        .addOnSuccessListener(new OnSuccessListener<AppCheckToken>() {
