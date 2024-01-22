@@ -1,5 +1,7 @@
 package com.example.solox3_dit2b21.daoimpl;
 
+import android.util.Log;
+
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
@@ -82,7 +84,8 @@ public class FirebaseBookDao implements BookDao {
     @Override
     public void getUserBooks(final DataCallback callback, String userId, Boolean published) {
         DatabaseReference ref = database.getReference("Book");
-
+        Log.d("userId: ", userId);
+        Log.d("published: ", published.toString());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -90,9 +93,11 @@ public class FirebaseBookDao implements BookDao {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Book book = snapshot.getValue(Book.class);
+                    Log.d("Book AuthorId: ", String.valueOf(book.getAuthorId()));
 
-                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished()) == published) {
+                    if (book != null && book.getAuthorId().toString().equals(userId) && Boolean.parseBoolean(book.getIsPublished()) == published) {
                         userBooks.add(book);
+                        Log.d("Book added: ", String.valueOf(book));
                     }
                 }
 
@@ -231,12 +236,25 @@ public class FirebaseBookDao implements BookDao {
     public void getTotalUserPublished(final DataCallback callback, String userId) {
         DatabaseReference ref = database.getReference("Book");
 
+//        return only books written by the userId given
         Query query = ref.orderByChild("authorId").equalTo(userId);
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Integer totalPublished = (int) dataSnapshot.getChildrenCount();
+                Integer totalPublished = 0;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+//                    check if book has been published
+                    if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
+                        totalPublished++;
+                    }
+                }
+
+//                if no need to check for additional conditions,
+//                Integer totalPublished = (int) dataSnapshot.getChildrenCount();
+
                 callback.onDataReceived(totalPublished);
             }
 

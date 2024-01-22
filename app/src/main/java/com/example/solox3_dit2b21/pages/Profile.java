@@ -5,10 +5,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +23,12 @@ import java.util.List;
 
 public class Profile extends AppCompatActivity {
 
-    private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
+    private TextView profileUsername;
+    private TextView totalPublished;
+    private TextView totalComments;
+    private TextView averageRating;
+    private TextView tabPublished;
+    private TextView tabDraft;
     private ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
@@ -42,11 +45,18 @@ public class Profile extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-//        profileUsername.setText(user.getDisplayName());
-        Toast.makeText(Profile.this, "Display: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+        profileUsername = findViewById(R.id.profileUsername);
+        profileUsername.setText(user.getEmail());
+
+//        Toast.makeText(Profile.this, "Display: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Profile.this, "UID: " + user.getUid(), Toast.LENGTH_SHORT).show();
 
         totalPublished = findViewById(R.id.totalPublished);
-        totalPublished.setText(bindDataForTotalPublished(user.getUid()));
+        bindDataForTotalPublished(user.getUid());
+
+//        totalPublished.setText(bindDataForTotalPublished(total));
+
+//        totalPublished.setText(bindDataForTotalPublished(user.getUid()));
 
         totalComments = findViewById(R.id.totalComments);
         averageRating = findViewById(R.id.averageRating);
@@ -118,8 +128,13 @@ public class Profile extends AppCompatActivity {
 
         bookDao.getTotalUserPublished(new DataCallback<Integer>() {
             @Override
-            public String onDataReceived(Integer totalPublished) {
-                return totalPublished.toString();
+            public String onDataReceived(Integer totalPublishedInt) {
+                if (totalPublishedInt != null) {
+                    totalPublished.setText(String.valueOf(totalPublishedInt));
+                } else {
+                    totalPublished.setText("0");
+                }
+                return null;
             }
 
             @Override
@@ -139,9 +154,6 @@ public class Profile extends AppCompatActivity {
             public String onDataReceived(List<Book> books) {
                 booksProfile.clear();
                 booksProfile.addAll(books);
-                for (Book book: books) {
-                    Log.d("Book: ", String.valueOf(book));
-                }
                 profileAdapter.notifyDataSetChanged();
                 return null;
             }
