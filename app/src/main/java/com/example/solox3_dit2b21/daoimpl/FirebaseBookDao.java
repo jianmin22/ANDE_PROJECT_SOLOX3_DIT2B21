@@ -8,6 +8,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -109,6 +110,33 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
+    public void getUserBooksId(final DataCallback callback, String userId) {
+        DatabaseReference ref = database.getReference("Book");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> userBookIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
+                        userBookIds.add(book.getBookId());
+                    }
+                }
+
+                callback.onDataReceived(userBookIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
     public void loadBookDetailsById(String bookId, DataCallback<Book> callback) {
         DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("Book").child(bookId);
         bookRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -197,6 +225,26 @@ public class FirebaseBookDao implements BookDao {
             }
         }
         return false;
+    }
+
+    @Override
+    public void getTotalUserPublished(final DataCallback callback, String userId) {
+        DatabaseReference ref = database.getReference("Book");
+
+        Query query = ref.orderByChild("authorId").equalTo(userId).startAt(true).endAt(true);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer totalPublished = (int) dataSnapshot.getChildrenCount();
+                callback.onDataReceived(totalPublished);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 
 }

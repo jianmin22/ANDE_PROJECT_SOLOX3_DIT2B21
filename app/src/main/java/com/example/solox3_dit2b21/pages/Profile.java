@@ -25,7 +25,7 @@ import java.util.List;
 
 public class Profile extends AppCompatActivity {
 
-    private TextView textPublished, textDraft;
+    private TextView totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     private ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
@@ -42,8 +42,13 @@ public class Profile extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
-        textPublished = findViewById(R.id.textPublished);
-        textDraft = findViewById(R.id.textDraft);
+        totalPublished = findViewById(R.id.totalPublished);
+        totalPublished.setText(bindDataForTotalPublished(user.getUid()));
+
+        totalComments = findViewById(R.id.totalComments);
+        averageRating = findViewById(R.id.averageRating);
+        tabPublished = findViewById(R.id.tabPublished);
+        tabDraft = findViewById(R.id.tabDraft);
         profilePic = findViewById(R.id.profilePic);
 //        implementation 'com.squareup.picasso:picasso:2.71828'
 //        if (user != null) {
@@ -57,20 +62,20 @@ public class Profile extends AppCompatActivity {
 //            }
 //        }
 
-        setSelectedTab(textPublished);
+        setSelectedTab(tabPublished);
 
-        textPublished.setOnClickListener(new View.OnClickListener() {
+        tabPublished.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setSelectedTab(textPublished);
+                setSelectedTab(tabPublished);
                 bindDataForProfile(user.getUid(), true);
             }
         });
 
-        textDraft.setOnClickListener(new View.OnClickListener() {
+        tabDraft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setSelectedTab(textDraft);
+                setSelectedTab(tabDraft);
                 bindDataForProfile(user.getUid(), false);
             }
         });
@@ -80,8 +85,8 @@ public class Profile extends AppCompatActivity {
     }
 
     private void setSelectedTab(TextView selectedTab) {
-        textPublished.setTextColor(Color.parseColor("000000"));
-        textDraft.setTextColor(Color.parseColor("000000"));
+        tabPublished.setTextColor(Color.parseColor("000000"));
+        tabDraft.setTextColor(Color.parseColor("000000"));
 
         selectedTab.setTextColor(Color.parseColor("F4D163"));
     }
@@ -106,14 +111,33 @@ public class Profile extends AppCompatActivity {
 
     }
 
+    private CharSequence bindDataForTotalPublished(String userId) {
+
+        bookDao.getTotalUserPublished(new DataCallback<Integer>() {
+            @Override
+            public String onDataReceived(Integer totalPublished) {
+                return totalPublished.toString();
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForTotalPublished", "Error fetching total number of published books", exception);
+                Toast.makeText(Profile.this, "Error fetching total number of published books.", Toast.LENGTH_SHORT).show();
+            }
+        }, userId);
+
+        return null;
+    }
+
     private void bindDataForProfile(String userId, Boolean published) {
 
         bookDao.getUserBooks(new DataCallback<List<Book>>() {
             @Override
-            public void onDataReceived(List<Book> books) {
+            public String onDataReceived(List<Book> books) {
                 booksProfile.clear();
                 booksProfile.addAll(books);
                 profileAdapter.notifyDataSetChanged();
+                return null;
             }
 
             @Override

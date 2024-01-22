@@ -20,7 +20,6 @@ import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
-import com.example.solox3_dit2b21.model.SearchHistory;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -140,12 +139,13 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
     private void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
         bookDao.fetchSearchAndFilterBooks(search, filter, searchOrder, filterOrder, new DataCallback<List<Book>>() {
             @Override
-            public void onDataReceived(List<Book> books) {
+            public String onDataReceived(List<Book> books) {
                 bookList.clear();
                 bookList.addAll(books);
                 TextView resultsFoundView = findViewById(R.id.resultsFound);
                 resultsFoundView.setText(bookList.size() + " Results Found");
                 adapter.notifyDataSetChanged();
+                return null;
             }
 
             @Override

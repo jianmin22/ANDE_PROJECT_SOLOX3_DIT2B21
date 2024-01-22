@@ -14,28 +14,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.solox3_dit2b21.R;
-import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.SearchHistoryDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseSearchHistoryDao;
 import com.example.solox3_dit2b21.model.SearchHistory;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
 
 public class Search extends AppCompatActivity implements View.OnClickListener {
 
@@ -70,8 +59,9 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     private void loadSearchHistory() {
         searchHistoryDao.getUserSearchHistory(userId, new DataCallback<List<SearchHistory>>() {
             @Override
-            public void onDataReceived(List<SearchHistory> searchHistoryList) {
+            public String onDataReceived(List<SearchHistory> searchHistoryList) {
                 displaySearchHistory(searchHistoryList);
+                return null;
             }
             @Override
             public void onError(Exception exception) {

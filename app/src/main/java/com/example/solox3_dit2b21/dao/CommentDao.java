@@ -6,4 +6,6 @@ import java.util.List;
 public interface CommentDao {
     void loadLatest2Comments(String bookId, DataCallback<List<Comment>> callback);
     void addComment(Comment comment, DataStatusCallback callback);
+
+    void getTotalUserComments(DataCallback callback, String userId);
 }

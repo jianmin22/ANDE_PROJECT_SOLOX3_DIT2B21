@@ -120,10 +120,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     private void bindDataForPopular() {
         bookDao.getPopularBooks(new DataCallback<List<Book>>() {
             @Override
-            public void onDataReceived(List<Book> books) {
+            public String onDataReceived(List<Book> books) {
                 booksPopular.clear();
                 booksPopular.addAll(books);
                 adapter1.notifyDataSetChanged();
+                return null;
             }
 
             @Override
@@ -137,10 +138,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
     private void bindDataForLatest() {
         bookDao.getLatestBooks(new DataCallback<List<Book>>() {
             @Override
-            public void onDataReceived(List<Book> books) {
+            public String onDataReceived(List<Book> books) {
                 booksLatest.clear();
                 booksLatest.addAll(books);
                 adapter2.notifyDataSetChanged();
+                return null;
             }
 
             @Override
