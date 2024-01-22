@@ -15,6 +15,7 @@ import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,6 +39,8 @@ public class Profile extends AppCompatActivity {
     private List<Book> booksProfile = new ArrayList<>();
     private FirebaseBookDao bookDao = new FirebaseBookDao();
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
+    private FirebaseUserRatingDao userRatingDao = new FirebaseUserRatingDao();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class Profile extends AppCompatActivity {
         bindDataForTotalComments(userId);
 
         averageRating = findViewById(R.id.averageRating);
+        bindDataForAverageRating(userId);
 
         tabPublished = findViewById(R.id.tabPublished);
         tabDraft = findViewById(R.id.tabDraft);
@@ -162,6 +166,26 @@ public class Profile extends AppCompatActivity {
             public void onError(Exception exception) {
                 Log.e("bindDataForTotalComments", "Error fetching total number of comments", exception);
                 Toast.makeText(Profile.this, "Error fetching total number of comments.", Toast.LENGTH_SHORT).show();
+            }
+        }, userId);
+    }
+
+    private void bindDataForAverageRating(String userId) {
+
+        userRatingDao.getAverageUserRating(new DataCallback<Double>() {
+            @Override
+            public void onDataReceived(Double averageRatingInt) {
+                if (averageRatingInt != null) {
+                    averageRating.setText(String.format("%.2f", averageRatingInt));
+                } else {
+                    averageRating.setText("0");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForAverageRating", "Error fetching user's average rating", exception);
+                Toast.makeText(Profile.this, "Error fetching user's average rating.", Toast.LENGTH_SHORT).show();
             }
         }, userId);
     }

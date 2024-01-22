@@ -74,12 +74,10 @@ public class FirebaseCommentDao implements CommentDao {
                for (String bookId : userBookIds) {
                    // Now, query the "Comment" table to get the comments for each book
                    Query query = commentsRef.orderByChild("bookId").equalTo(bookId);
-                   Log.d("bookId: ", bookId);
                    query.addListenerForSingleValueEvent(new ValueEventListener() {
                        @Override
                        public void onDataChange(DataSnapshot dataSnapshot) {
                            // Count the comments for each book
-                           Log.d(bookId, String.valueOf((int) dataSnapshot.getChildrenCount()));
                            totalComments[0] += (int) dataSnapshot.getChildrenCount();
 
                            // Notify the callback after processing all books
