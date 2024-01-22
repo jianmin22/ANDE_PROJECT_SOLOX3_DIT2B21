@@ -79,6 +79,36 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
+    public void getUserBooks(final DataCallback callback) {
+        DatabaseReference ref = database.getReference("Book");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Book> booksWithPublishedDate = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+                    if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
+                        booksWithPublishedDate.add(book);
+                    }
+                }
+
+                Collections.sort(booksWithPublishedDate, (book1, book2) ->
+                        book2.getPublishedDate().compareTo(book1.getPublishedDate()));
+
+                callback.onDataReceived(booksWithPublishedDate.subList(0, Math.min(5, booksWithPublishedDate.size())));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
     public void loadBookDetailsById(String bookId, DataCallback<Book> callback) {
         DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("Book").child(bookId);
         bookRef.addListenerForSingleValueEvent(new ValueEventListener() {
