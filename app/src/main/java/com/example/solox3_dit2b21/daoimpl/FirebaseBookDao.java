@@ -109,32 +109,32 @@ public class FirebaseBookDao implements BookDao {
         });
     }
 
-    @Override
-    public void getUserBooksId(final DataCallback callback, String userId) {
-        DatabaseReference ref = database.getReference("Book");
-
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> userBookIds = new ArrayList<>();
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Book book = snapshot.getValue(Book.class);
-
-                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
-                        userBookIds.add(book.getBookId());
-                    }
-                }
-
-                callback.onDataReceived(userBookIds);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
-            }
-        });
-    }
+//    @Override
+//    public void getUserBooksId(final DataCallback callback, String userId) {
+//        DatabaseReference ref = database.getReference("Book");
+//
+//        ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                List<String> userBookIds = new ArrayList<>();
+//
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                    Book book = snapshot.getValue(Book.class);
+//
+//                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
+//                        userBookIds.add(book.getBookId());
+//                    }
+//                }
+//
+//                callback.onDataReceived(userBookIds);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                callback.onError(databaseError.toException());
+//            }
+//        });
+//    }
 
     @Override
     public void loadBookDetailsById(String bookId, DataCallback<Book> callback) {
