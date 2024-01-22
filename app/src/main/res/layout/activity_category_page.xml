@@ -42,7 +42,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <GridLayout
+            <GridLayout
             android:id="@+id/categoryGridLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,11 +52,11 @@
             android:padding="16dp"
             android:rowCount="2"
             app:layout_constraintTop_toBottomOf="@id/topLinearLayout">
+            </GridLayout>
 
 
 
-        </GridLayout>
-    </LinearLayout>
+</LinearLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
