@@ -1,5 +1,7 @@
 package com.example.solox3_dit2b21.daoimpl;
 
+import android.util.Log;
+
 import com.example.solox3_dit2b21.dao.CommentDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
@@ -60,41 +62,43 @@ public class FirebaseCommentDao implements CommentDao {
     }
 
     @Override
-    public void getTotalUserComments(DataCallback callback, String userId) {
+    public void getTotalCommentsReceived(DataCallback callback, String userId) {
         DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
 
-//        FirebaseBookDao bookDao = new FirebaseBookDao();
-//
-//       List<String> userBookIds = bookDao.getUserBooksId(new DataCallback<List<String>>() {
-//           @Override
-//           public String onDataReceived(List<String> userBookIds) {
-//               Integer totalComments = 0;
-//
-//               for (String bookId : userBookIds) {
-//                   // Now, query the "Comment" table to get the comments for each book
-//                   DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment")
-//                           .orderByChild("bookId")
-//                           .equalTo(bookId);
-//
-//                   commentsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                       @Override
-//                       public void onDataChange(DataSnapshot dataSnapshot) {
-//                           // Count the comments for each book
-//                           totalComments += (int) dataSnapshot.getChildrenCount();
-//
-//                           // Notify the callback after processing all books
-//                           callback.onDataReceived(totalComments);
-//                       }
-//
-//                       @Override
-//                       public void onCancelled(DatabaseError databaseError) {
-//                           // Handle errors
-//                           callback.onError(databaseError.toException());
-//                       }
-//                   });
-//               }
-//           }
-//       });
+        FirebaseBookDao bookDao = new FirebaseBookDao();
 
+       List<String> userBookIds = bookDao.getUserBookIds(new DataCallback<List<String>>() {
+           @Override
+           public void onDataReceived(List<String> userBookIds) {
+               final Integer[] totalComments = {0};
+               for (String bookId : userBookIds) {
+                   // Now, query the "Comment" table to get the comments for each book
+                   Query query = commentsRef.orderByChild("bookId").equalTo(bookId);
+                   Log.d("bookId: ", bookId);
+                   query.addListenerForSingleValueEvent(new ValueEventListener() {
+                       @Override
+                       public void onDataChange(DataSnapshot dataSnapshot) {
+                           // Count the comments for each book
+                           Log.d(bookId, String.valueOf((int) dataSnapshot.getChildrenCount()));
+                           totalComments[0] += (int) dataSnapshot.getChildrenCount();
+
+                           // Notify the callback after processing all books
+                           callback.onDataReceived(totalComments[0]);
+                       }
+
+                       @Override
+                       public void onCancelled(DatabaseError databaseError) {
+                           // Handle errors
+                           callback.onError(databaseError.toException());
+                       }
+                   });
+               }
+           }
+
+           @Override
+           public void onError(Exception exception) {
+               callback.onError(exception);
+           }
+       }, userId);
     }
 }

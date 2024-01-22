@@ -84,8 +84,6 @@ public class FirebaseBookDao implements BookDao {
     @Override
     public void getUserBooks(final DataCallback callback, String userId, Boolean published) {
         DatabaseReference ref = database.getReference("Book");
-        Log.d("userId: ", userId);
-        Log.d("published: ", published.toString());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -93,11 +91,9 @@ public class FirebaseBookDao implements BookDao {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Book book = snapshot.getValue(Book.class);
-                    Log.d("Book AuthorId: ", String.valueOf(book.getAuthorId()));
 
                     if (book != null && book.getAuthorId().toString().equals(userId) && Boolean.parseBoolean(book.getIsPublished()) == published) {
                         userBooks.add(book);
-                        Log.d("Book added: ", String.valueOf(book));
                     }
                 }
 
@@ -114,32 +110,33 @@ public class FirebaseBookDao implements BookDao {
         });
     }
 
-//    @Override
-//    public void getUserBooksId(final DataCallback callback, String userId) {
-//        DatabaseReference ref = database.getReference("Book");
-//
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                List<String> userBookIds = new ArrayList<>();
-//
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    Book book = snapshot.getValue(Book.class);
-//
-//                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
-//                        userBookIds.add(book.getBookId());
-//                    }
-//                }
-//
-//                callback.onDataReceived(userBookIds);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                callback.onError(databaseError.toException());
-//            }
-//        });
-//    }
+    @Override
+    public List<String> getUserBookIds(final DataCallback callback, String userId) {
+        DatabaseReference ref = database.getReference("Book");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> userBookIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
+                        userBookIds.add(book.getBookId());
+                    }
+                }
+
+                callback.onDataReceived(userBookIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+        return null;
+    }
 
     @Override
     public void loadBookDetailsById(String bookId, DataCallback<Book> callback) {

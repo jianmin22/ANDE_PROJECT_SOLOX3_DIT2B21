@@ -139,13 +139,12 @@ public class SearchFilterResults extends AppCompatActivity implements View.OnCli
     private void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder) {
         bookDao.fetchSearchAndFilterBooks(search, filter, searchOrder, filterOrder, new DataCallback<List<Book>>() {
             @Override
-            public String onDataReceived(List<Book> books) {
+            public void onDataReceived(List<Book> books) {
                 bookList.clear();
                 bookList.addAll(books);
                 TextView resultsFoundView = findViewById(R.id.resultsFound);
                 resultsFoundView.setText(bookList.size() + " Results Found");
                 adapter.notifyDataSetChanged();
-                return null;
             }
 
             @Override

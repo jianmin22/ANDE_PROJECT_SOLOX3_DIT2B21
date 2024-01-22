@@ -59,7 +59,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         descriptionEditText=findViewById(R.id.descriptionEditText);
         categoryDao.loadAllCategories(new DataCallback<List<Category>>() {
             @Override
-            public String onDataReceived(List<Category> categories) {
+            public void onDataReceived(List<Category> categories) {
                 List<String> categoryNames = new ArrayList<>();
                 categoriesList=categories;
                 for (Category category : categories) {
@@ -91,7 +91,6 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         categoryId=null;
                     }
                 });
-                return null;
             }
 
             @Override
@@ -109,7 +108,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
             bookId = getData.getString("bookId");
             bookDao.loadBookDetailsById(bookId, new DataCallback<Book>(){
                 @Override
-                public String onDataReceived(Book returnedBookDetails) {
+                public void onDataReceived(Book returnedBookDetails) {
                     bookDetails=returnedBookDetails;
                     LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
                     bookTitleEditText.setText(bookDetails.getTitle());
@@ -129,7 +128,6 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                             categorySpinner.setSelection(selectedIndex);
                         }
                     }
-                    return null;
                 }
 
                 @Override

@@ -53,11 +53,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         categoryDao.loadBookCategory(book.getCategoryId(), new DataCallback<Category>() {
             @Override
-            public String onDataReceived(Category category) {
+            public void onDataReceived(Category category) {
                 if (category != null) {
                     holder.category.setText(category.getCategoryName());
                 }
-                return null;
             }
 
             @Override

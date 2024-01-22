@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,6 +37,7 @@ public class Profile extends AppCompatActivity {
     private ProfileAdapter profileAdapter;
     private List<Book> booksProfile = new ArrayList<>();
     private FirebaseBookDao bookDao = new FirebaseBookDao();
+    private FirebaseCommentDao commentDao = new FirebaseCommentDao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class Profile extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        String userId = user.getUid();
 
         profileUsername = findViewById(R.id.profileUsername);
         profileUsername.setText(user.getEmail());
@@ -52,14 +55,13 @@ public class Profile extends AppCompatActivity {
 //        Toast.makeText(Profile.this, "UID: " + user.getUid(), Toast.LENGTH_SHORT).show();
 
         totalPublished = findViewById(R.id.totalPublished);
-        bindDataForTotalPublished(user.getUid());
-
-//        totalPublished.setText(bindDataForTotalPublished(total));
-
-//        totalPublished.setText(bindDataForTotalPublished(user.getUid()));
+        bindDataForTotalPublished(userId);
 
         totalComments = findViewById(R.id.totalComments);
+        bindDataForTotalComments(userId);
+
         averageRating = findViewById(R.id.averageRating);
+
         tabPublished = findViewById(R.id.tabPublished);
         tabDraft = findViewById(R.id.tabDraft);
         profilePic = findViewById(R.id.profilePic);
@@ -124,17 +126,16 @@ public class Profile extends AppCompatActivity {
 
     }
 
-    private CharSequence bindDataForTotalPublished(String userId) {
+    private void bindDataForTotalPublished(String userId) {
 
         bookDao.getTotalUserPublished(new DataCallback<Integer>() {
             @Override
-            public String onDataReceived(Integer totalPublishedInt) {
+            public void onDataReceived(Integer totalPublishedInt) {
                 if (totalPublishedInt != null) {
                     totalPublished.setText(String.valueOf(totalPublishedInt));
                 } else {
                     totalPublished.setText("0");
                 }
-                return null;
             }
 
             @Override
@@ -143,19 +144,36 @@ public class Profile extends AppCompatActivity {
                 Toast.makeText(Profile.this, "Error fetching total number of published books.", Toast.LENGTH_SHORT).show();
             }
         }, userId);
+    }
 
-        return null;
+    private void bindDataForTotalComments(String userId) {
+
+        commentDao.getTotalCommentsReceived(new DataCallback<Integer>() {
+            @Override
+            public void onDataReceived(Integer totalCommentsInt) {
+                if (totalCommentsInt != null) {
+                    totalComments.setText(String.valueOf(totalCommentsInt));
+                } else {
+                    totalComments.setText("0");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForTotalComments", "Error fetching total number of comments", exception);
+                Toast.makeText(Profile.this, "Error fetching total number of comments.", Toast.LENGTH_SHORT).show();
+            }
+        }, userId);
     }
 
     private void bindDataForProfile(String userId, Boolean published) {
 
         bookDao.getUserBooks(new DataCallback<List<Book>>() {
             @Override
-            public String onDataReceived(List<Book> books) {
+            public void onDataReceived(List<Book> books) {
                 booksProfile.clear();
                 booksProfile.addAll(books);
                 profileAdapter.notifyDataSetChanged();
-                return null;
             }
 
             @Override

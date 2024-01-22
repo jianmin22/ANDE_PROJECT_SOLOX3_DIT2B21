@@ -121,7 +121,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
             bookDao.loadBookDetailsById(bookId, new DataCallback<Book>() {
                 @Override
-                public String onDataReceived(Book returnedBookDetails) {
+                public void onDataReceived(Book returnedBookDetails) {
                     if (returnedBookDetails!=null) {
                         bookDetails = returnedBookDetails;
                         LoadImageURL.loadImageURL(bookDetails.getImage(),bookImage);
@@ -137,7 +137,6 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
                         finish();
                     }
-                    return null;
                 }
 
                 @Override
@@ -154,11 +153,10 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private void loadComments(String bookId) {
         commentDao.loadLatest2Comments(bookId, new DataCallback<List<Comment>>() {
             @Override
-            public String onDataReceived(List<Comment> comments) {
+            public void onDataReceived(List<Comment> comments) {
                 twoCommentsForBook.clear();
                 twoCommentsForBook.addAll(comments);
                 adapter.notifyDataSetChanged();
-                return null;
             }
 
             @Override
@@ -173,10 +171,9 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private void loadUserRating(String bookId) {
         userRatingDao.loadUserRatingForBook(bookId, new DataCallback<Double>() {
             @Override
-            public String onDataReceived(Double rating) {
+            public void onDataReceived(Double rating) {
                 calculatedUserRating = rating;
                 bookRating.setText(String.format("%.1f", calculatedUserRating));
-                return null;
             }
 
             @Override
@@ -190,14 +187,13 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private void loadCategory(String categoryId) {
         categoryDao.loadBookCategory(categoryId, new DataCallback<Category>() {
             @Override
-            public String onDataReceived(Category category) {
+            public void onDataReceived(Category category) {
                 if (category != null) {
                     bookCategory = category;
                     bookCategoryButton.setText(category.getCategoryName());
                 } else {
                     Log.d("NOT FOUND", "No Category found for the book");
                 }
-                return null;
             }
 
             @Override
@@ -212,10 +208,9 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private void loadUserFavourite(String bookId) {
         userFavouriteBookDao.loadNumberOfUserFavouriteBook(bookId, new DataCallback<Integer>() {
             @Override
-            public String onDataReceived(Integer count) {
+            public void onDataReceived(Integer count) {
                 noOfUserFavouriteBook = count;
                 addToFavouriteText.setText(String.valueOf(noOfUserFavouriteBook));
-                return null;
             }
 
             @Override

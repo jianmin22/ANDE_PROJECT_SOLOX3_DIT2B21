@@ -59,9 +59,8 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
     private void loadSearchHistory() {
         searchHistoryDao.getUserSearchHistory(userId, new DataCallback<List<SearchHistory>>() {
             @Override
-            public String onDataReceived(List<SearchHistory> searchHistoryList) {
+            public void onDataReceived(List<SearchHistory> searchHistoryList) {
                 displaySearchHistory(searchHistoryList);
-                return null;
             }
             @Override
             public void onError(Exception exception) {
