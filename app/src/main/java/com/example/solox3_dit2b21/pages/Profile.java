@@ -25,7 +25,7 @@ import java.util.List;
 
 public class Profile extends AppCompatActivity {
 
-    private TextView totalPublished, totalComments, averageRating, tabPublished, tabDraft;
+    private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     private ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
@@ -41,6 +41,9 @@ public class Profile extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+
+//        profileUsername.setText(user.getDisplayName());
+        Toast.makeText(Profile.this, "Display: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 
         totalPublished = findViewById(R.id.totalPublished);
         totalPublished.setText(bindDataForTotalPublished(user.getUid()));
@@ -62,34 +65,34 @@ public class Profile extends AppCompatActivity {
 //            }
 //        }
 
-        setSelectedTab(tabPublished);
+//        setSelectedTab(tabPublished);
 
-        tabPublished.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSelectedTab(tabPublished);
-                bindDataForProfile(user.getUid(), true);
-            }
-        });
+//        tabPublished.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSelectedTab(tabPublished);
+//                bindDataForProfile(user.getUid(), true);
+//            }
+//        });
 
-        tabDraft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSelectedTab(tabDraft);
-                bindDataForProfile(user.getUid(), false);
-            }
-        });
+//        tabDraft.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSelectedTab(tabDraft);
+//                bindDataForProfile(user.getUid(), false);
+//            }
+//        });
 
-//        bindDataForProfile(user.getUid(), true);
+        bindDataForProfile(user.getUid(), true);
         setUIRef();
     }
 
-    private void setSelectedTab(TextView selectedTab) {
-        tabPublished.setTextColor(Color.parseColor("000000"));
-        tabDraft.setTextColor(Color.parseColor("000000"));
-
-        selectedTab.setTextColor(Color.parseColor("F4D163"));
-    }
+//    private void setSelectedTab(TextView selectedTab) {
+//        tabPublished.setTextColor(Color.parseColor("000000"));
+//        tabDraft.setTextColor(Color.parseColor("000000"));
+//
+//        selectedTab.setTextColor(Color.parseColor("F4D163"));
+//    }
 
     private void setUIRef()
     {
@@ -136,6 +139,9 @@ public class Profile extends AppCompatActivity {
             public String onDataReceived(List<Book> books) {
                 booksProfile.clear();
                 booksProfile.addAll(books);
+                for (Book book: books) {
+                    Log.d("Book: ", String.valueOf(book));
+                }
                 profileAdapter.notifyDataSetChanged();
                 return null;
             }

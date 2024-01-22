@@ -231,7 +231,7 @@ public class FirebaseBookDao implements BookDao {
     public void getTotalUserPublished(final DataCallback callback, String userId) {
         DatabaseReference ref = database.getReference("Book");
 
-        Query query = ref.orderByChild("authorId").equalTo(userId).startAt(true).endAt(true);
+        Query query = ref.orderByChild("authorId").equalTo(userId);
 
         query.addValueEventListener(new ValueEventListener() {
             @Override
