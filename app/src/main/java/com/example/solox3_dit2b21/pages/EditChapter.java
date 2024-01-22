@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.Chapter;
@@ -21,9 +24,11 @@ import java.util.List;
 public class EditChapter extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EditChaptersAdapter adapter;
-    private List<Chapter> chapters = new ArrayList<>(); // Initialize the chapters list
+    private List<Chapter> chapters = new ArrayList<>();
     private DatabaseReference databaseReference;
     private String bookId;
+
+    private String chapterNodeIdentifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,27 +47,63 @@ public class EditChapter extends AppCompatActivity {
 
         adapter = new EditChaptersAdapter(this, chapters);
         recyclerView.setAdapter(adapter);
-
         getChaptersData();
+        Button btnSave = findViewById(R.id.save_chapter_button);
+        btnSave.setOnClickListener(this::saveChapters);
+
+
     }
 
     private void getChaptersData() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Chapters");
+        databaseReference = FirebaseDatabase.getInstance().getReference("Chapter");
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                    if (bookChapterSnapshot.child("bookId").getValue(String.class).equals(bookId)) {
+                        chapterNodeIdentifier = bookChapterSnapshot.getKey(); // Store the node identifier
+                        Log.d("chapterNodeIdentifier: ", chapterNodeIdentifier);
+                        DataSnapshot chaptersSnapshot = bookChapterSnapshot.child("chapters");
+                        for (DataSnapshot chapterSnapshot : chaptersSnapshot.getChildren()) {
+                            Log.d("node identifier: ",chapterSnapshot.getKey());
+                            Chapter chapter = chapterSnapshot.getValue(Chapter.class);
+                            if (chapter != null) {
+                                chapters.add(chapter);
+                            }
+                        }
+                        break;
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("EditChapter", "Database error: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void saveChapters(View view) {
+        // First, find the parent node for the chapters based on bookId
         databaseReference.orderByChild("bookId").equalTo(bookId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        chapters.clear(); // Clear existing data
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            Chapter chapter = snapshot.getValue(Chapter.class);
-                            if (chapter != null) {
-                                chapters.add(chapter); // Add chapter to the list
+                        if (dataSnapshot.exists()) {
+                            for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                                // We found the parent node, now get its key
+                                String parentNodeKey = bookChapterSnapshot.getKey();
+                                DatabaseReference bookChaptersRef = databaseReference.child(parentNodeKey).child("chapters");
+                                bookChaptersRef.setValue(chapters)
+                                        .addOnSuccessListener(aVoid -> Toast.makeText(EditChapter.this, "Chapter " + " saved successfully", Toast.LENGTH_SHORT).show())
+                                        .addOnFailureListener(e -> Toast.makeText(EditChapter.this, "Failed to save chapter " + ": " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                                ;
+
                             }
-                        }
-                        if (chapters.isEmpty()) {
-                            Log.e("EditChapter", "No chapters found for bookId: " + bookId);
                         } else {
-                            adapter.notifyDataSetChanged(); // Notify the adapter of the data change
+                            Log.e("EditChapter", "No parent node found for bookId: " + bookId);
                         }
                     }
 
@@ -72,5 +113,8 @@ public class EditChapter extends AppCompatActivity {
                     }
                 });
     }
-}
 
+
+
+
+}
