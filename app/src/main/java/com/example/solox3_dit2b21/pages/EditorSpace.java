@@ -1,5 +1,6 @@
 package com.example.solox3_dit2b21.pages;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
@@ -38,8 +40,11 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
     private String bookId;
     private RichEditor mEditor;
 //    private TextView mPreview;
+    private SubChapter currentSubChapter;
     private int chapterId;
     private int subChapterId;
+    private String editorContent;
+    private List<Chapter> chapters;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +62,7 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                 fetchChapters(); // Fetch the chapters from Firebase
             } else {
                 Log.e("ReadingActivity", "No bookId provided");
-                return; // Exit if no bookId is provided
+                return;
             }
             setContentView(R.layout.activity_editor_space);
             mEditor = (RichEditor) findViewById(R.id.editor);
@@ -66,6 +71,7 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
             mEditor.setEditorFontColor(Color.BLACK);
             mEditor.setPadding(10, 10, 10, 10);
             mEditor.setPlaceholder("Insert text here...");
+
 
             findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -249,7 +255,7 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    List<Chapter> chapters = new ArrayList<>();
+                    chapters = new ArrayList<Chapter>();
                     for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
                         String fetchedBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
                         if (bookId.equals(fetchedBookId)) {
@@ -264,6 +270,7 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                     }
 
                     if (!chapters.isEmpty()) {
+
                         // Handle the first chapter and its subchapters
                         Chapter firstChapter = chapters.get(0);
                         chapterId = firstChapter.getChapterOrder();
@@ -272,9 +279,22 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                             SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
                             subChapterId=firstSubChapter.getSubChapterOrder();
                             mEditor.setHtml(firstSubChapter.getChapterContent());// This method should reset and update the ViewPager
-                            Log.e("chapter", "First subchapter: " + firstSubChapter.getTitle());
+                            currentSubChapter=firstSubChapter;
+                            mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+                                @Override
+                                public void onTextChange(String text) {
+                                    editorContent = text;
+                                    Log.d("text", text);
+//                Log.d("subchapter",currentSubChapter.getChapterContent());
+                                    if (currentSubChapter != null) {
+                                        currentSubChapter.setChapterContent(editorContent);
+                                        Log.d("current subchapter",currentSubChapter.getChapterContent());
+                                    }
+                                }
+                            });
+                            Log.d("chapter", "First subchapter: " + firstSubChapter.getTitle());
                         }
-                        Log.e("chapter", chapters.get(0).getTitle());
+                        Log.d("chapter", chapters.get(0).getTitle());
                         populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
                     } else {
                         Log.e("ReadingActivity", "No matching bookId found in chapters");
@@ -298,6 +318,36 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
         } else if (v.getId()==R.id.menuButtonEdit) {
             DrawerLayout drawer = findViewById(R.id.drawer_layout_editor);
             drawer.openDrawer(GravityCompat.START);
+        }else if(v.getId()==R.id.saveChangesButton){
+            databaseReference.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                                    // We found the parent node, now get its key
+                                    String parentNodeKey = bookChapterSnapshot.getKey();
+                                    DatabaseReference bookChaptersRef = databaseReference.child(parentNodeKey).child("chapters");
+                                    bookChaptersRef.setValue(chapters)
+                                            .addOnSuccessListener(aVoid -> Toast.makeText(EditorSpace.this, "Chapter " + " saved successfully", Toast.LENGTH_SHORT).show())
+                                            .addOnFailureListener(e -> Toast.makeText(EditorSpace.this, "Failed to save chapter " + ": " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                                    ;
+
+                                }
+                            } else {
+                                Log.e("EditChapter", "No parent node found for bookId: " + bookId);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e("EditChapter", "error occurred"+error.getMessage());
+                        }
+                    }
+
+            );
+        }else if (v.getId()==R.id.back){
+            finish();
         }
     }
     private void populateDrawerMenu(List<Chapter> chapters) {
@@ -325,10 +375,23 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
 
     private void navigateToSubChapter(SubChapter subChapter,Chapter chapter) {
         chapterId=chapter.getChapterOrder();
+        currentSubChapter = subChapter;
         if (subChapter != null) {
             subChapterId=subChapter.getSubChapterOrder();
             // Split the subchapter content into pages and update the ViewPager
             mEditor.setHtml(subChapter.getChapterContent()); // This method should reset and update the ViewPager
+            mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+                @Override
+                public void onTextChange(String text) {
+                    editorContent = text;
+                    Log.d("text", text);
+//                Log.d("subchapter",currentSubChapter.getChapterContent());
+                    if (currentSubChapter != null) {
+                        currentSubChapter.setChapterContent(editorContent);
+                        Log.d("current subchapter",currentSubChapter.getChapterContent());
+                    }
+                }
+            });
             Log.d("chapterId",chapterId+"");
             Log.d("subChapterId",subChapterId+"");
             // Optionally, close the drawer if open

@@ -21,7 +21,7 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <ImageView
-            android:id="@+id/backButtonEdit"
+            android:id="@+id/back"
             android:layout_width="20dp"
             android:layout_height="match_parent"
             android:src="@drawable/back"
@@ -381,6 +381,7 @@
         android:backgroundTint="#D8A57A"
         android:layout_gravity="right"
         android:layout_margin="5dp"
+        android:onClick="onClick"
         android:text="Save Changes"
         android:textAllCaps="false"/>
 
