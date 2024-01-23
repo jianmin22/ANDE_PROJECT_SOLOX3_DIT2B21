@@ -42,6 +42,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
             if (itemId == R.id.navigation_bookshelf) {
                 Intent intent = new Intent(Home.this, EditorSpace.class);
+                intent.putExtra("bookId", "book2");
                 startActivity(intent);
                 // Navigate to Bookshelf activity
                 // Replace CategoryPage.class with the correct Activity class for Bookshelf
@@ -58,6 +59,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                 startActivity(intent);
                 // }
             } else if (itemId == R.id.navigation_profile) {
+                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
+                intent.putExtra("bookId", "book2");
+                startActivity(intent);
                 // Navigate to Profile activity
                 // Replace CategoryPage.class with the correct Activity class for Profile
                 // if (this is not instance of ProfileActivity) {

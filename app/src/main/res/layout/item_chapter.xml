@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <EditText
+            android:id="@+id/editText_chapter_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:textSize="18sp"
+            android:text="Chapter 1: The Story Begin"
+            android:background="@android:color/transparent"/>
+
+        <ImageView
+            android:id="@+id/imageView_delete_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="63dp"
+            android:contentDescription="expand"
+            android:src="@drawable/ic_trash" />
+
+        <ImageView
+            android:id="@+id/imageView_expand_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="34dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="8dp"
+            android:contentDescription="expand"
+            android:src="@drawable/ic_expand_more" />
+
+        <ImageView
+            android:id="@+id/imageView_add_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="3dp"
+            android:contentDescription="expand"
+            android:src="@drawable/ic_add" />
+
+        <!-- Your Edit and Delete buttons here -->
+    </RelativeLayout>
+
+    <!-- Subchapters layout, initially gone and made visible when expanded -->
+    <LinearLayout
+        android:id="@+id/linearLayout_subchapters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <!-- Dynamically add your subchapters here in code -->
+        <!-- Example static subchapter -->
+        <EditText
+            android:id="@+id/editText_subchapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.1 Type something here..."
+            android:paddingLeft="16dp"
+            android:textSize="16sp"
+            android:background="@android:color/transparent"/>
+
+        <ImageView
+            android:id="@+id/imageView_delete_subchapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_toStartOf="@+id/imageView_add_subchapter"
+            android:src="@drawable/ic_trash" />
+
+        <ImageView
+            android:id="@+id/imageView_add_subchapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="40dp"
+            android:src="@drawable/ic_add" />
+        <!-- Add more TextViews for additional subchapters -->
+    </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

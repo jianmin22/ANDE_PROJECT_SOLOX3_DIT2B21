@@ -2,7 +2,9 @@ package com.example.solox3_dit2b21.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class Book {
     private String bookId;
@@ -123,5 +125,21 @@ public class Book {
 
     public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("bookId", bookId);
+        result.put("title", title);
+        result.put("description", description);
+        result.put("categoryId", categoryId);
+        result.put("image", image);
+        result.put("publishedDate", publishedDate);
+        result.put("createdDate", createdDate);
+        result.put("lastUpdated", lastUpdated);
+        result.put("authorId", authorId);
+        result.put("isPublished", isPublished);
+        result.put("numberOfReads", numberOfReads);
+        return result;
     }
 }
