@@ -22,6 +22,7 @@ import android.view.SubMenu;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import android.widget.TextView;
 
@@ -275,8 +276,10 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                             // Display the first subchapter of the first chapter
                             SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
                             subChapterId=firstSubChapter.getSubChapterOrder();
-                            mEditor.setHtml(firstSubChapter.getChapterContent()); // This method should reset and update the ViewPager
+                            mEditor.setHtml(firstSubChapter.getChapterContent());// This method should reset and update the ViewPager
+                            Log.e("chapter", "First subchapter: " + firstSubChapter.getTitle());
                         }
+                        Log.e("chapter", chapters.get(0).getTitle());
                         populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
                     } else {
                         Log.e("ReadingActivity", "No matching bookId found in chapters");
@@ -302,23 +305,29 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
             drawer.openDrawer(GravityCompat.START);
         }
     }
-    private void populateDrawerMenu(List< Chapter > chapters) {
+    private void populateDrawerMenu(List<Chapter> chapters) {
         NavigationView navigationView = findViewById(R.id.nav_view_editor);
         Menu menu = navigationView.getMenu();
         menu.clear(); // Clear any existing items
 
         for (Chapter chapter : chapters) {
+            // Check if subChapters is null or empty and initialize if necessary
+            if (chapter.getSubChapters() == null) {
+                chapter.setSubChapters(new HashMap<>()); // Initialize with empty Map if null
+            }
+
             SubMenu chapterMenu = menu.addSubMenu(chapter.getTitle());
             for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
                 SubChapter subChapter = entry.getValue();
                 chapterMenu.add(Menu.NONE, Menu.NONE, Menu.NONE, subChapter.getTitle()).setOnMenuItemClickListener(item -> {
                     // Handle subchapter selection here
-                    navigateToSubChapter(subChapter,chapter);
+                    navigateToSubChapter(subChapter, chapter);
                     return true;
                 });
             }
         }
     }
+
     private void navigateToSubChapter(SubChapter subChapter,Chapter chapter) {
         chapterId=chapter.getChapterOrder();
         if (subChapter != null) {
