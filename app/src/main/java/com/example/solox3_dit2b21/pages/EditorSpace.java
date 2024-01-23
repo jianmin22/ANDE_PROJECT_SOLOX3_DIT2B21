@@ -159,11 +159,11 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
             });
 
             findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
-                private boolean isChanged;
+                private boolean isChanged=false;
 
                 @Override
                 public void onClick(View v) {
-                    mEditor.setTextColor(isChanged ? Color.RED : Color.BLACK);
+                    mEditor.setTextColor(isChanged ? Color.BLACK : Color.RED);
                     isChanged = !isChanged;
                 }
             });
