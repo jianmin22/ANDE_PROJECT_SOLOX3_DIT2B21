@@ -63,14 +63,6 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setPlaceholder("Insert text here...");
 
-//        mPreview = (TextView) findViewById(R.id.preview);
-//        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-//            @Override
-//            public void onTextChange(String text) {
-//                mPreview.setText(text);
-//            }
-//        });
-
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
