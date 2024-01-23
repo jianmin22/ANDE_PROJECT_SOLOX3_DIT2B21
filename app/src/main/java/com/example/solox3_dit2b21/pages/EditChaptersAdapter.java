@@ -89,8 +89,14 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
                 editTextSubChapterTitle.setTextSize(16);
                 // Add other styling and layout parameters as needed
                 holder.linearLayoutSubchapters.addView(editTextSubChapterTitle);
-                holder.linearLayoutSubchapters.addView(holder.imageViewAddSubChapterToggle);
-                holder.linearLayoutSubchapters.addView(holder.imageViewDeleteSubChapterToggle);
+// Create new image views for each subchapter
+                ImageView imageViewAddSubChapter = new ImageView(holder.itemView.getContext());
+                imageViewAddSubChapter.setImageResource(R.drawable.ic_add); // Assuming you have an add icon
+                holder.linearLayoutSubchapters.addView(imageViewAddSubChapter);
+
+                ImageView imageViewDeleteSubChapter = new ImageView(holder.itemView.getContext());
+                imageViewDeleteSubChapter.setImageResource(R.drawable.ic_trash); // Assuming you have a delete icon
+                holder.linearLayoutSubchapters.addView(imageViewDeleteSubChapter);
                 // Set up TextWatcher for subchapter title
                 editTextSubChapterTitle.addTextChangedListener(new TextWatcher() {
                     @Override
