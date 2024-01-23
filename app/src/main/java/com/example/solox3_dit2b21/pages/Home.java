@@ -42,6 +42,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
             if (itemId == R.id.navigation_bookshelf) {
                 Intent intent = new Intent(Home.this, EditorSpace.class);
+                intent.putExtra("bookId", "book1");
                 startActivity(intent);
                 // Navigate to Bookshelf activity
                 // Replace CategoryPage.class with the correct Activity class for Bookshelf
