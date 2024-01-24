@@ -9,21 +9,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="85dp">
 
         <TextView
             android:id="@+id/profileUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="10dp"
-            android:textSize="35dp"
+            android:text=""
             android:textColor="@color/black"
-            android:text="" />
+            android:textSize="35dp" />
 
         <ImageView
+            android:id="@+id/profilePic"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/profilePic" />
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,64 +35,70 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/totalPublished"
-                    android:textSize="20dp"
-                    android:textColor="@color/black"
-                    android:text="" />
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="20dp" />
+
+                <TextView
                     android:id="@+id/textPublished"
-                    android:textColor="@color/black"
-                    android:text="@string/published" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/published"
+                    android:textColor="@color/unselected_color" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/totalComments"
-                    android:textSize="20dp"
-                    android:textColor="@color/black"
-                    android:text="" />
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textComments"
+                    android:text=""
                     android:textColor="@color/black"
-                    android:text="@string/comments" />
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/textComments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/comments"
+                    android:textColor="@color/unselected_color" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_weight="1"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/averageRating"
-                    android:textSize="20dp"
-                    android:textColor="@color/black"
-                    android:text="" />
-                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textAverageRating"
+                    android:text=""
                     android:textColor="@color/black"
-                    android:text="@string/average_rating" />
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/textAverageRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/average_rating"
+                    android:textColor="@color/unselected_color" />
             </LinearLayout>
 
         </LinearLayout>
@@ -98,41 +106,82 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginTop="30dp"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/book" />
+                android:text="@string/book"
+                android:textColor="@color/black"
+                android:textSize="30dp" />
+
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/tabPublishedDraft"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:orientation="horizontal">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
                 android:id="@+id/tabPublished"
-                android:text="@string/published" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:shadowColor="@android:color/black"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="4"
+                android:text="@string/published"
+                android:textColor="@color/selected_color"
+                android:textSize="20dp" />
+
             <TextView
+                android:id="@+id/tabDraft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:id="@+id/tabDraft"
-                android:text="@string/drafts" />
+                android:text="@string/drafts"
+                android:textColor="@color/unselected_color"
+                android:textSize="20dp" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="380dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/recyclerViewGuideline"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintTop_toTopOf="@id/tabPublishedDraft" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/recyclerViewGuideline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:orientation="horizontal"/>
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
 
     </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:menu="@menu/bottom_nav_menu" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

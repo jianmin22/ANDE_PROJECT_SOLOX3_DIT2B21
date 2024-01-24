@@ -1,12 +1,16 @@
 package com.example.solox3_dit2b21.pages;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,13 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Profile extends AppCompatActivity {
-
-    private TextView profileUsername;
-    private TextView totalPublished;
-    private TextView totalComments;
-    private TextView averageRating;
-    private TextView tabPublished;
-    private TextView tabDraft;
+    private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
+    int selectedColor, unselectedColor;
     private ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
@@ -68,6 +67,10 @@ public class Profile extends AppCompatActivity {
 
         tabPublished = findViewById(R.id.tabPublished);
         tabDraft = findViewById(R.id.tabDraft);
+
+        selectedColor = ContextCompat.getColor(this, R.color.selected_color);
+        unselectedColor = ContextCompat.getColor(this, R.color.unselected_color);
+
         profilePic = findViewById(R.id.profilePic);
 //        implementation 'com.squareup.picasso:picasso:2.71828'
 //        if (user != null) {
@@ -83,38 +86,41 @@ public class Profile extends AppCompatActivity {
 
 //        setSelectedTab(tabPublished);
 
-//        tabPublished.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setSelectedTab(tabPublished);
-//                bindDataForProfile(user.getUid(), true);
-//            }
-//        });
+        tabPublished.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSelectedTab(tabPublished, tabDraft);
+                bindDataForProfile(userId, true);
+            }
+        });
 
-//        tabDraft.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setSelectedTab(tabDraft);
-//                bindDataForProfile(user.getUid(), false);
-//            }
-//        });
+        tabDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSelectedTab(tabDraft, tabPublished);
+                bindDataForProfile(userId, false);
+            }
+        });
 
-        bindDataForProfile(user.getUid(), true);
+        bindDataForProfile(userId, true);
         setUIRef();
     }
 
-//    private void setSelectedTab(TextView selectedTab) {
-//        tabPublished.setTextColor(Color.parseColor("000000"));
-//        tabDraft.setTextColor(Color.parseColor("000000"));
-//
-//        selectedTab.setTextColor(Color.parseColor("F4D163"));
-//    }
+    private void setSelectedTab(TextView selectedTab, TextView unselectedTab) {
+        selectedTab.setTextColor(selectedColor);
+        selectedTab.setElevation(4);
+        selectedTab.setShadowLayer(4, 0, 2, Color.BLACK);
+
+        unselectedTab.setTextColor(unselectedColor);
+        unselectedTab.setElevation(0);
+        unselectedTab.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
+    }
 
     private void setUIRef()
     {
         recyclerViewProfile = findViewById(R.id.recycler_view_profile);
-        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerViewProfile.setLayoutManager(layoutManager1);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
+        recyclerViewProfile.setLayoutManager(layoutManager);
         profileAdapter = new ProfileAdapter(booksProfile, new ProfileAdapter.MyRecyclerViewItemClickListener()
         {
             @Override

@@ -97,8 +97,13 @@ public class FirebaseBookDao implements BookDao {
                     }
                 }
 
-                Collections.sort(userBooks, (book1, book2) ->
-                        book2.getPublishedDate().compareTo(book1.getPublishedDate()));
+                if (published) {
+                    Collections.sort(userBooks, (book1, book2) ->
+                            book2.getPublishedDate().compareTo(book1.getPublishedDate()));
+                } else {
+                    Collections.sort(userBooks, (book1, book2) ->
+                            book2.getLastUpdated().compareTo(book1.getLastUpdated()));
+                }
 
                 callback.onDataReceived(userBooks);
             }
