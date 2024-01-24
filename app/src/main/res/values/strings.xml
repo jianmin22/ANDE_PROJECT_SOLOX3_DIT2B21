@@ -11,5 +11,9 @@
     <string name="register_now"><u>Register here.</u></string>
     <string name="login_now"><u>Login here.</u></string>
     <string name="password_check">Re-enter your password</string>
-    <string name="book">Book</string>
+    <string name="your_books">Your Books</string>
+    <string name="published">Published</string>
+    <string name="drafts">Drafts</string>
+    <string name="comments">Comments</string>
+    <string name="average_rating">Average Rating</string>
 </resources>

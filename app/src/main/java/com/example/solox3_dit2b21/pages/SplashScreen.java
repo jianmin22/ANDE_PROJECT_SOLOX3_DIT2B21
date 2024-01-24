@@ -20,7 +20,7 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 try {
                     // sleep time in milliseconds (3000 = 3sec)
-                    sleep(3000);
+                    sleep(1000);
                 } catch(InterruptedException e) {
                     // Trace the error
                     e.printStackTrace();

@@ -16,17 +16,9 @@ import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
-import com.google.firebase.storage.FirebaseStorage;
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHolder> {
     private List<Book> userBooks;
     private CategoryDao categoryDao = new FirebaseCategoryDao();

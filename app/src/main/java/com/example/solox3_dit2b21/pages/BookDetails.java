@@ -34,8 +34,6 @@ import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.example.solox3_dit2b21.model.UserRating;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
