@@ -20,6 +20,7 @@
             android:layout_marginVertical="10dp"
             android:text=""
             android:textColor="@color/black"
+            android:textStyle="bold"
             android:textSize="35dp" />
 
         <ImageView
@@ -106,16 +107,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginHorizontal="20dp"
             android:layout_marginTop="30dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/book"
+                android:layout_weight="1"
+                android:text="@string/your_books"
                 android:textColor="@color/black"
+                android:textStyle="bold"
                 android:textSize="30dp" />
+
+            <ImageView
+                android:id="@+id/addBookBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="5dp"
+                android:onClick="onClick"
+                android:src="@drawable/plus_in_circle" />
 
         </LinearLayout>
 
@@ -139,7 +151,8 @@
                 android:shadowRadius="4"
                 android:text="@string/published"
                 android:textColor="@color/selected_color"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tabDraft"
@@ -149,7 +162,9 @@
                 android:gravity="center"
                 android:text="@string/drafts"
                 android:textColor="@color/unselected_color"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

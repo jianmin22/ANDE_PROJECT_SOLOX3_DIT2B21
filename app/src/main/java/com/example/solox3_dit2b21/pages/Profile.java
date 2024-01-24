@@ -21,6 +21,7 @@ import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -31,6 +32,8 @@ public class Profile extends AppCompatActivity {
     private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     int selectedColor, unselectedColor;
     private ImageView profilePic;
+
+    private BottomNavigationView bottomNavigationView;
     FirebaseAuth auth;
     FirebaseUser user;
     private RecyclerView recyclerViewProfile;
@@ -45,6 +48,27 @@ public class Profile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navigation_bookshelf) {
+                Intent intent = new Intent(this, EditorSpace.class);
+                startActivity(intent);
+            } else if (itemId == R.id.navigation_home) {
+                Intent intent = new Intent(this, Home.class);
+                startActivity(intent);
+            } else if (itemId == R.id.navigation_category) {
+                Intent intent = new Intent(this, CategoryPage.class);
+                startActivity(intent);
+            }
+
+            return true;
+        });
+
+        // To select a default item (e.g. profile) when the activity starts
+        bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -83,8 +107,6 @@ public class Profile extends AppCompatActivity {
 //                profilePic.setImageResource(R.drawable.default_profile_image);
 //            }
 //        }
-
-//        setSelectedTab(tabPublished);
 
         tabPublished.setOnClickListener(new View.OnClickListener() {
             @Override
