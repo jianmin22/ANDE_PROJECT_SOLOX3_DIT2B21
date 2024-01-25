@@ -40,7 +40,7 @@ public class Register extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Home.class);
+            Intent intent = new Intent(this, Home.class);
             startActivity(intent);
             finish();
         }
@@ -91,7 +91,7 @@ public class Register extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Login.class);
+                Intent intent = new Intent(Register.this, Login.class);
                 startActivity(intent);
                 finish();
             }
@@ -106,7 +106,7 @@ public class Register extends AppCompatActivity {
                 String password = editTextPassword.getText().toString().trim();
                 String passwordCheck = editTextPasswordCheck.getText().toString().trim();
 
-                if (TextUtils.isEmpty(email)) {
+                if (TextUtils.isEmpty(username)) {
                     editTextUsername.setError("Username is required.");
                     progressBar.setVisibility(View.GONE);
                     return;

@@ -83,7 +83,8 @@ public class Profile extends AppCompatActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                auth.signOut();
+                Intent intent = new Intent(Profile.this, UserSettings.class);
+                startActivity(intent);
             }
         });
 
