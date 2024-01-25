@@ -238,7 +238,7 @@ public class Profile extends AppCompatActivity {
                     noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
 
                     ViewGroup.LayoutParams layoutParams = recyclerViewProfile.getLayoutParams();
-                    layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+                    layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 285, getResources().getDisplayMetrics());
                     recyclerViewProfile.setLayoutParams(layoutParams);
                 }
             }

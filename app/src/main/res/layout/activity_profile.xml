@@ -44,8 +44,8 @@
 
         <ImageView
             android:id="@+id/profilePic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:layout_gravity="center"
             android:src="@drawable/empty_profile_pic" />
 
@@ -205,7 +205,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_profile"
             android:layout_width="wrap_content"
-            android:layout_height="250dp"
+            android:layout_height="285dp"
             android:layout_gravity="center"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

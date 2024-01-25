@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +34,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycleritembooks, parent, false);
+                .inflate(R.layout.profile_recycleritembooks, parent, false);
 
         final ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +51,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
         holder.bookTitle.setText(book.getTitle());
         LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookId.setText(book.getBookId());
+        String publish = "PUBLISH";
+        if (Boolean.parseBoolean(book.getIsPublished())) publish = "UNPUBLISH";
+        holder.publishButton.setText(publish);
 
         categoryDao.loadBookCategory(book.getCategoryId(), new DataCallback<Category>() {
             @Override
@@ -73,11 +77,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView bookImage;
-        public TextView bookTitle;
-        public TextView category;
-
-        public TextView bookId;
-
+        public TextView bookTitle, category, bookId;
+        public Button publishButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -85,6 +86,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
             bookImage = itemView.findViewById(R.id.bookImage);
             category = itemView.findViewById(R.id.category);
             bookId = itemView.findViewById(R.id.bookId);
+            publishButton = itemView.findViewById(R.id.publishButton);
         }
     }
     //RecyclerView Click Listener
