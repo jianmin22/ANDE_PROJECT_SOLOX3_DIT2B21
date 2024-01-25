@@ -11,9 +11,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class FirebaseBookDao implements BookDao {
@@ -211,7 +215,20 @@ public class FirebaseBookDao implements BookDao {
                 .addOnFailureListener(callback::onFailure);
     }
 
-
+    @Override
+    public void updateBookIsPublished(Book book, DataStatusCallback callback) {
+        Map<String, Object> bookUpdates = book.toMap();
+        String published = String.valueOf(!Boolean.parseBoolean(book.getIsPublished()));
+        bookUpdates.put("isPublished", published);
+        if (Boolean.parseBoolean(published)) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+            dateFormat.setTimeZone(Calendar.getInstance().getTimeZone());
+            bookUpdates.put("publishedDate", dateFormat.format(new Date()));
+        }
+        bookRef.child(book.getBookId()).updateChildren(bookUpdates)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+    }
 
     private boolean matchesFilter(String categoryId, String filter) {
         String[] filters = filter.split(",");

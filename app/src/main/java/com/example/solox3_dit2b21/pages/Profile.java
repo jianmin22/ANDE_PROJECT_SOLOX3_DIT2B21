@@ -149,7 +149,7 @@ public class Profile extends AppCompatActivity {
                 intent.putExtra("bookId", book.getBookId());
                 startActivity(intent);
             }
-        });
+        }, Profile.this);
 
         recyclerViewProfile.setAdapter(profileAdapter);
 

@@ -1,5 +1,6 @@
 package com.example.solox3_dit2b21.pages;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,13 +8,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.CategoryDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
@@ -22,13 +27,16 @@ import java.util.List;
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHolder> {
     private List<Book> userBooks;
+    private Context context;
+    private BookDao bookDao = new FirebaseBookDao();
     private CategoryDao categoryDao = new FirebaseCategoryDao();
 
 
     private MyRecyclerViewItemClickListener mItemClickListener;
-    public ProfileAdapter(List<Book> userBooks, MyRecyclerViewItemClickListener itemClickListener) {
+    public ProfileAdapter(List<Book> userBooks, MyRecyclerViewItemClickListener itemClickListener, Context context) {
         this.userBooks = userBooks;
         this.mItemClickListener = itemClickListener;
+        this.context = context;
     }
 
     @Override
@@ -66,6 +74,25 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
             @Override
             public void onError(Exception exception) {
                 Log.e("Firebase", "Error fetching category data", exception);
+            }
+        });
+
+        String finalPublish = publish.toLowerCase();
+        holder.publishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bookDao.updateBookIsPublished(book, new DataStatusCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(context, "Book " + finalPublish + "ed successfully", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e("Update Book Failed", exception.getMessage());
+                        Toast.makeText(context, "Failed to " + finalPublish + "!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
