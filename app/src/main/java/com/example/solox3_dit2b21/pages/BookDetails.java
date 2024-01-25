@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.BookDao;
@@ -34,8 +35,6 @@ import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.example.solox3_dit2b21.model.UserRating;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,8 @@ import java.util.UUID;
 public class BookDetails extends AppCompatActivity implements View.OnClickListener {
     private String bookId;
     private Book bookDetails;
-    private final String userId="user1";
+    private String userId;
+    private String userName;
     private String profilePicURL;
     private List<Comment> twoCommentsForBook=new ArrayList<>();
     private double calculatedUserRating;
@@ -90,14 +90,18 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private CategoryDao categoryDao = new FirebaseCategoryDao();
     private UserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
 
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_details);
-
-
+        userId=AuthUtils.getUserId();
+        userName=AuthUtils.getUserName();
         Bundle getData = getIntent().getExtras();
 
         if (getData != null) {
@@ -132,7 +136,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         loadCategory(bookDetails.getCategoryId());
                         loadComments(bookId);
                         loadUserRating(bookId);
-                        currentUserName.setText(userId);
+                        currentUserName.setText(userName);
 
                         loadUserFavourite(bookId);
                     } else {

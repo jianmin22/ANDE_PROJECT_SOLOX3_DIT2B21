@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.CategoryDao;
@@ -37,7 +38,7 @@ import java.util.List;
 public class AuthorBookDetails extends AppCompatActivity implements View.OnClickListener {
     private String bookId;
     private Book bookDetails;
-    private String userId="user1";
+    private String userId;
     private List<Comment> twoCommentsForBook=new ArrayList<>();
     private double calculatedUserRating;
     private Category bookCategory;
@@ -67,11 +68,17 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
     private CategoryDao categoryDao = new FirebaseCategoryDao();
     private UserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_author_book_details);
+        userId=AuthUtils.getUserId();
         Bundle getData = getIntent().getExtras();
 
         if (getData != null) {

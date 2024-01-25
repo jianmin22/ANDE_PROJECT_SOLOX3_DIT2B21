@@ -13,11 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class FirebaseSearchHistoryDao implements SearchHistoryDao {
+    DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
 
     @Override
     public void getUserSearchHistory(String userId, DataCallback<List<SearchHistory>> callback) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("SearchHistory");
-        Query searchHistoryQuery = ref.orderByChild("userId").equalTo(userId);
+        Query searchHistoryQuery = searchHistoryRef.orderByChild("userId").equalTo(userId);
 
         searchHistoryQuery.addValueEventListener(new ValueEventListener() {
             @Override
@@ -41,7 +41,6 @@ public class FirebaseSearchHistoryDao implements SearchHistoryDao {
 
     @Override
     public void insertOrUpdateSearchHistory(String userId, String search, DataStatusCallback callback) {
-        DatabaseReference searchHistoryRef = FirebaseDatabase.getInstance().getReference("SearchHistory");
         Query searchQuery = searchHistoryRef.orderByChild("search").equalTo(search);
 
         searchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -79,6 +78,14 @@ public class FirebaseSearchHistoryDao implements SearchHistoryDao {
                 callback.onFailure(databaseError.toException());
             }
         });
+    }
+
+    @Override
+    public void removeSearchHistory(String searchId, DataStatusCallback callback) {
+        DatabaseReference searchIdRef = searchHistoryRef.child(searchId);
+        searchIdRef.removeValue()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onFailure(e));
     }
 
     private String generateUUID() {

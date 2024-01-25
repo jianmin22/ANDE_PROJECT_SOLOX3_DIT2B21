@@ -12,9 +12,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class FirebaseCommentDao implements CommentDao {
+    DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
+
     @Override
     public void loadLatest2Comments(String bookId, DataCallback<List<Comment>> callback) {
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
         Query commentsQuery = commentsRef.orderByChild("bookId").equalTo(bookId);
 
         commentsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -53,7 +54,6 @@ public class FirebaseCommentDao implements CommentDao {
 
     @Override
     public void addComment(Comment comment, DataStatusCallback callback) {
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
         commentsRef.child(comment.getCommentId()).setValue(comment)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);

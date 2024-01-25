@@ -15,15 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseChapterDao implements ChapterDao {
-    private DatabaseReference databaseReference;
+    DatabaseReference chapterRef = FirebaseDatabase.getInstance().getReference("Chapter");
 
-    public FirebaseChapterDao() {
-        this.databaseReference = FirebaseDatabase.getInstance().getReference();
-    }
 
     @Override
     public void fetchChapters(String bookId, DataCallback<List<Chapter>> callback) {
-        databaseReference.child("Chapter").orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
+        chapterRef.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -51,16 +48,15 @@ public class FirebaseChapterDao implements ChapterDao {
 
     @Override
     public void saveChapters(String bookId, List<Chapter> chapters, DataStatusCallback callback) {
-        databaseReference.child("Chapter").orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(
+        chapterRef.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                                // We found the parent node, now get its key
                                 String parentNodeKey = bookChapterSnapshot.getKey();
                                 if (parentNodeKey != null) {
-                                    DatabaseReference bookChaptersRef = databaseReference.child("Chapter").child(parentNodeKey).child("chapters");
+                                    DatabaseReference bookChaptersRef = chapterRef.child(parentNodeKey).child("chapters");
                                     bookChaptersRef.setValue(chapters)
                                             .addOnSuccessListener(aVoid -> callback.onSuccess())
                                             .addOnFailureListener(callback::onFailure);

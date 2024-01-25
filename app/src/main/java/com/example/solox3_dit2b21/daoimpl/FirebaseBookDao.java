@@ -16,13 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 public class FirebaseBookDao implements BookDao {
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
+
 
     @Override
     public void getPopularBooks(final DataCallback callback) {
-        DatabaseReference ref = database.getReference("Book");
-
-        ref.addValueEventListener(new ValueEventListener() {
+        bookRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Book> booksWithReads = new ArrayList<>();
@@ -50,9 +49,7 @@ public class FirebaseBookDao implements BookDao {
 
     @Override
     public void getLatestBooks(final DataCallback callback) {
-        DatabaseReference ref = database.getReference("Book");
-
-        ref.addValueEventListener(new ValueEventListener() {
+        bookRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Book> booksWithPublishedDate = new ArrayList<>();
@@ -80,9 +77,7 @@ public class FirebaseBookDao implements BookDao {
 
     @Override
     public void getUserBooks(final DataCallback callback) {
-        DatabaseReference ref = database.getReference("Book");
-
-        ref.addValueEventListener(new ValueEventListener() {
+        bookRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Book> booksWithPublishedDate = new ArrayList<>();
@@ -110,8 +105,8 @@ public class FirebaseBookDao implements BookDao {
 
     @Override
     public void loadBookDetailsById(String bookId, DataCallback<Book> callback) {
-        DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference().child("Book").child(bookId);
-        bookRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference bookIdRef = bookRef.child(bookId);
+        bookIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -130,8 +125,7 @@ public class FirebaseBookDao implements BookDao {
     }
     @Override
     public void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        bookRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Book> bookList = new ArrayList<>();
@@ -172,17 +166,15 @@ public class FirebaseBookDao implements BookDao {
 
     @Override
     public void insertBook(Book book, DataStatusCallback callback) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
-        databaseReference.child(book.getBookId()).setValue(book)
+        bookRef.child(book.getBookId()).setValue(book)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
     }
 
     @Override
     public void updateBookDetails(Book book, DataStatusCallback callback) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
         Map<String, Object> bookUpdates = book.toMap();
-        databaseReference.child(book.getBookId()).updateChildren(bookUpdates)
+        bookRef.child(book.getBookId()).updateChildren(bookUpdates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
     }

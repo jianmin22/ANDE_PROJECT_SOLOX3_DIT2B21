@@ -1,42 +1,38 @@
 package com.example.solox3_dit2b21.pages;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
+import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.ChapterDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseChapterDao;
+import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Chapter;
 import com.example.solox3_dit2b21.model.SubChapter;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import android.graphics.Color;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.SubMenu;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import java.util.Map;
+import java.util.Objects;
 
 import jp.wasabeef.richeditor.RichEditor;
 public class EditorSpace extends AppCompatActivity implements View.OnClickListener{
@@ -47,23 +43,48 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
     private int chapterId;
     private int subChapterId;
     private String editorContent;
+    private BookDao bookDao = new FirebaseBookDao();
     private List<Chapter> chapters;
     private ChapterDao chapterDao=new FirebaseChapterDao();
+    private String userId;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle getData = getIntent().getExtras();
+        userId=AuthUtils.getUserId();
 
         if (getData != null) {
             bookId = getData.getString("bookId");
-            // Initialize Firebase
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
-            // Update the reference to point to the specific book's chapters
-            // Use the bookId to dynamically refer to the correct book chapters
             if (bookId != null && !bookId.isEmpty()) {
-                databaseReference = firebaseDatabase.getReference("Chapter");
-                fetchChapters(); // Fetch the chapters from Firebase
+                bookDao.loadBookDetailsById(bookId, new DataCallback<Book>() {
+                    @Override
+                    public void onDataReceived(Book returnedBookDetails) {
+                        if (returnedBookDetails!=null) {
+                            if(!Objects.equals(returnedBookDetails.getAuthorId(), userId)){
+                                Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                        Log.e("Firebase", "Failed to get book details", exception);
+                        finish();
+                    }
+                });
+                fetchChapters();
             } else {
                 Log.e("ReadingActivity", "No bookId provided");
                 return;
@@ -262,7 +283,6 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                 chapters = data;
 
                 if (!chapters.isEmpty()) {
-
                     // Handle the first chapter and its subchapters
                     Chapter firstChapter = chapters.get(0);
                     chapterId = firstChapter.getChapterOrder();
@@ -360,7 +380,6 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
                 public void onTextChange(String text) {
                     editorContent = text;
                     Log.d("text", text);
-//                Log.d("subchapter",currentSubChapter.getChapterContent());
                     if (currentSubChapter != null) {
                         currentSubChapter.setChapterContent(editorContent);
                         Log.d("current subchapter",currentSubChapter.getChapterContent());
