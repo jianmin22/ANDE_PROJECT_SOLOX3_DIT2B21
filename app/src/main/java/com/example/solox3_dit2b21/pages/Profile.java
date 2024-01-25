@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -233,6 +235,18 @@ public class Profile extends AppCompatActivity {
                 booksProfile.clear();
                 booksProfile.addAll(books);
                 profileAdapter.notifyDataSetChanged();
+
+                TextView noBooksFound = findViewById(R.id.noBooksFound);
+
+                if (books.size() == 0) {
+                    if (noBooksFound.getText().toString().trim().equals("")) {
+                        noBooksFound.setText("No books yet. Write a book!");
+                        noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    }
+                } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
+                    noBooksFound.setText("");
+                    noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
+                }
             }
 
             @Override

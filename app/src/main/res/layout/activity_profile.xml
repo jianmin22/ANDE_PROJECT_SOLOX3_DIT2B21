@@ -186,6 +186,13 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/noBooksFound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_profile"
             android:layout_width="wrap_content"
@@ -193,16 +200,7 @@
             android:layout_gravity="center"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/recyclerViewGuideline"
-            app:layout_constraintHeight_percent="0.5"
             app:layout_constraintTop_toTopOf="@id/tabPublishedDraft" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/recyclerViewGuideline"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5" />
 
     </LinearLayout>
 

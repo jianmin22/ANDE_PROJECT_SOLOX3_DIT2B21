@@ -18,4 +18,5 @@
     <string name="average_rating">Average Rating</string>
     <string name="username">Username</string>
     <string name="forgot_password"><u>Forgot password?</u></string>
+    <string name="write_a_book">No books yet. Write a book!</string>
 </resources>
