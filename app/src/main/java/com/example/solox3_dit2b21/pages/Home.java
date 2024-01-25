@@ -58,10 +58,12 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                 startActivity(intent);
                 // }
             } else if (itemId == R.id.navigation_profile) {
-                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
-                intent.putExtra("bookId", "book1");
-                startActivity(intent);
+//                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
+//                intent.putExtra("bookId", "book1");
+//                startActivity(intent);
                 // Navigate to Profile activity
+                Intent intent = new Intent(Home.this, Profile.class);
+                startActivity(intent);
                 // Replace CategoryPage.class with the correct Activity class for Profile
                 // if (this is not instance of ProfileActivity) {
                 //Intent intent = new Intent(Home.this, ProfileActivity.class);

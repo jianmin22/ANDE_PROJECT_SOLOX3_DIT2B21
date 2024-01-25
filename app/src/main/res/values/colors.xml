@@ -9,5 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="selected_color">#8A0D16</color> <!-- Example color for selected state -->
     <color name="unselected_color">#848484</color> <!-- Example color for unselected state -->
-
+    <color name="link">#0000FF</color>
 </resources>
