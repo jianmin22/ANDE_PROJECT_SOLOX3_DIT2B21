@@ -197,6 +197,16 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
         });
     }
 
+    private void navigateToFilterResult() {
+        Intent intent = new Intent(AuthorBookDetails.this, SearchFilterResults.class);
+        intent.putExtra("filter", bookDetails.getCategoryId());
+        String searchOrder="2";
+        String filterOrder="1";
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder", filterOrder);
+        startActivity(intent);
+    }
+
     @Override
     public void onClick(View v){
         if (v.getId()==R.id.back){
@@ -209,6 +219,8 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
             Intent intent = new Intent(AuthorBookDetails.this, AuthorEditBookDetails.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
+        } else if (v.getId()==R.id.categoryButton){
+            navigateToFilterResult();
         }
     }
 }

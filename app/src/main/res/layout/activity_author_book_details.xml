@@ -129,6 +129,7 @@
                     android:layout_centerHorizontal="true"
                     android:backgroundTint="#D8A57A"
                     android:text="Category"
+                    android:onClick="onClick"
                     android:textAllCaps="false"
                     app:cornerRadius="10dp" />
 

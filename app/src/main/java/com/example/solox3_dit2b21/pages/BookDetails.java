@@ -388,6 +388,16 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+    private void navigateToFilterResult() {
+        Intent intent = new Intent(BookDetails.this, SearchFilterResults.class);
+        intent.putExtra("filter", bookDetails.getCategoryId());
+        String searchOrder="2";
+        String filterOrder="1";
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder", filterOrder);
+        startActivity(intent);
+    }
+
     @Override
     public void onClick(View v){
         if (v.getId()==R.id.back){
@@ -410,6 +420,8 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             handleRating(v.getId());
         } else if (v.getId() == R.id.addCommentBtn){
             addComment();
+        } else if (v.getId()==R.id.categoryButton){
+            navigateToFilterResult();
         }
     }
 }
