@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.dao.ChapterDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseChapterDao;
 import com.example.solox3_dit2b21.model.Chapter;
 import com.example.solox3_dit2b21.model.SubChapter;
 import com.google.android.material.navigation.NavigationView;
@@ -39,12 +43,12 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
     private DatabaseReference databaseReference;
     private String bookId;
     private RichEditor mEditor;
-//    private TextView mPreview;
     private SubChapter currentSubChapter;
     private int chapterId;
     private int subChapterId;
     private String editorContent;
     private List<Chapter> chapters;
+    private ChapterDao chapterDao=new FirebaseChapterDao();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,63 +254,48 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
 
         }
     }
+
     private void fetchChapters() {
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        chapterDao.fetchChapters(bookId, new DataCallback<List<Chapter>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    chapters = new ArrayList<Chapter>();
-                    for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                        String fetchedBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
-                        if (bookId.equals(fetchedBookId)) {
-                            for (DataSnapshot chapterSnapshot : bookChapterSnapshot.child("chapters").getChildren()) {
-                                Chapter chapter = chapterSnapshot.getValue(Chapter.class);
-                                if (chapter != null) {
-                                    chapters.add(chapter); // Add chapter to list
+            public void onDataReceived(List<Chapter> data) {
+                chapters = data;
+
+                if (!chapters.isEmpty()) {
+
+                    // Handle the first chapter and its subchapters
+                    Chapter firstChapter = chapters.get(0);
+                    chapterId = firstChapter.getChapterOrder();
+                    if (firstChapter.getSubChapters() != null && !firstChapter.getSubChapters().isEmpty()) {
+                        // Display the first subchapter of the first chapter
+                        SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
+                        subChapterId = firstSubChapter.getSubChapterOrder();
+                        mEditor.setHtml(firstSubChapter.getChapterContent());// This method should reset and update the ViewPager
+                        currentSubChapter = firstSubChapter;
+                        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+                            @Override
+                            public void onTextChange(String text) {
+                                editorContent = text;
+                                Log.d("text", text);
+                                if (currentSubChapter != null) {
+                                    currentSubChapter.setChapterContent(editorContent);
+                                    Log.d("current subchapter", currentSubChapter.getChapterContent());
                                 }
                             }
-                            // No need to return here, let the loop finish
-                        }
+                        });
+                        Log.d("chapter", "First subchapter: " + firstSubChapter.getTitle());
                     }
-
-                    if (!chapters.isEmpty()) {
-
-                        // Handle the first chapter and its subchapters
-                        Chapter firstChapter = chapters.get(0);
-                        chapterId = firstChapter.getChapterOrder();
-                        if (firstChapter.getSubChapters() != null && !firstChapter.getSubChapters().isEmpty()) {
-                            // Display the first subchapter of the first chapter
-                            SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
-                            subChapterId=firstSubChapter.getSubChapterOrder();
-                            mEditor.setHtml(firstSubChapter.getChapterContent());// This method should reset and update the ViewPager
-                            currentSubChapter=firstSubChapter;
-                            mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-                                @Override
-                                public void onTextChange(String text) {
-                                    editorContent = text;
-                                    Log.d("text", text);
-//                Log.d("subchapter",currentSubChapter.getChapterContent());
-                                    if (currentSubChapter != null) {
-                                        currentSubChapter.setChapterContent(editorContent);
-                                        Log.d("current subchapter",currentSubChapter.getChapterContent());
-                                    }
-                                }
-                            });
-                            Log.d("chapter", "First subchapter: " + firstSubChapter.getTitle());
-                        }
-                        Log.d("chapter", chapters.get(0).getTitle());
-                        populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
-                    } else {
-                        Log.e("ReadingActivity", "No matching bookId found in chapters");
-                    }
+                    Log.d("chapter", chapters.get(0).getTitle());
+                    populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
                 } else {
                     Log.e("ReadingActivity", "No chapters available");
                 }
             }
 
+
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("ReadingActivity", "Failed to retrieve chapter data: " + databaseError.getMessage());
+            public void onError(Exception exception) {
+                Log.e("ReadingActivity", "Failed to retrieve chapter data: " + exception.getMessage());
             }
         });
     }
@@ -319,33 +308,19 @@ public class EditorSpace extends AppCompatActivity implements View.OnClickListen
             DrawerLayout drawer = findViewById(R.id.drawer_layout_editor);
             drawer.openDrawer(GravityCompat.START);
         }else if(v.getId()==R.id.saveChangesButton){
-            databaseReference.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                                    // We found the parent node, now get its key
-                                    String parentNodeKey = bookChapterSnapshot.getKey();
-                                    DatabaseReference bookChaptersRef = databaseReference.child(parentNodeKey).child("chapters");
-                                    bookChaptersRef.setValue(chapters)
-                                            .addOnSuccessListener(aVoid -> Toast.makeText(EditorSpace.this, "Chapter " + " saved successfully", Toast.LENGTH_SHORT).show())
-                                            .addOnFailureListener(e -> Toast.makeText(EditorSpace.this, "Failed to save chapter " + ": " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                                    ;
+            chapterDao.saveChapters(bookId, chapters, new DataStatusCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(EditorSpace.this, "Chapter saved successfully", Toast.LENGTH_SHORT).show();
+                }
 
-                                }
-                            } else {
-                                Log.e("EditChapter", "No parent node found for bookId: " + bookId);
-                            }
-                        }
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e("EditChapter", "error occurred"+exception.getMessage());
+                    Toast.makeText(EditorSpace.this, "Failed to save chapter" , Toast.LENGTH_SHORT).show();
+                }
+            });
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e("EditChapter", "error occurred"+error.getMessage());
-                        }
-                    }
-
-            );
         }else if (v.getId()==R.id.back){
             finish();
         }
