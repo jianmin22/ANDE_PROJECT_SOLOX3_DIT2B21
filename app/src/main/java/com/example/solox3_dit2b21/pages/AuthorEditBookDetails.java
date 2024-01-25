@@ -12,10 +12,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.FirebaseStorageManager;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
@@ -32,11 +34,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class AuthorEditBookDetails extends AppCompatActivity implements View.OnClickListener{
     private String bookId;
-    private String userId="userId";
+    private String userId;
     private static final int PICK_IMAGE_REQUEST = 1;
     CategoryDao categoryDao = new FirebaseCategoryDao();
     BookDao bookDao = new FirebaseBookDao();
@@ -48,14 +51,22 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     String imageURL;
     String categoryId;
     List<Category> categoriesList = new ArrayList<>();
+    private ProgressBar progressBar;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_author_edit_book_details);
-
+        userId= AuthUtils.getUserId();
         categorySpinner = findViewById(R.id.categorySpinner);
         bookImage=findViewById(R.id.bookImage);
         bookTitleEditText=findViewById(R.id.bookTitleEditText);
+        progressBar = findViewById(R.id.progressBar);
         descriptionEditText=findViewById(R.id.descriptionEditText);
         categoryDao.loadAllCategories(new DataCallback<List<Category>>() {
             @Override
@@ -110,6 +121,10 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 @Override
                 public void onDataReceived(Book returnedBookDetails) {
                     bookDetails=returnedBookDetails;
+                    if(!Objects.equals(bookDetails.getAuthorId(), userId)){
+                        Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
                     LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
                     bookTitleEditText.setText(bookDetails.getTitle());
                     descriptionEditText.setText(bookDetails.getDescription());
@@ -213,10 +228,12 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         }
                     });
                 } else {
-                    book = new Book(UUID.randomUUID().toString(), title, description, categoryId, 0,imageURL, null, 0, CurrentDateUtils.getCurrentDateTime(), CurrentDateUtils.getCurrentDateTime(), userId, "false");
+                    String newBookId=UUID.randomUUID().toString();
+                    book = new Book(newBookId, title, description, categoryId, 0,imageURL, null, 0, CurrentDateUtils.getCurrentDateTime(), CurrentDateUtils.getCurrentDateTime(), userId, "false");
                     bookDao.insertBook(book, new DataStatusCallback() {
                         @Override
                         public void onSuccess() {
+                            bookId=newBookId;
                             Toast.makeText(AuthorEditBookDetails.this, "Book saved successfully", Toast.LENGTH_SHORT).show();
                         }
 
@@ -231,26 +248,37 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 Toast.makeText(AuthorEditBookDetails.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             }
         } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.bookImage) {
-            if (imageURL != null && !imageURL.equals("")) {
-                FirebaseStorageManager storageManager = new FirebaseStorageManager();
-                storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firebase Storage", "Delete Success");
-                        selectImage();
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Delete Image Failed:", e.getMessage());
-                        selectImage();
-                    }
-                });
-            } else {
-                selectImage();
-            }
+            deleteImageAndSelectNewOne();
         }
 
 
+    }
+
+    private void deleteImageAndSelectNewOne() {
+        if (imageURL != null && !imageURL.equals("")) {
+            showLoading(true);
+            FirebaseStorageManager storageManager = new FirebaseStorageManager();
+            storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("Firebase Storage", "Delete Success");
+                    showLoading(false);
+                    selectImage();
+                }
+            }, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Delete Image Failed:", e.getMessage());
+                    showLoading(false);
+                    selectImage();
+                }
+            });
+        } else {
+            selectImage();
+        }
+    }
+
+    private void showLoading(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }

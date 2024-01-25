@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -175,6 +176,11 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         menu.clear(); // Clear any existing items
 
         for (Chapter chapter : chapters) {
+            // Check if subChapters is null or empty and initialize if necessary
+            if (chapter.getSubChapters() == null) {
+                chapter.setSubChapters(new HashMap<>()); // Initialize with empty Map if null
+            }
+
             SubMenu chapterMenu = menu.addSubMenu(chapter.getTitle());
             for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
                 SubChapter subChapter = entry.getValue();

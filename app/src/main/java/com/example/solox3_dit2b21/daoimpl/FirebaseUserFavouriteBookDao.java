@@ -7,9 +7,10 @@ import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.google.firebase.database.*;
 
 public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
+    DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
+
     @Override
     public void loadNumberOfUserFavouriteBook(String bookId, DataCallback<Integer> callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         Query userFavouriteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
         userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -31,7 +32,6 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
 
     @Override
     public void deleteUserFavourite(String bookId, String userId, DataStatusCallback callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
 
         deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,7 +57,6 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
 
     @Override
     public void insertUserFavourite(UserFavouriteBook userFavouriteBook, DataStatusCallback callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         userFavouriteRef.push().setValue(userFavouriteBook)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
