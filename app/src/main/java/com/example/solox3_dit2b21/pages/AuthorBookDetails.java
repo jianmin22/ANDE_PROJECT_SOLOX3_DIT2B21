@@ -100,6 +100,10 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
                 public void onDataReceived(Book returnedBookDetails) {
                     if (returnedBookDetails!=null) {
                         bookDetails = returnedBookDetails;
+                        if (!bookDetails.getAuthorId().equals(userId)){
+                            Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
                         LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
                         bookTitle.setText(bookDetails.getTitle());
                         descriptionContent.setText(bookDetails.getDescription());

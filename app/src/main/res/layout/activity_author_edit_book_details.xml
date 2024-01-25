@@ -17,8 +17,7 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:visibility="gone"
-            android:layout_gravity="center"
-            android:indeterminateTint="#FF0000" />
+            android:layout_gravity="center"/>
     </FrameLayout>
 
     <ImageView
@@ -147,8 +146,8 @@
             android:layout_width="184dp"
             android:layout_height="wrap_content"
             android:backgroundTint="#8A0D16"
-            android:text="Proceed Chapter Page"
             android:onClick="onClick"
+            android:text="Proceed To Edit Chapter"
             app:cornerRadius="15dp" />
     </LinearLayout>
 
