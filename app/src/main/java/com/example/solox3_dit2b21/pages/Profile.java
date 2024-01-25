@@ -31,7 +31,7 @@ import java.util.List;
 public class Profile extends AppCompatActivity {
     private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     int selectedColor, unselectedColor;
-    private ImageView profilePic;
+    private ImageView profilePic, settings, addBookBtn;
 
     private BottomNavigationView bottomNavigationView;
     FirebaseAuth auth;
@@ -75,7 +75,15 @@ public class Profile extends AppCompatActivity {
         String userId = user.getUid();
 
         profileUsername = findViewById(R.id.profileUsername);
-        profileUsername.setText(user.getEmail());
+        profileUsername.setText(user.getDisplayName());
+
+        settings = findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                auth.signOut();
+            }
+        });
 
 //        Toast.makeText(Profile.this, "Display: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
 //        Toast.makeText(Profile.this, "UID: " + user.getUid(), Toast.LENGTH_SHORT).show();
@@ -96,6 +104,7 @@ public class Profile extends AppCompatActivity {
         unselectedColor = ContextCompat.getColor(this, R.color.unselected_color);
 
         profilePic = findViewById(R.id.profilePic);
+
 //        implementation 'com.squareup.picasso:picasso:2.71828'
 //        if (user != null) {
 //            String photoUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
@@ -179,10 +188,13 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForTotalComments(String userId) {
+        Toast.makeText(Profile.this, "fetching total comments", Toast.LENGTH_SHORT).show();
 
         commentDao.getTotalCommentsReceived(new DataCallback<Integer>() {
             @Override
             public void onDataReceived(Integer totalCommentsInt) {
+                Toast.makeText(Profile.this, "totalComments: " + totalCommentsInt, Toast.LENGTH_SHORT).show();
+
                 if (totalCommentsInt != null) {
                     totalComments.setText(String.valueOf(totalCommentsInt));
                 } else {
@@ -199,10 +211,13 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForAverageRating(String userId) {
+        Toast.makeText(Profile.this, "fetching average rating", Toast.LENGTH_SHORT).show();
 
         userRatingDao.getAverageUserRating(new DataCallback<Double>() {
             @Override
             public void onDataReceived(Double averageRatingInt) {
+                Toast.makeText(Profile.this, "averageRating: " + averageRatingInt, Toast.LENGTH_SHORT).show();
+
                 if (averageRatingInt != null) {
                     averageRating.setText(String.format("%.2f", averageRatingInt));
                 } else {

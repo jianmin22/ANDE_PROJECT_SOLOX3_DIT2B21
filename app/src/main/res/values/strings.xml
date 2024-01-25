@@ -16,4 +16,5 @@
     <string name="drafts">Drafts</string>
     <string name="comments">Comments</string>
     <string name="average_rating">Average Rating</string>
+    <string name="username">Username</string>
 </resources>

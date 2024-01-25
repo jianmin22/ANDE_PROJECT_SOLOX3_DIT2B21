@@ -110,6 +110,8 @@ public class FirebaseUserRatingDao implements UserRatingDao {
         List<String> userBookIds = bookDao.getUserBookIds(new DataCallback<List<String>>() {
             @Override
             public void onDataReceived(List<String> userBookIds) {
+                if (userBookIds.size() == 0) callback.onDataReceived(0.0);
+
                 final Double[] totalRatingValue = {0.0};
                 final Integer[] totalRatingsReceived = {0};
                 for (String bookId : userBookIds) {

@@ -70,6 +70,8 @@ public class FirebaseCommentDao implements CommentDao {
        List<String> userBookIds = bookDao.getUserBookIds(new DataCallback<List<String>>() {
            @Override
            public void onDataReceived(List<String> userBookIds) {
+               if (userBookIds.size() == 0) callback.onDataReceived(0);
+
                final Integer[] totalComments = {0};
                for (String bookId : userBookIds) {
                    // Now, query the "Comment" table to get the comments for each book

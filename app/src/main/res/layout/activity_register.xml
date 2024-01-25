@@ -23,6 +23,15 @@
         android:layout_marginBottom="15dp"
         app:boxCornerRadiusTopEnd="10dp"
         app:boxCornerRadiusTopStart="10dp"
+        android:id="@+id/username"
+        android:hint="@string/username" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
         android:id="@+id/email"
         android:hint="@string/email" />
 
