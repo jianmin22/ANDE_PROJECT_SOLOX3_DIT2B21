@@ -15,7 +15,7 @@
     <string name="published">Published</string>
     <string name="drafts">Drafts</string>
     <string name="comments">Comments</string>
-    <string name="average_rating">Average\nRating</string>
+    <string name="average_rating">Rating</string>
     <string name="username">Username</string>
     <string name="forgot_password"><u>Forgot password?</u></string>
     <string name="write_a_book">No books yet. Write a book!</string>

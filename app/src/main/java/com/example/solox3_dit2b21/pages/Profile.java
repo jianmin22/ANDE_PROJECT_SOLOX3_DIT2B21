@@ -120,6 +120,8 @@ public class Profile extends AppCompatActivity {
             }
         });
 
+        recyclerViewProfile = findViewById(R.id.recycler_view_profile);
+
         refreshProfileData();
         setUIRef();
     }
@@ -136,7 +138,6 @@ public class Profile extends AppCompatActivity {
 
     private void setUIRef()
     {
-        recyclerViewProfile = findViewById(R.id.recycler_view_profile);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
         recyclerViewProfile.setLayoutManager(layoutManager);
         profileAdapter = new ProfileAdapter(booksProfile, new ProfileAdapter.MyRecyclerViewItemClickListener()
@@ -227,10 +228,18 @@ public class Profile extends AppCompatActivity {
                     if (noBooksFound.getText().toString().trim().equals("")) {
                         noBooksFound.setText("No books yet. Write a book!");
                         noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+
+                        ViewGroup.LayoutParams layoutParams = recyclerViewProfile.getLayoutParams();
+                        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 117, getResources().getDisplayMetrics());
+                        recyclerViewProfile.setLayoutParams(layoutParams);
                     }
                 } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
                     noBooksFound.setText("");
                     noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
+
+                    ViewGroup.LayoutParams layoutParams = recyclerViewProfile.getLayoutParams();
+                    layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+                    recyclerViewProfile.setLayoutParams(layoutParams);
                 }
             }
 
