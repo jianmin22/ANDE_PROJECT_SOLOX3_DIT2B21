@@ -29,9 +29,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:drawableStart="@drawable/edit"
+            android:drawablePadding="8dp"
             android:textColor="@color/black"
             android:textSize="20dp"
             android:text="@string/edit_profile" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginVertical="10dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="5dp"
+            android:background="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/commentHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:drawableStart="@drawable/comment"
+            android:drawablePadding="8dp"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:text="@string/comment_history" />
 
         <View
             android:layout_width="match_parent"

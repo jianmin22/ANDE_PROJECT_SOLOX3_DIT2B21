@@ -25,7 +25,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserSettings extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView editProfile, resetPassword, logOut;
+    private TextView editProfile, commentHistory, resetPassword, logOut;
     FirebaseAuth auth;
     FirebaseUser user;
 
@@ -44,49 +44,15 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(UserSettings.this, EditProfile.class);
                 startActivity(intent);
             }
-//                final EditText newUsername = new EditText (v.getContext());
-//                final AlertDialog.Builder editProfileDialog = new AlertDialog.Builder(v.getContext());
-//                editProfileDialog.setTitle("Edit Profile");
-//                editProfileDialog.setMessage("Enter your new username.");
-//                editProfileDialog.setView(newUsername);
-//
-//                editProfileDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        String username = newUsername.getText().toString().trim();
-//
-//                        if (TextUtils.isEmpty(username)) {
-//                            newUsername.setError("Username is required.");
-//                            return;
-//                        }
-//
-//                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                                .setDisplayName(username)
-//                                .build();
-//
-//                        user.updateProfile(profileUpdates)
-//                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<Void> task) {
-//                                        if (task.isSuccessful()) {
-//                                            Log.d("updateProfile", "New Display Name: " + username);
-//                                        } else {
-//                                            Log.d("updateProfileError", task.getException().getMessage());
-//                                        }
-//                                    }
-//                                });
-//                    }
-//                });
-//
-//                editProfileDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                editProfileDialog.create().show();
-//            }
+        });
+
+        commentHistory = findViewById(R.id.commentHistory);
+        commentHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserSettings.this, UserComments.class);
+                startActivity(intent);
+            }
         });
 
         resetPassword = findViewById(R.id.resetPassword);

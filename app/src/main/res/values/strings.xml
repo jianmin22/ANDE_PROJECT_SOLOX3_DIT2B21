@@ -22,4 +22,5 @@
     <string name="log_out">Log Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="save_profile">Save Changes To Profile</string>
+    <string name="comment_history">Comment History</string>
 </resources>

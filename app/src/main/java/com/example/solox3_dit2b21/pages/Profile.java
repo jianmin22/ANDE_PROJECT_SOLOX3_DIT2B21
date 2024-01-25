@@ -136,8 +136,7 @@ public class Profile extends AppCompatActivity {
         unselectedTab.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
     }
 
-    private void setUIRef()
-    {
+    private void setUIRef() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
         recyclerViewProfile.setLayoutManager(layoutManager);
         profileAdapter = new ProfileAdapter(booksProfile, new ProfileAdapter.MyRecyclerViewItemClickListener()
@@ -176,7 +175,7 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForTotalComments(String userId) {
-        commentDao.getTotalCommentsReceived(new DataCallback<Integer>() {
+        commentDao.getTotalCommentsReceived(userId, new DataCallback<Integer>() {
             @Override
             public void onDataReceived(Integer totalCommentsInt) {
                 if (totalCommentsInt != null) {
@@ -191,7 +190,7 @@ public class Profile extends AppCompatActivity {
                 Log.e("bindDataForTotalComments", "Error fetching total number of comments", exception);
                 Toast.makeText(Profile.this, "Error fetching total number of comments.", Toast.LENGTH_SHORT).show();
             }
-        }, userId);
+        });
     }
 
     private void bindDataForAverageRating(String userId) {
