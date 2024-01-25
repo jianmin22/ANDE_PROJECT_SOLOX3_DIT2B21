@@ -13,7 +13,7 @@ public class FirebaseStorageManager {
 
     public static void uploadImage(Uri imageUri, OnSuccessListener<Uri> onSuccessListener, OnFailureListener onFailureListener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference fileRef = storageRef.child("bookImage/" + UUID.randomUUID().toString());
+        StorageReference fileRef = storageRef.child("uploadedImages/" + UUID.randomUUID().toString());
 
         fileRef.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(onSuccessListener))
