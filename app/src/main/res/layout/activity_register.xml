@@ -205,16 +205,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="5dp">
+            android:layout_marginVertical="5dp">
 
             <TextView
                 android:id="@+id/loginNow1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                android:textSize="16dp"
                 android:text="@string/have_account"
-                android:textAlignment="textEnd"
-                android:layout_marginEnd="5dp"/>
+                android:textAlignment="textEnd"/>
 
             <TextView
                 android:id="@+id/loginNow2"
@@ -223,19 +224,41 @@
                 android:layout_weight="1"
                 android:layout_gravity="left"
                 android:text="@string/login_now"
-                android:textColor="#0000FF"
+                android:textSize="16dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#0000FF"
                 android:clickable="true"
                 android:focusable="true" />
 
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:visibility="gone"
+        <TextView
+            android:id="@+id/forgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textSize="16dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/link"
+            android:text="@string/forgot_password"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <fragment
+            android:id="@+id/fragment_forgot_password"
+            class="com.example.solox3_dit2b21.pages.ForgotPasswordFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

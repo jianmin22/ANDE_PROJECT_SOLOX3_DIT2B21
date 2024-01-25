@@ -121,14 +121,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="5dp">
+            android:layout_marginVertical="5dp">
 
             <TextView
                 android:id="@+id/registerNow1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                android:textSize="16dp"
                 android:text="@string/no_account"
                 android:textAlignment="textEnd" />
 
@@ -138,19 +139,28 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="@string/register_now"
+                android:textSize="16dp"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#0000FF" />
+                android:textColor="#0000FF"
+                android:text="@string/register_now"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
+
+        <fragment
+            android:id="@+id/fragment_forgot_password"
+            class="com.example.solox3_dit2b21.pages.ForgotPasswordFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="10dp"
             android:visibility="gone" />
 
     </LinearLayout>
