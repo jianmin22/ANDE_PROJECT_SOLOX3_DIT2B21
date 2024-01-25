@@ -188,13 +188,9 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForTotalComments(String userId) {
-        Toast.makeText(Profile.this, "fetching total comments", Toast.LENGTH_SHORT).show();
-
         commentDao.getTotalCommentsReceived(new DataCallback<Integer>() {
             @Override
             public void onDataReceived(Integer totalCommentsInt) {
-                Toast.makeText(Profile.this, "totalComments: " + totalCommentsInt, Toast.LENGTH_SHORT).show();
-
                 if (totalCommentsInt != null) {
                     totalComments.setText(String.valueOf(totalCommentsInt));
                 } else {
@@ -211,13 +207,9 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForAverageRating(String userId) {
-        Toast.makeText(Profile.this, "fetching average rating", Toast.LENGTH_SHORT).show();
-
         userRatingDao.getAverageUserRating(new DataCallback<Double>() {
             @Override
             public void onDataReceived(Double averageRatingInt) {
-                Toast.makeText(Profile.this, "averageRating: " + averageRatingInt, Toast.LENGTH_SHORT).show();
-
                 if (averageRatingInt != null) {
                     averageRating.setText(String.format("%.2f", averageRatingInt));
                 } else {
