@@ -232,19 +232,6 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/forgotPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:textSize="16dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/link"
-            android:text="@string/forgot_password"
-            android:clickable="true"
-            android:focusable="true" />
-
         <fragment
             android:id="@+id/fragment_forgot_password"
             class="com.example.solox3_dit2b21.pages.ForgotPasswordFragment"
