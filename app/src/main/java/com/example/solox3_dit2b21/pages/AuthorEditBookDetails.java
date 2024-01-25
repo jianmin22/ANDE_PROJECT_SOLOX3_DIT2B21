@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -102,6 +103,47 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         categoryId=null;
                     }
                 });
+
+                Bundle getData = getIntent().getExtras();
+
+                if (getData != null) {
+                    bookId = getData.getString("bookId");
+                    bookDao.loadBookDetailsById(bookId, new DataCallback<Book>(){
+                        @Override
+                        public void onDataReceived(Book returnedBookDetails) {
+                            bookDetails=returnedBookDetails;
+                            if (!bookDetails.getAuthorId().equals(userId)){
+                                Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                            LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
+                            bookTitleEditText.setText(bookDetails.getTitle());
+                            descriptionEditText.setText(bookDetails.getDescription());
+                            imageURL=bookDetails.getImage();
+                            categoryId=bookDetails.getCategoryId();
+                            if (categoryId != null) {
+                                int selectedIndex = -1;
+                                for (int i = 0; i < categoriesList.size(); i++) {
+                                    if (categoriesList.get(i).getCategoryId().equals(categoryId)) {
+                                        selectedIndex = i;
+                                        break;
+                                    }
+                                }
+
+                                if (selectedIndex != -1) {
+                                    categorySpinner.setSelection(selectedIndex);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception exception) {
+                            Log.e("Firebase", "Failed to get categories", exception);
+                            Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -113,46 +155,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         });
 
 
-        Bundle getData = getIntent().getExtras();
 
-        if (getData != null) {
-            bookId = getData.getString("bookId");
-            bookDao.loadBookDetailsById(bookId, new DataCallback<Book>(){
-                @Override
-                public void onDataReceived(Book returnedBookDetails) {
-                    bookDetails=returnedBookDetails;
-                    if(!Objects.equals(bookDetails.getAuthorId(), userId)){
-                        Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                    LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
-                    bookTitleEditText.setText(bookDetails.getTitle());
-                    descriptionEditText.setText(bookDetails.getDescription());
-                    imageURL=bookDetails.getImage();
-                    categoryId=bookDetails.getCategoryId();
-                    if (categoryId != null) {
-                        int selectedIndex = -1;
-                        for (int i = 0; i < categoriesList.size(); i++) {
-                            if (categoriesList.get(i).getCategoryId().equals(categoryId)) {
-                                selectedIndex = i;
-                                break;
-                            }
-                        }
-
-                        if (selectedIndex != -1) {
-                            categorySpinner.setSelection(selectedIndex);
-                        }
-                    }
-                }
-
-                @Override
-                public void onError(Exception exception) {
-                    Log.e("Firebase", "Failed to get categories", exception);
-                    Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            });
-        }
 
 
     }
