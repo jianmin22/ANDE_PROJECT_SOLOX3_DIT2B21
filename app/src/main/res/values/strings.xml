@@ -15,10 +15,11 @@
     <string name="published">Published</string>
     <string name="drafts">Drafts</string>
     <string name="comments">Comments</string>
-    <string name="average_rating">Average Rating</string>
+    <string name="average_rating">Average\nRating</string>
     <string name="username">Username</string>
     <string name="forgot_password"><u>Forgot password?</u></string>
     <string name="write_a_book">No books yet. Write a book!</string>
     <string name="log_out">Log Out</string>
     <string name="edit_profile">Edit Profile</string>
+    <string name="save_profile">Save Changes To Profile</string>
 </resources>

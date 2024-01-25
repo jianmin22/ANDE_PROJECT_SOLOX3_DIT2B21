@@ -15,10 +15,10 @@
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"
             android:layout_gravity="center"
-            android:indeterminateTint="#FF0000" />
+            android:indeterminate="true"
+            android:indeterminateTint="#FF0000"
+            android:visibility="gone" />
     </FrameLayout>
 
     <ImageView

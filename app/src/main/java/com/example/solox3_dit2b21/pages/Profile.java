@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
@@ -79,6 +80,11 @@ public class Profile extends AppCompatActivity {
         profileUsername = findViewById(R.id.profileUsername);
         profileUsername.setText(user.getDisplayName());
 
+        profilePic = findViewById(R.id.profilePic);
+        if (user.getPhotoUrl() != null) {
+            LoadImageURL.loadImageURL(user.getPhotoUrl().toString(), profilePic);
+        }
+
         settings = findViewById(R.id.settings);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,33 +95,14 @@ public class Profile extends AppCompatActivity {
         });
 
         totalPublished = findViewById(R.id.totalPublished);
-        bindDataForTotalPublished(userId);
-
         totalComments = findViewById(R.id.totalComments);
-        bindDataForTotalComments(userId);
-
         averageRating = findViewById(R.id.averageRating);
-        bindDataForAverageRating(userId);
 
         tabPublished = findViewById(R.id.tabPublished);
         tabDraft = findViewById(R.id.tabDraft);
 
         selectedColor = ContextCompat.getColor(this, R.color.selected_color);
         unselectedColor = ContextCompat.getColor(this, R.color.unselected_color);
-
-        profilePic = findViewById(R.id.profilePic);
-
-//        implementation 'com.squareup.picasso:picasso:2.71828'
-//        if (user != null) {
-//            String photoUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
-//
-//            if (photoUrl != null && !photoUrl.isEmpty()) {
-//                Picasso.get().load(photoUrl).into(profilePic);
-//            } else {
-//                // Set a default image if the photo URL is not available
-//                profilePic.setImageResource(R.drawable.default_profile_image);
-//            }
-//        }
 
         tabPublished.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +120,7 @@ public class Profile extends AppCompatActivity {
             }
         });
 
-        bindDataForProfile(userId, true);
+        refreshProfileData();
         setUIRef();
     }
 
@@ -157,7 +144,7 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onItemClicked(Book book)
             {
-                Intent intent = new Intent(Profile.this, BookDetails.class);
+                Intent intent = new Intent(Profile.this, AuthorBookDetails.class);
                 intent.putExtra("bookId", book.getBookId());
                 startActivity(intent);
             }
@@ -213,7 +200,7 @@ public class Profile extends AppCompatActivity {
                 if (averageRatingInt != null) {
                     averageRating.setText(String.format("%.2f", averageRatingInt));
                 } else {
-                    averageRating.setText("0");
+                    averageRating.setText("0.00");
                 }
             }
 
@@ -253,5 +240,19 @@ public class Profile extends AppCompatActivity {
                 Toast.makeText(Profile.this, "Error fetching profile data.", Toast.LENGTH_SHORT).show();
             }
         }, userId, published);
+    }
+
+    private void refreshProfileData() {
+        // Call the methods to refresh your data
+        bindDataForTotalPublished(user.getUid());
+        bindDataForTotalComments(user.getUid());
+        bindDataForAverageRating(user.getUid());
+
+        // Determine which tab is currently selected and refresh accordingly
+        if (tabPublished.getCurrentTextColor() == selectedColor) {
+            bindDataForProfile(user.getUid(), true);
+        } else {
+            bindDataForProfile(user.getUid(), false);
+        }
     }
 }
