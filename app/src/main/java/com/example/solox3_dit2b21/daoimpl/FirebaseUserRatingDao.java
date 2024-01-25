@@ -105,7 +105,7 @@ public class FirebaseUserRatingDao implements UserRatingDao {
 
         FirebaseBookDao bookDao = new FirebaseBookDao();
 
-        List<String> userBookIds = bookDao.getUserBookIds(new DataCallback<List<String>>() {
+        bookDao.getUserBookIds(new DataCallback<List<String>>() {
             @Override
             public void onDataReceived(List<String> userBookIds) {
                 if (userBookIds.size() == 0) callback.onDataReceived(0.0);
@@ -113,6 +113,8 @@ public class FirebaseUserRatingDao implements UserRatingDao {
                 final Double[] totalRatingValue = {0.0};
                 final Integer[] totalRatingsReceived = {0};
                 for (String bookId : userBookIds) {
+
+                    Log.d("bookId", bookId);
 
                     // Now, query the "Comment" table to get the comments for each book
                     Query query = userRatingRef.orderByChild("bookId").equalTo(bookId);
@@ -123,14 +125,13 @@ public class FirebaseUserRatingDao implements UserRatingDao {
                                 for (DataSnapshot ratingSnapshot : dataSnapshot.getChildren()) {
                                     UserRating rating = ratingSnapshot.getValue(UserRating.class);
                                     if (rating != null) {
+                                        Log.d("rating", String.valueOf(rating.getRating()));
                                         totalRatingValue[0] += rating.getRating();
                                         totalRatingsReceived[0]++;
                                     }
                                 }
                                 // Notify the callback after processing all books
                                 callback.onDataReceived(totalRatingValue[0] / totalRatingsReceived[0]);
-                            } else {
-                                callback.onDataReceived(null);
                             }
                         }
 

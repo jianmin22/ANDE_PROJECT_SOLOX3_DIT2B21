@@ -197,8 +197,8 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:textSize="20sp"
-            app:cornerRadius="3dp"
-            android:background="@color/selected_color"
+            app:cornerRadius="6dp"
+            android:backgroundTint="@color/selected_color"
             android:padding="10dp" />
 
         <LinearLayout

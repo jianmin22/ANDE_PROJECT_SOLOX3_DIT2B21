@@ -14,6 +14,8 @@ public interface BookDao {
     void fetchSearchAndFilterBooks(String search, String filter, String searchOrder, String filterOrder, DataCallback<List<Book>> callback);
     void insertBook(Book book, DataStatusCallback callback);
     void updateBookDetails(Book book, DataStatusCallback callback);
+    void updateBookIsPublished(Book book, DataStatusCallback callback);
+
     void getTotalUserPublished(DataCallback callback, String userId);
 }
 

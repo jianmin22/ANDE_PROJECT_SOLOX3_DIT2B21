@@ -67,7 +67,7 @@ public class FirebaseCommentDao implements CommentDao {
 
         FirebaseBookDao bookDao = new FirebaseBookDao();
 
-       List<String> userBookIds = bookDao.getUserBookIds(new DataCallback<List<String>>() {
+       bookDao.getUserBookIds(new DataCallback<List<String>>() {
            @Override
            public void onDataReceived(List<String> userBookIds) {
                if (userBookIds.size() == 0) callback.onDataReceived(0);

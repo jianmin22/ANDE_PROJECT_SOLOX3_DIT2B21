@@ -19,11 +19,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.auth.User;
 
 public class UserSettings extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,7 +32,7 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_user_settings);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
@@ -43,49 +41,52 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText newUsername = new EditText (v.getContext());
-                final AlertDialog.Builder editProfileDialog = new AlertDialog.Builder(v.getContext());
-                editProfileDialog.setTitle("Edit Profile");
-                editProfileDialog.setMessage("Enter your new username.");
-                editProfileDialog.setView(newUsername);
-
-                editProfileDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String username = newUsername.getText().toString().trim();
-
-                        if (TextUtils.isEmpty(username)) {
-                            newUsername.setError("Username is required.");
-                            return;
-                        }
-
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(username)
-                                .build();
-
-                        user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Log.d("updateProfile", "New Display Name: " + username);
-                                        } else {
-                                            Log.d("updateProfileError", task.getException().getMessage());
-                                        }
-                                    }
-                                });
-                    }
-                });
-
-                editProfileDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                editProfileDialog.create().show();
+                Intent intent = new Intent(UserSettings.this, EditProfile.class);
+                startActivity(intent);
             }
+//                final EditText newUsername = new EditText (v.getContext());
+//                final AlertDialog.Builder editProfileDialog = new AlertDialog.Builder(v.getContext());
+//                editProfileDialog.setTitle("Edit Profile");
+//                editProfileDialog.setMessage("Enter your new username.");
+//                editProfileDialog.setView(newUsername);
+//
+//                editProfileDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        String username = newUsername.getText().toString().trim();
+//
+//                        if (TextUtils.isEmpty(username)) {
+//                            newUsername.setError("Username is required.");
+//                            return;
+//                        }
+//
+//                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+//                                .setDisplayName(username)
+//                                .build();
+//
+//                        user.updateProfile(profileUpdates)
+//                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                    @Override
+//                                    public void onComplete(@NonNull Task<Void> task) {
+//                                        if (task.isSuccessful()) {
+//                                            Log.d("updateProfile", "New Display Name: " + username);
+//                                        } else {
+//                                            Log.d("updateProfileError", task.getException().getMessage());
+//                                        }
+//                                    }
+//                                });
+//                    }
+//                });
+//
+//                editProfileDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//
+//                editProfileDialog.create().show();
+//            }
         });
 
         resetPassword = findViewById(R.id.resetPassword);

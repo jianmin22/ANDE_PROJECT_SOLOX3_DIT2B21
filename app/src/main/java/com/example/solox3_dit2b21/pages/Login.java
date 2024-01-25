@@ -40,8 +40,8 @@ public class Login extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Home.class);
+        if (currentUser != null) {
+            Intent intent = new Intent(Login.this, Home.class);
             startActivity(intent);
             finish();
         }
@@ -80,7 +80,7 @@ public class Login extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Register.class);
+                Intent intent = new Intent(Login.this, Register.class);
                 startActivity(intent);
                 finish();
             }
@@ -127,7 +127,7 @@ public class Login extends AppCompatActivity {
                                                                 progressBar.setVisibility(View.GONE);
                                                                 if (task.isSuccessful()) {
                                                                     Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                                                    Intent intent = new Intent(getApplicationContext(), Home.class);
+                                                                    Intent intent = new Intent(Login.this, Home.class);
                                                                     startActivity(intent);
                                                                     finish();
                                                                 } else {
