@@ -31,6 +31,30 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
     }
 
     @Override
+    public void loadIsUserFavouriteBook(String bookId, String userId, DataCallback<Boolean> callback) {
+        Query userFavouriteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
+        userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot userFavouriteSnapshot) {
+                boolean isFavourite = false;
+                for (DataSnapshot snapshot : userFavouriteSnapshot.getChildren()) {
+                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+                    if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
+                        isFavourite = true;
+                        break; // Break the loop as we found the user's favorite book
+                    }
+                }
+                callback.onDataReceived(isFavourite);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
     public void deleteUserFavourite(String bookId, String userId, DataStatusCallback callback) {
         Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
 
