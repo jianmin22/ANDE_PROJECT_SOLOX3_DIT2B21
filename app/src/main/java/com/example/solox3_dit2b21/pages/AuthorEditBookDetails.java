@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +35,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -102,6 +105,47 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         categoryId=null;
                     }
                 });
+
+                Bundle getData = getIntent().getExtras();
+
+                if (getData != null) {
+                    bookId = getData.getString("bookId");
+                    bookDao.loadBookDetailsById(bookId, new DataCallback<Book>(){
+                        @Override
+                        public void onDataReceived(Book returnedBookDetails) {
+                            bookDetails=returnedBookDetails;
+                            if (!bookDetails.getAuthorId().equals(userId)){
+                                Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                            LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
+                            bookTitleEditText.setText(bookDetails.getTitle());
+                            descriptionEditText.setText(bookDetails.getDescription());
+                            imageURL=bookDetails.getImage();
+                            categoryId=bookDetails.getCategoryId();
+                            if (categoryId != null) {
+                                int selectedIndex = -1;
+                                for (int i = 0; i < categoriesList.size(); i++) {
+                                    if (categoriesList.get(i).getCategoryId().equals(categoryId)) {
+                                        selectedIndex = i;
+                                        break;
+                                    }
+                                }
+
+                                if (selectedIndex != -1) {
+                                    categorySpinner.setSelection(selectedIndex);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception exception) {
+                            Log.e("Firebase", "Failed to get categories", exception);
+                            Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -113,46 +157,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         });
 
 
-        Bundle getData = getIntent().getExtras();
 
-        if (getData != null) {
-            bookId = getData.getString("bookId");
-            bookDao.loadBookDetailsById(bookId, new DataCallback<Book>(){
-                @Override
-                public void onDataReceived(Book returnedBookDetails) {
-                    bookDetails=returnedBookDetails;
-                    if(!Objects.equals(bookDetails.getAuthorId(), userId)){
-                        Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                    LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
-                    bookTitleEditText.setText(bookDetails.getTitle());
-                    descriptionEditText.setText(bookDetails.getDescription());
-                    imageURL=bookDetails.getImage();
-                    categoryId=bookDetails.getCategoryId();
-                    if (categoryId != null) {
-                        int selectedIndex = -1;
-                        for (int i = 0; i < categoriesList.size(); i++) {
-                            if (categoriesList.get(i).getCategoryId().equals(categoryId)) {
-                                selectedIndex = i;
-                                break;
-                            }
-                        }
-
-                        if (selectedIndex != -1) {
-                            categorySpinner.setSelection(selectedIndex);
-                        }
-                    }
-                }
-
-                @Override
-                public void onError(Exception exception) {
-                    Log.e("Firebase", "Failed to get categories", exception);
-                    Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            });
-        }
 
 
     }
@@ -168,8 +173,8 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            showLoading(true);
             Uri imageUri = data.getData();
-
             FirebaseStorageManager storageManager = new FirebaseStorageManager();
             storageManager.uploadImage(imageUri, new OnSuccessListener<Uri>() {
                 @Override
@@ -177,12 +182,14 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                     String imageUrl = uri.toString();
                     imageURL=imageUrl;
                     LoadImageURL.loadImageURL(imageUrl, bookImage);
+                    showLoading(false);
                 }
             }, new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.e("Upload Image Failed:" , e.getMessage());
                     Toast.makeText(AuthorEditBookDetails.this, "Upload image failed, try again later.",Toast.LENGTH_SHORT).show();
+                    showLoading(false);
                 }
             });
         }
@@ -256,20 +263,17 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
 
     private void deleteImageAndSelectNewOne() {
         if (imageURL != null && !imageURL.equals("")) {
-            showLoading(true);
             FirebaseStorageManager storageManager = new FirebaseStorageManager();
             storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.d("Firebase Storage", "Delete Success");
-                    showLoading(false);
                     selectImage();
                 }
             }, new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.e("Delete Image Failed:", e.getMessage());
-                    showLoading(false);
                     selectImage();
                 }
             });

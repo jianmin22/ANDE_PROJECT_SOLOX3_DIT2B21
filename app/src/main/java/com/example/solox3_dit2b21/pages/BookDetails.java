@@ -136,6 +136,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                         loadCategory(bookDetails.getCategoryId());
                         loadComments(bookId);
                         loadUserRating(bookId);
+                        loadIsUserFavouriteBook(bookId);
                         currentUserName.setText(userName);
 
                         loadUserFavourite(bookId);
@@ -226,6 +227,29 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 finish();
             }
         });
+    }
+
+    private void loadIsUserFavouriteBook (String bookId){
+        userFavouriteBookDao.loadIsUserFavouriteBook(bookId,userId, new DataCallback<Boolean>() {
+            @Override
+            public void onDataReceived(Boolean data) {
+                if(data){
+                    addedToFavourite = true;
+                    addToFavouriteStarImage.setImageResource(R.drawable.staryellow);
+                }else {
+                    addedToFavourite = false;
+                    addToFavouriteStarImage.setImageResource(R.drawable.starnocolor);
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Failed to get is user favourite", exception);
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+
     }
 
     private void deleteUserFavourite() {
