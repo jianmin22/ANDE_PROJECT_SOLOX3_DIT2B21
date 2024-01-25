@@ -8,6 +8,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -76,24 +77,29 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
-    public void getUserBooks(final DataCallback callback) {
+    public void getUserBooks(final DataCallback callback, String userId, Boolean published) {
         bookRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Book> booksWithPublishedDate = new ArrayList<>();
+                List<Book> userBooks = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Book book = snapshot.getValue(Book.class);
 
-                    if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
-                        booksWithPublishedDate.add(book);
+                    if (book != null && book.getAuthorId().toString().equals(userId) && Boolean.parseBoolean(book.getIsPublished()) == published) {
+                        userBooks.add(book);
                     }
                 }
 
-                Collections.sort(booksWithPublishedDate, (book1, book2) ->
-                        book2.getPublishedDate().compareTo(book1.getPublishedDate()));
+                if (published) {
+                    Collections.sort(userBooks, (book1, book2) ->
+                            book2.getPublishedDate().compareTo(book1.getPublishedDate()));
+                } else {
+                    Collections.sort(userBooks, (book1, book2) ->
+                            book2.getLastUpdated().compareTo(book1.getLastUpdated()));
+                }
 
-                callback.onDataReceived(booksWithPublishedDate.subList(0, Math.min(5, booksWithPublishedDate.size())));
+                callback.onDataReceived(userBooks);
             }
 
             @Override
@@ -101,6 +107,32 @@ public class FirebaseBookDao implements BookDao {
                 callback.onError(databaseError.toException());
             }
         });
+    }
+
+    @Override
+    public List<String> getUserBookIds(final DataCallback callback, String userId) {
+        bookRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> userBookIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
+                        userBookIds.add(book.getBookId());
+                    }
+                }
+
+                callback.onDataReceived(userBookIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+        return null;
     }
 
     @Override
@@ -189,6 +221,36 @@ public class FirebaseBookDao implements BookDao {
             }
         }
         return false;
+    }
+
+    @Override
+    public void getTotalUserPublished(final DataCallback callback, String userId) {
+        Query query = bookRef.orderByChild("authorId").equalTo(userId);
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer totalPublished = 0;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Book book = snapshot.getValue(Book.class);
+
+//                    check if book has been published
+                    if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
+                        totalPublished++;
+                    }
+                }
+
+//                if no need to check for additional conditions,
+//                Integer totalPublished = (int) dataSnapshot.getChildrenCount();
+
+                callback.onDataReceived(totalPublished);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 
 }
