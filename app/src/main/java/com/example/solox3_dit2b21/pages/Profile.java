@@ -87,9 +87,6 @@ public class Profile extends AppCompatActivity {
             }
         });
 
-//        Toast.makeText(Profile.this, "Display: " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(Profile.this, "UID: " + user.getUid(), Toast.LENGTH_SHORT).show();
-
         totalPublished = findViewById(R.id.totalPublished);
         bindDataForTotalPublished(userId);
 
