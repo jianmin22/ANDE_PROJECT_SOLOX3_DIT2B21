@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
 import com.example.solox3_dit2b21.model.Comment;
@@ -25,6 +26,11 @@ public class CommentHistory extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseUser user;
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

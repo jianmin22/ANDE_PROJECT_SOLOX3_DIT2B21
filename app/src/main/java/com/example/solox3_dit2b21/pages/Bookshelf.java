@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
@@ -43,6 +44,11 @@ public class Bookshelf extends AppCompatActivity {
     private FirebaseBookDao bookDao = new FirebaseBookDao();
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
     private FirebaseUserRatingDao userRatingDao = new FirebaseUserRatingDao();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
