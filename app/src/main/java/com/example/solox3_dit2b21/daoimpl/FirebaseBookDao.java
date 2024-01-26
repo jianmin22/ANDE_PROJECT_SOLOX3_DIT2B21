@@ -6,6 +6,7 @@ import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.UserRating;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -116,6 +117,45 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
+    public void getUserFavouriteBooks(DataCallback callback, String userId) {
+        FirebaseUserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
+
+        userFavouriteBookDao.getUserFavouriteBookIds(userId, new DataCallback<List<String>>() {
+            @Override
+            public void onDataReceived(List<String> userBookIds) {
+                bookRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<Book> userFavouriteBooks = new ArrayList<>();
+
+                        for (DataSnapshot bookSnapshot : dataSnapshot.getChildren()) {
+                            Book book = bookSnapshot.getValue(Book.class);
+                            if (book != null && userBookIds.contains(book.getBookId()) && Boolean.parseBoolean(book.getIsPublished())) {
+                                userFavouriteBooks.add(book);
+                            }
+                        }
+
+                        Collections.sort(userFavouriteBooks, (book1, book2) ->
+                                book2.getLastUpdated().compareTo(book1.getLastUpdated()));
+
+                        callback.onDataReceived(userFavouriteBooks);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        callback.onError(databaseError.toException());
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                callback.onError(exception);
+            }
+        });
+    }
+
+    @Override
     public void getUserBookIds(final DataCallback callback, String userId) {
         Query userBooksQuery = bookRef.orderByChild("authorId").equalTo(userId);
 
@@ -127,7 +167,6 @@ public class FirebaseBookDao implements BookDao {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Book book = snapshot.getValue(Book.class);
                     if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
-                        Log.d("bookId", book.getBookId());
                         userBookIds.add(book.getBookId());
                     }
                 }

@@ -47,8 +47,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
-                Intent intent = new Intent(Home.this, EditorSpace.class);
-                intent.putExtra("bookId", "f28f342c-753b-4dcd-830f-a8849078f5cb");
+                Intent intent = new Intent(Home.this, Bookshelf.class);
+//                Intent intent = new Intent(Home.this, EditorSpace.class);
+//                intent.putExtra("bookId", "f28f342c-753b-4dcd-830f-a8849078f5cb");
                 startActivity(intent);
                 // Navigate to Bookshelf activity
             } else if (itemId == R.id.navigation_home) {

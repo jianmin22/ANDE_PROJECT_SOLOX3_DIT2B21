@@ -151,7 +151,6 @@ public class Profile extends AppCompatActivity {
         }, Profile.this);
 
         recyclerViewProfile.setAdapter(profileAdapter);
-
     }
 
     private void bindDataForTotalPublished(String userId) {
