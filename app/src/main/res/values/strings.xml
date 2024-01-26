@@ -22,4 +22,8 @@
     <string name="log_out">Log Out</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="save_profile">Save Changes To Profile</string>
+    <string name="comment_history">Comment History</string>
+    <string name="bookshelf">Bookshelf</string>
+    <string name="favourite_books">Favourite Books</string>
+    <string name="reading_history">Reading History</string>
 </resources>

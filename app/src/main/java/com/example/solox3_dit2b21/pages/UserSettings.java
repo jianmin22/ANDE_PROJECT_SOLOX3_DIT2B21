@@ -7,28 +7,27 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserSettings extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView editProfile, resetPassword, logOut;
+    private TextView editProfile, commentHistory, resetPassword, logOut;
     FirebaseAuth auth;
     FirebaseUser user;
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,49 +43,15 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(UserSettings.this, EditProfile.class);
                 startActivity(intent);
             }
-//                final EditText newUsername = new EditText (v.getContext());
-//                final AlertDialog.Builder editProfileDialog = new AlertDialog.Builder(v.getContext());
-//                editProfileDialog.setTitle("Edit Profile");
-//                editProfileDialog.setMessage("Enter your new username.");
-//                editProfileDialog.setView(newUsername);
-//
-//                editProfileDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        String username = newUsername.getText().toString().trim();
-//
-//                        if (TextUtils.isEmpty(username)) {
-//                            newUsername.setError("Username is required.");
-//                            return;
-//                        }
-//
-//                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                                .setDisplayName(username)
-//                                .build();
-//
-//                        user.updateProfile(profileUpdates)
-//                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<Void> task) {
-//                                        if (task.isSuccessful()) {
-//                                            Log.d("updateProfile", "New Display Name: " + username);
-//                                        } else {
-//                                            Log.d("updateProfileError", task.getException().getMessage());
-//                                        }
-//                                    }
-//                                });
-//                    }
-//                });
-//
-//                editProfileDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                editProfileDialog.create().show();
-//            }
+        });
+
+        commentHistory = findViewById(R.id.commentHistory);
+        commentHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserSettings.this, CommentHistory.class);
+                startActivity(intent);
+            }
         });
 
         resetPassword = findViewById(R.id.resetPassword);

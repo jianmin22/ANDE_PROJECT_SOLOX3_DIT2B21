@@ -1,73 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
     tools:context=".pages.UserSettings">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:onClick="onClick"
+        android:src="@drawable/back" />
+
+    <TextView
+        android:id="@+id/editProfile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:drawableStart="@drawable/edit"
+        android:drawablePadding="8dp"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:text="@string/edit_profile" />
 
-        <ImageView
-            android:id="@+id/back"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="15dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:onClick="onClick"
-            android:src="@drawable/back" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginVertical="10dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/editProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:text="@string/edit_profile" />
+    <TextView
+        android:id="@+id/commentHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:drawableStart="@drawable/comment"
+        android:drawablePadding="8dp"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:text="@string/comment_history" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginVertical="10dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="5dp"
-            android:background="@android:color/darker_gray" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginVertical="10dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/resetPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:text="Reset Password" />
+    <TextView
+        android:id="@+id/resetPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:text="Reset Password" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginVertical="10dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="8dp"
-            android:background="@android:color/darker_gray" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginVertical="10dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="8dp"
+        android:background="@android:color/darker_gray" />
 
-        <TextView
-            android:id="@+id/logOut"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:textColor="@color/design_default_color_error"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            android:text="@string/log_out" />
+    <TextView
+        android:id="@+id/logOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/design_default_color_error"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:text="@string/log_out" />
 
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

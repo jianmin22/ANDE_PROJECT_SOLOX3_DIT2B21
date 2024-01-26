@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
@@ -45,8 +46,11 @@ public class Profile extends AppCompatActivity {
     private FirebaseBookDao bookDao = new FirebaseBookDao();
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
     private FirebaseUserRatingDao userRatingDao = new FirebaseUserRatingDao();
-
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +61,7 @@ public class Profile extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
-                Intent intent = new Intent(this, EditorSpace.class);
+                Intent intent = new Intent(this, Bookshelf.class);
                 startActivity(intent);
             } else if (itemId == R.id.navigation_home) {
                 Intent intent = new Intent(this, Home.class);
@@ -136,8 +140,7 @@ public class Profile extends AppCompatActivity {
         unselectedTab.setShadowLayer(0, 0, 0, Color.TRANSPARENT);
     }
 
-    private void setUIRef()
-    {
+    private void setUIRef() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
         recyclerViewProfile.setLayoutManager(layoutManager);
         profileAdapter = new ProfileAdapter(booksProfile, new ProfileAdapter.MyRecyclerViewItemClickListener()
@@ -152,7 +155,6 @@ public class Profile extends AppCompatActivity {
         }, Profile.this);
 
         recyclerViewProfile.setAdapter(profileAdapter);
-
     }
 
     private void bindDataForTotalPublished(String userId) {
@@ -176,7 +178,7 @@ public class Profile extends AppCompatActivity {
     }
 
     private void bindDataForTotalComments(String userId) {
-        commentDao.getTotalCommentsReceived(new DataCallback<Integer>() {
+        commentDao.getTotalCommentsReceived(userId, new DataCallback<Integer>() {
             @Override
             public void onDataReceived(Integer totalCommentsInt) {
                 if (totalCommentsInt != null) {
@@ -191,7 +193,7 @@ public class Profile extends AppCompatActivity {
                 Log.e("bindDataForTotalComments", "Error fetching total number of comments", exception);
                 Toast.makeText(Profile.this, "Error fetching total number of comments.", Toast.LENGTH_SHORT).show();
             }
-        }, userId);
+        });
     }
 
     private void bindDataForAverageRating(String userId) {

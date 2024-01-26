@@ -1,10 +1,18 @@
 package com.example.solox3_dit2b21.daoimpl;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.UserFavouriteBookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.google.firebase.database.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
     DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
@@ -84,5 +92,31 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
         userFavouriteRef.push().setValue(userFavouriteBook)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
+    public void getUserFavouriteBookIds(String userId, DataCallback<List<String>> callback) {
+        Query userFavouriteQuery = userFavouriteRef.orderByChild("userId").equalTo(userId);
+
+        userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> userBookIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+                    if (userFavouriteBook != null) {
+                        userBookIds.add(userFavouriteBook.getBookId());
+                    }
+                }
+
+                callback.onDataReceived(userBookIds);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

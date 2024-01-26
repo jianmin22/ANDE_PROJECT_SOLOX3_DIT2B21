@@ -62,9 +62,7 @@ public class FirebaseCommentDao implements CommentDao {
     }
 
     @Override
-    public void getTotalCommentsReceived(DataCallback callback, String userId) {
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comment");
-
+    public void getTotalCommentsReceived(String userId, DataCallback callback) {
         FirebaseBookDao bookDao = new FirebaseBookDao();
 
        bookDao.getUserBookIds(new DataCallback<List<String>>() {
@@ -100,5 +98,40 @@ public class FirebaseCommentDao implements CommentDao {
                callback.onError(exception);
            }
        }, userId);
+    }
+
+    @Override
+    public void getUserComments(String userId, DataCallback callback) {
+        commentsRef.orderByChild("userId").equalTo(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Comment> userComments = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Comment comment = snapshot.getValue(Comment.class);
+                    if (comment != null) {
+                        userComments.add(comment);
+                    }
+                }
+
+                // Sort comments by date, assuming date is a string in "yyyy-MM-dd HH:mm:ss" format
+                Collections.sort(userComments, (comment1, comment2) ->
+                        comment2.getDate().compareTo(comment1.getDate()));
+
+                callback.onDataReceived(userComments);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
+    public void deleteComment(String commentId, DataStatusCallback callback) {
+        commentsRef.child(commentId).removeValue()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 }

@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.FirebaseStorageManager;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
@@ -39,7 +40,11 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     ImageView profilePic;
     FirebaseAuth auth;
     FirebaseUser user;
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
