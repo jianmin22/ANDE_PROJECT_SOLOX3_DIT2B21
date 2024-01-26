@@ -45,6 +45,7 @@ public class CommentHistory extends AppCompatActivity {
         commentHistoryAdapter = new CommentHistoryAdapter(this, userComments);
         recyclerView.setAdapter(commentHistoryAdapter);
     }
+
     private void bindDataForUserComments(String userId) {
         commentDao.getUserComments(userId, new DataCallback<List<Comment>>() {
             @Override

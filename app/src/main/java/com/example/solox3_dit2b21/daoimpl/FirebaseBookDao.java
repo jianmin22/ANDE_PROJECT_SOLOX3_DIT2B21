@@ -1,5 +1,7 @@
 package com.example.solox3_dit2b21.daoimpl;
 
+import android.util.Log;
+
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
@@ -114,16 +116,18 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
-    public List<String> getUserBookIds(final DataCallback callback, String userId) {
-        bookRef.addValueEventListener(new ValueEventListener() {
+    public void getUserBookIds(final DataCallback callback, String userId) {
+        Query userBooksQuery = bookRef.orderByChild("authorId").equalTo(userId);
+
+        userBooksQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> userBookIds = new ArrayList<>();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Book book = snapshot.getValue(Book.class);
-
-                    if (book != null && book.getAuthorId().equals(userId) && Boolean.parseBoolean(book.getIsPublished())) {
+                    if (book != null && Boolean.parseBoolean(book.getIsPublished())) {
+                        Log.d("bookId", book.getBookId());
                         userBookIds.add(book.getBookId());
                     }
                 }
@@ -136,7 +140,6 @@ public class FirebaseBookDao implements BookDao {
                 callback.onError(databaseError.toException());
             }
         });
-        return null;
     }
 
     @Override
