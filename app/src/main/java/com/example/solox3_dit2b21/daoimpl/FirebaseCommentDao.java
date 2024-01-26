@@ -31,12 +31,8 @@ public class FirebaseCommentDao implements CommentDao {
                             commentsList.add(comment);
                         }
                     }
-                    Collections.sort(commentsList, new Comparator<Comment>() {
-                        @Override
-                        public int compare(Comment c1, Comment c2) {
-                            return c2.getDate().compareTo(c1.getDate());
-                        }
-                    });
+                    Collections.sort(commentsList, (c1, c2) ->
+                            c2.getDate().compareTo(c1.getDate()));
                     if (commentsList.size() > 2) {
                         commentsList = commentsList.subList(0, 2);
                     }
