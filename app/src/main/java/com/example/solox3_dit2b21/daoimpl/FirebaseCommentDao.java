@@ -127,4 +127,11 @@ public class FirebaseCommentDao implements CommentDao {
             }
         });
     }
+
+    @Override
+    public void deleteComment(String commentId, DataStatusCallback callback) {
+        commentsRef.child(commentId).removeValue()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+    }
 }

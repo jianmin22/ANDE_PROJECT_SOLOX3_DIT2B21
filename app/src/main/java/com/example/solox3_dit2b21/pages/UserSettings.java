@@ -7,21 +7,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserSettings extends AppCompatActivity implements View.OnClickListener {
 
@@ -50,7 +44,7 @@ public class UserSettings extends AppCompatActivity implements View.OnClickListe
         commentHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserSettings.this, UserComments.class);
+                Intent intent = new Intent(UserSettings.this, CommentHistory.class);
                 startActivity(intent);
             }
         });

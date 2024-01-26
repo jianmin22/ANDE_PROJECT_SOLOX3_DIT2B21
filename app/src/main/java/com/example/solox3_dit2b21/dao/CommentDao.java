@@ -8,4 +8,5 @@ public interface CommentDao {
     void addComment(Comment comment, DataStatusCallback callback);
     void getTotalCommentsReceived(String userId, DataCallback callback);
     void getUserComments(String userId, DataCallback callback);
+    void deleteComment(String commentId, DataStatusCallback callback);
 }
