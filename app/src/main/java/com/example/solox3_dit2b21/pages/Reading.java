@@ -5,6 +5,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -71,8 +72,12 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         CurrentDateUtils currentDateUtil = new CurrentDateUtils();
         getCurrentDateTime = currentDateUtil.getCurrentDateTime();
         // Retrieve the bookId passed from the previous activity
-        bookId = getIntent().getStringExtra("bookId");
-
+        Intent intent = getIntent();
+        bookId = intent.getStringExtra("bookId");
+        int lastReadChapterOrder = intent.getIntExtra("lastReadChapterOrder", -1);
+        int lastReadSubChapterOrder = intent.getIntExtra("lastReadSubChapterOrder", -1);
+        Log.d("lastReadChapterOrder: ", String.valueOf(lastReadChapterOrder));
+        Log.d("lastReadSubChapterOrder: ", String.valueOf(lastReadSubChapterOrder));
         // Initialize the ViewPager and other views
         viewPager = findViewById(R.id.viewPager);
         currentPageNumber = findViewById(R.id.currentPageNumber);

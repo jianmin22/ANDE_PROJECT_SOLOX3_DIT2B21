@@ -6,6 +6,7 @@ import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.BookWithReadingHistory;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseBookDao implements BookDao {
     DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
@@ -314,45 +317,53 @@ public class FirebaseBookDao implements BookDao {
     }
 
     @Override
-    public void getUserReadingHistoryBooks(String userId, DataCallback<List<Book>> callback) {
+    public void getUserReadingHistoryBooks(String userId, DataCallback<List<BookWithReadingHistory>> callback) {
         DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference("ReadingHistory");
         DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
 
         historyRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> bookIds = new ArrayList<>();
+                Map<String, Integer> bookIdToChapterOrderMap = new HashMap<>();
+                Map<String, Integer> bookIdToSubChapterOrderMap = new HashMap<>();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String bookId = snapshot.child("bookId").getValue(String.class);
+                    Integer chapterOrder = snapshot.child("chapterOrder").getValue(Integer.class);
+                    Integer subChapterOrder = snapshot.child("subChapterOrder").getValue(Integer.class);
+
                     if (bookId != null) {
-                        bookIds.add(bookId);
+                        bookIdToChapterOrderMap.put(bookId, chapterOrder);
+                        bookIdToSubChapterOrderMap.put(bookId, subChapterOrder);
                     }
                 }
 
-                // Fetch books for each bookId
-                List<Book> books = new ArrayList<>();
-                if (!bookIds.isEmpty()) {
-                    for (String id : bookIds) {
-                        bookRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot bookSnapshot) {
-                                Book book = bookSnapshot.getValue(Book.class);
-                                if (book != null) {
-                                    books.add(book);
-                                    if (books.size() == bookIds.size()) {
-                                        callback.onDataReceived(books);
-                                    }
+                List<BookWithReadingHistory> booksWithHistory = new ArrayList<>();
+                AtomicInteger booksFetched = new AtomicInteger();
+                bookIdToChapterOrderMap.forEach((bookId, chapterOrder) -> {
+                    bookRef.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot bookSnapshot) {
+                            Book book = bookSnapshot.getValue(Book.class);
+                            Integer subChapterOrder = bookIdToSubChapterOrderMap.get(bookId);
+
+                            if (book != null) {
+                                booksWithHistory.add(new BookWithReadingHistory(book, chapterOrder, subChapterOrder));
+                                if (booksFetched.incrementAndGet() == bookIdToChapterOrderMap.size()) {
+                                    callback.onDataReceived(booksWithHistory);
                                 }
                             }
+                        }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.e("FirebaseBookDao", "Failed to fetch book details: " + databaseError.getMessage());
-                            }
-                        });
-                    }
-                } else {
-                    callback.onDataReceived(books); // Return empty list if no reading history found
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.e("FirebaseBookDao", "Failed to fetch book details: " + databaseError.getMessage());
+                        }
+                    });
+                });
+
+                if (bookIdToChapterOrderMap.isEmpty()) {
+                    callback.onDataReceived(booksWithHistory); // Return empty list if no reading history found
                 }
             }
 
@@ -363,6 +374,7 @@ public class FirebaseBookDao implements BookDao {
             }
         });
     }
+
 
 
 }
