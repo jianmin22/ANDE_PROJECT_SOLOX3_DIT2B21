@@ -33,8 +33,9 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/backButtonChapter"
         android:layout_width="36dp"
+        android:onClick="onClick"
         android:layout_height="38dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -49,7 +50,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView4"
+        app:layout_constraintTop_toBottomOf="@+id/backButtonChapter"
         app:srcCompat="@drawable/editbookicon" />
 
     <TextView

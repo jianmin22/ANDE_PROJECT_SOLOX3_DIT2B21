@@ -17,6 +17,35 @@ import java.util.List;
 public class FirebaseChapterDao implements ChapterDao {
     DatabaseReference chapterRef = FirebaseDatabase.getInstance().getReference("Chapter");
 
+    public void getChaptersByBookId(String bookId, DataCallback<List<Chapter>> callback) {
+        chapterRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Chapter> chapters = new ArrayList<>();
+                for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                    if (bookChapterSnapshot.child("bookId").getValue(String.class).equals(bookId)) {
+                        // Assuming "chapters" is a direct child of the book chapter snapshot
+                        DataSnapshot chaptersSnapshot = bookChapterSnapshot.child("chapters");
+                        for (DataSnapshot chapterSnapshot : chaptersSnapshot.getChildren()) {
+                            Chapter chapter = chapterSnapshot.getValue(Chapter.class);
+                            if (chapter != null) {
+                                chapters.add(chapter);
+                            }
+                        }
+                        break; // Break after finding the matching bookId
+                    }
+                }
+                callback.onDataReceived(chapters);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+
 
     @Override
     public void fetchChapters(String bookId, DataCallback<List<Chapter>> callback) {

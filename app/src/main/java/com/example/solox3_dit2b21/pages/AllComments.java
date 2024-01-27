@@ -1,11 +1,14 @@
 package com.example.solox3_dit2b21.pages;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
@@ -20,7 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class AllComments extends AppCompatActivity {
+public class AllComments extends AppCompatActivity implements View.OnClickListener{
     private String bookId;
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
@@ -38,7 +41,7 @@ public class AllComments extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         // Retrieve comments from Firebase
-        bookId="book1";
+        bookId=getIntent().getStringExtra("bookId");
         loadCommentsFromFirebase(bookId);
     }
 
@@ -73,6 +76,13 @@ public class AllComments extends AppCompatActivity {
                 Log.e("AllComments", "Error loading comments from Firebase: " + databaseError.getMessage());
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.backButtonComment) {
+            finish();
+        }
     }
 
 }
