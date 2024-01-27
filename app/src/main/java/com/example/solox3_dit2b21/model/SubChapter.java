@@ -8,7 +8,11 @@ public class SubChapter {
     // Default constructor is needed for Firebase deserialization
     public SubChapter() {
     }
-
+    public SubChapter(String title, int order, String content) {
+        this.title = title;
+        this.subChapterOrder = order;
+        this.chapterContent = content;
+    }
     // Getters and setters
     public String getTitle() {
         return title;

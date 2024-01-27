@@ -47,9 +47,11 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
         setupChapterTitleTextWatcher(holder, chapter);
 
         holder.imageViewExpandToggle.setOnClickListener(v -> toggleSubChapterVisibility(holder));
-
+        holder.imageViewDeleteToggle.setOnClickListener(v -> deleteChapter(position));
         // Populate subchapters
-        populateSubChapters(holder, chapter);
+        populateSubChapters(holder, chapter,position);
+
+
     }
 
     private void setupChapterTitleTextWatcher(ChapterViewHolder holder, Chapter chapter) {
@@ -78,19 +80,46 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
         holder.imageViewExpandToggle.setImageResource(isExpanded ? R.drawable.ic_expand_more : R.drawable.ic_expand_less);
     }
 
-    private void populateSubChapters(ChapterViewHolder holder, Chapter chapter) {
+    private void populateSubChapters(ChapterViewHolder holder, Chapter chapter,int chapterPosition) {
         holder.linearLayoutSubchapters.removeAllViews();
         if (chapter.getSubChapters() != null) {
             for (Map.Entry<String, SubChapter> entry : chapter.getSubChapters().entrySet()) {
                 SubChapter subChapter = entry.getValue();
 
+                // Create a horizontal LinearLayout
+                LinearLayout horizontalLayout = new LinearLayout(holder.itemView.getContext());
+                horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+                horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+
+                // EditText for subchapter title
                 EditText editTextSubChapterTitle = new EditText(holder.itemView.getContext());
                 editTextSubChapterTitle.setText(subChapter.getTitle());
                 editTextSubChapterTitle.setTextSize(16);
-                // Add other styling and layout parameters as needed
-                holder.linearLayoutSubchapters.addView(editTextSubChapterTitle);
-                holder.linearLayoutSubchapters.addView(holder.imageViewAddSubChapterToggle);
-                holder.linearLayoutSubchapters.addView(holder.imageViewDeleteSubChapterToggle);
+                editTextSubChapterTitle.setLayoutParams(new LinearLayout.LayoutParams(
+                        0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)); // Weighted to take up remaining space
+                horizontalLayout.addView(editTextSubChapterTitle);
+
+                // ImageView for adding a subchapter
+                ImageView imageViewAddSubChapter = new ImageView(holder.itemView.getContext());
+                imageViewAddSubChapter.setImageResource(R.drawable.ic_add); // Assuming you have an add icon
+                imageViewAddSubChapter.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                imageViewAddSubChapter.setOnClickListener(v -> addSubChapter(chapter, chapterPosition));
+                horizontalLayout.addView(imageViewAddSubChapter);
+
+                // ImageView for deleting a subchapter
+                ImageView imageViewDeleteSubChapter = new ImageView(holder.itemView.getContext());
+                imageViewDeleteSubChapter.setImageResource(R.drawable.ic_trash); // Assuming you have a delete icon
+                imageViewDeleteSubChapter.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+                horizontalLayout.addView(imageViewDeleteSubChapter);
+
+                holder.linearLayoutSubchapters.addView(horizontalLayout); // Add the horizontal layout to the vertical layout
+
                 // Set up TextWatcher for subchapter title
                 editTextSubChapterTitle.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -109,8 +138,34 @@ public class EditChaptersAdapter extends RecyclerView.Adapter<EditChaptersAdapte
                         // Not needed
                     }
                 });
+                imageViewDeleteSubChapter.setOnClickListener(v -> {
+                    // Remove subChapter
+                    chapter.getSubChapters().remove(entry.getKey());
+                    // Notify data set changed or handle UI update accordingly
+                    notifyDataSetChanged(); // Call this if your UI needs to reflect the change immediately
+                });
             }
         }
+
+    }
+
+    private void addSubChapter(Chapter chapter, int chapterPosition) {
+        int newSubChapterOrder = chapter.getSubChapters().size() + 1;
+        SubChapter newSubChapter = new SubChapter("SubChapter " + newSubChapterOrder, newSubChapterOrder, "");
+        // Adjust key generation as needed to ensure uniqueness
+        chapter.getSubChapters().put("subchapter" + newSubChapterOrder, newSubChapter);
+        notifyItemChanged(chapterPosition); // Update only the modified chapter
+    }
+
+    private void deleteSubChapter(Chapter chapter, SubChapter subChapter) {
+        chapter.getSubChapters().values().remove(subChapter);
+        notifyDataSetChanged(); // Notify the adapter to update the UI
+    }
+
+    private void deleteChapter(int position) {
+        chapters.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, chapters.size());
     }
 
     @Override

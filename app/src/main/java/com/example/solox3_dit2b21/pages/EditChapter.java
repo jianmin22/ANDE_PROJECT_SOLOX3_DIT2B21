@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.model.Chapter;
+import com.example.solox3_dit2b21.model.SubChapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EditChapter extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -60,12 +62,26 @@ public class EditChapter extends AppCompatActivity {
         newChapter.setBookId(bookId);
         newChapter.setTitle("Chapter " + newChapterOrder);
         newChapter.setChapterOrder(newChapterOrder);
+
         // Initialize empty subChapters map or any other required fields
-        newChapter.setSubChapters(new HashMap<>());
+        Map<String, SubChapter> subChaptersMap = new HashMap<>();
+
+        // Create a new subchapter
+        SubChapter newSubChapter = new SubChapter();
+        newSubChapter.setTitle("Part 1");
+        newSubChapter.setChapterContent("Your content here...");
+        newSubChapter.setSubChapterOrder(1); // Assuming subChapter order starts from 1
+
+        // Add the new subchapter to the subChapters map
+        subChaptersMap.put("subChapter1", newSubChapter); // Using "subChapter1" as the key
+
+        // Set the subChapters map in the new chapter
+        newChapter.setSubChapters(subChaptersMap);
 
         chapters.add(newChapter);
         adapter.notifyItemInserted(chapters.size() - 1); // Notify adapter about the new chapter
     }
+
 
     private void getChaptersData() {
         databaseReference = FirebaseDatabase.getInstance().getReference("Chapter");
