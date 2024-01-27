@@ -2,6 +2,7 @@ package com.example.solox3_dit2b21.daoimpl;
 
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.ReadingHistoryDao;
+import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Chapter;
 import com.example.solox3_dit2b21.model.SubChapter;
 import com.google.firebase.database.DataSnapshot;
@@ -10,11 +11,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseReadingHistoryDao implements ReadingHistoryDao {
-
     @Override
     public void updateOrCreateReadingHistory(String userId, String bookId, Chapter currentChapter, SubChapter currentSubChapter, String lastRead, DataCallback<Boolean> callback) {
         DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference("ReadingHistory");

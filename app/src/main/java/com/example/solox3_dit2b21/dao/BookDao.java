@@ -17,5 +17,7 @@ public interface BookDao {
     void updateBookDetails(Book book, DataStatusCallback callback);
     void updateBookIsPublished(Book book, DataStatusCallback callback);
     void getTotalUserPublished(DataCallback callback, String userId);
+
+    void getUserReadingHistoryBooks(String userId, DataCallback<List<Book>> callback);
 }
 

@@ -99,7 +99,7 @@ public class Bookshelf extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setSelectedTab(tabReadingHistory, tabFavouriteBooks);
-                // insert bindDataForReadingHistory
+                bindDataForReadingHistory(userId);
             }
         });
 
@@ -169,7 +169,7 @@ public class Bookshelf extends AppCompatActivity {
 
     private void bindDataForReadingHistory(String userId) {
 
-        bookDao.getUserFavouriteBooks(new DataCallback<List<Book>>() {
+        bookDao.getUserReadingHistoryBooks(userId,new DataCallback<List<Book>>() {
             @Override
             public void onDataReceived(List<Book> books) {
                 bookshelfBooks.clear();
@@ -195,6 +195,6 @@ public class Bookshelf extends AppCompatActivity {
                 Log.e("bindDataForReadingHistory", "Error fetching reading history", exception);
                 Toast.makeText(Bookshelf.this, "Error fetching reading history.", Toast.LENGTH_SHORT).show();
             }
-        }, userId);
+        });
     }
 }

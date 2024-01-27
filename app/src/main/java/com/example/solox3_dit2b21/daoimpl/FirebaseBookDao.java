@@ -6,7 +6,6 @@ import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.model.Book;
-import com.example.solox3_dit2b21.model.UserRating;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -313,6 +312,58 @@ public class FirebaseBookDao implements BookDao {
             }
         });
     }
+
+    @Override
+    public void getUserReadingHistoryBooks(String userId, DataCallback<List<Book>> callback) {
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference("ReadingHistory");
+        DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
+
+        historyRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> bookIds = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String bookId = snapshot.child("bookId").getValue(String.class);
+                    if (bookId != null) {
+                        bookIds.add(bookId);
+                    }
+                }
+
+                // Fetch books for each bookId
+                List<Book> books = new ArrayList<>();
+                if (!bookIds.isEmpty()) {
+                    for (String id : bookIds) {
+                        bookRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot bookSnapshot) {
+                                Book book = bookSnapshot.getValue(Book.class);
+                                if (book != null) {
+                                    books.add(book);
+                                    if (books.size() == bookIds.size()) {
+                                        callback.onDataReceived(books);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e("FirebaseBookDao", "Failed to fetch book details: " + databaseError.getMessage());
+                            }
+                        });
+                    }
+                } else {
+                    callback.onDataReceived(books); // Return empty list if no reading history found
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseBookDao", "Failed to fetch reading history: " + databaseError.getMessage());
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
 
 }
 
