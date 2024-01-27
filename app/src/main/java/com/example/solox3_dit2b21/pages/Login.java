@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,8 +19,11 @@ import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.appcheck.AppCheckToken;
 import com.google.firebase.appcheck.FirebaseAppCheck;
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 import com.google.firebase.auth.AuthResult;
@@ -140,18 +144,18 @@ public class Login extends AppCompatActivity {
                                                             }
                                                         });
                                             }
-//                                        })
+                                        });
 //                        .addOnFailureListener(new OnFailureListener() {
 //                            @Override
 //                            public void onFailure(@NonNull Exception e) {
 //                                progressBar.setVisibility(View.GONE);
-//                                Log.e("AppCheck", "Error fetching token: " + e.getMessage());
-//                                Toast.makeText(Login.this, "Authentication Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                                Log.e("AppCheck", e.getMessage());
+//                                Toast.makeText(Login.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
 //                            }
 //                        });
-
+//
 //            }
-        });
+//        });
 
     }
 }
