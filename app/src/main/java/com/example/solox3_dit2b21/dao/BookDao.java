@@ -1,6 +1,7 @@
 package com.example.solox3_dit2b21.dao;
 
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.BookWithReadingHistory;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public interface BookDao {
     void updateBookIsPublished(Book book, DataStatusCallback callback);
     void getTotalUserPublished(DataCallback callback, String userId);
 
-    void getUserReadingHistoryBooks(String userId, DataCallback<List<Book>> callback);
+    void getUserReadingHistoryBooks(String userId, DataCallback<List<BookWithReadingHistory>> callback);
 }
 
