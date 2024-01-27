@@ -14,9 +14,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.dao.ChapterDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.ReadingHistoryDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseChapterDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseReadingHistoryDao;
 import com.example.solox3_dit2b21.model.SubChapter;
 import com.example.solox3_dit2b21.model.Chapter;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,7 +39,6 @@ import java.util.Map;
 
 public class Reading extends AppCompatActivity implements View.OnClickListener {
 
-    private DatabaseReference databaseReference;
     private TextView currentPageNumber;
     private ImageView previousButton;
     private ImageView nextButton;
@@ -38,13 +46,30 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
     private int currentPage = 0; // The current page index
     private List<String> pages;
     private String bookId;
+    private ChapterDao chapterDao;
+    private Chapter currentChapter;
 
-
+    private SubChapter currentSubChapter;
+    private ReadingHistoryDao readingHistoryDao;
+    private String getCurrentDateTime;
+    FirebaseAuth auth;
+    FirebaseUser user;
+    private String userId;
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reading);
-
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        userId = user.getUid();
+        chapterDao = new FirebaseChapterDao();
+        readingHistoryDao = new FirebaseReadingHistoryDao();
+        CurrentDateUtils currentDateUtil = new CurrentDateUtils();
+        getCurrentDateTime = currentDateUtil.getCurrentDateTime();
         // Retrieve the bookId passed from the previous activity
         bookId = getIntent().getStringExtra("bookId");
 
@@ -53,19 +78,6 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         currentPageNumber = findViewById(R.id.currentPageNumber);
         previousButton = findViewById(R.id.previousButton);
         nextButton = findViewById(R.id.nextButton);
-
-        // Initialize Firebase
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-
-        // Update the reference to point to the specific book's chapters
-        // Use the bookId to dynamically refer to the correct book chapters
-        if (bookId != null && !bookId.isEmpty()) {
-            databaseReference = firebaseDatabase.getReference("Chapter");
-
-        } else {
-            Log.e("ReadingActivity", "No bookId provided");
-            return; // Exit if no bookId is provided
-        }
 
         // Set up button listeners
         setupButtonListeners();
@@ -124,50 +136,36 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void fetchChapters() {
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    List<Chapter> chapters = new ArrayList<>();
-                    for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                        String fetchedBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
-                        if (bookId.equals(fetchedBookId)) {
-                            for (DataSnapshot chapterSnapshot : bookChapterSnapshot.child("chapters").getChildren()) {
-                                Chapter chapter = chapterSnapshot.getValue(Chapter.class);
-                                if (chapter != null) {
-                                    chapters.add(chapter); // Add chapter to list
-                                }
-                            }
-                            // No need to return here, let the loop finish
-                        }
-                    }
-
+        if (bookId != null && !bookId.isEmpty()) {
+            chapterDao.fetchChapters(bookId, new DataCallback<List<Chapter>>() {
+                @Override
+                public void onDataReceived(List<Chapter> chapters) {
                     if (!chapters.isEmpty()) {
-                        // Handle the first chapter and its subchapters
-                        Chapter firstChapter = chapters.get(0);
-                        if (firstChapter.getSubChapters() != null && !firstChapter.getSubChapters().isEmpty()) {
-                            // Display the first subchapter of the first chapter
-                            SubChapter firstSubChapter = firstChapter.getSubChapters().values().iterator().next();
+                        currentChapter = chapters.get(0); // Set the currentChapter as the first chapter
+
+                        if (currentChapter.getSubChapters() != null && !currentChapter.getSubChapters().isEmpty()) {
+                            SubChapter firstSubChapter = currentChapter.getSubChapters().values().iterator().next();
                             TextView chapterTitle = findViewById(R.id.ChapterTitle);
                             chapterTitle.setText(firstSubChapter.getTitle());
                             List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
                             setupViewPager(pages);
                         }
-                        populateDrawerMenu(chapters); // Populate the drawer menu with the complete list of chapters
+                        populateDrawerMenu(chapters);
                     } else {
                         Log.e("ReadingActivity", "No matching bookId found in chapters");
                     }
-                } else {
-                    Log.e("ReadingActivity", "No chapters available");
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("ReadingActivity", "Failed to retrieve chapter data: " + databaseError.getMessage());
-            }
-        });
+                @Override
+                public void onError(Exception exception) {
+                    Log.e("ReadingActivity", "Failed to retrieve chapter data", exception);
+                }
+            });
+        } else {
+            Log.e("ReadingActivity", "No bookId provided");
+        }
     }
+
 
 
     private void populateDrawerMenu(List<Chapter> chapters) {
@@ -195,6 +193,8 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
 
     private void navigateToSubChapter(SubChapter subChapter) {
         if (subChapter != null) {
+            currentSubChapter = subChapter; // Set the currentSubChapter
+
             // Update the title
             TextView chapterTitle = findViewById(R.id.ChapterTitle);
             chapterTitle.setText(subChapter.getTitle());
@@ -211,10 +211,30 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+    private void updateReadingHistory() {
+        if (currentChapter != null && currentSubChapter != null) {
+            readingHistoryDao.updateOrCreateReadingHistory(userId, bookId, currentChapter, currentSubChapter, getCurrentDateTime, new DataCallback<Boolean>() {
+                @Override
+                public void onDataReceived(Boolean result) {
+                    if (result) {
+                        Log.d("ReadingHistory", "Reading history updated successfully.");
+                    }
+                }
+
+                @Override
+                public void onError(Exception exception) {
+                    Log.e("ReadingHistory", "Failed to update reading history.", exception);
+                }
+            });
+        }
+    }
+
+
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.backButton) {
+            updateReadingHistory();
             finish();
         } else if (v.getId()==R.id.menuButton) {
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
