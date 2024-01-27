@@ -15,6 +15,18 @@
         android:theme="@style/Theme.SOLOX3_DIT2B21"
         tools:targetApi="31">
         <activity
+            android:name=".pages.Bookshelf"
+            android:exported="false" />
+        <activity
+            android:name=".pages.CommentHistory"
+            android:exported="false" />
+        <activity
+            android:name=".pages.EditProfile"
+            android:exported="false" />
+        <activity
+            android:name=".pages.UserSettings"
+            android:exported="false" />
+        <activity
             android:name=".pages.Profile"
             android:exported="false" />
         <activity

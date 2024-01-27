@@ -7,4 +7,5 @@ public interface UserRatingDao {
     void deleteUserRating(String bookId, String userId, DataStatusCallback callback);
     void updateUserRating(String bookId, String userId, double newRating, DataStatusCallback callback);
     void insertUserRating(UserRating userRating, DataStatusCallback callback);
+    void getAverageUserRating(DataCallback callback, String userId);
 }

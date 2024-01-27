@@ -30,7 +30,7 @@ public class Login extends AppCompatActivity {
 
     EditText editTextEmail, editTextPassword;
     Button btnLogin;
-    FirebaseAuth mAuth;
+    FirebaseAuth auth;
     ProgressBar progressBar;
     TextView textView;
     FirebaseAppCheck firebaseAppCheck;
@@ -39,9 +39,9 @@ public class Login extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Home.class);
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(Login.this, Home.class);
             startActivity(intent);
             finish();
         }
@@ -56,7 +56,7 @@ public class Login extends AppCompatActivity {
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance());
 
-        mAuth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         ImageView imageViewShowHidePassword = findViewById(R.id.show_hide_password);
@@ -80,7 +80,7 @@ public class Login extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Register.class);
+                Intent intent = new Intent(Login.this, Register.class);
                 startActivity(intent);
                 finish();
             }
@@ -90,17 +90,24 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password;
-                email = editTextEmail.getText().toString().trim();
-                password = editTextPassword.getText().toString().trim();
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, "Enter email", Toast.LENGTH_SHORT).show();
+                    editTextEmail.setError("Email is required.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Login.this, "Enter password", Toast.LENGTH_SHORT).show();
+                    editTextPassword.setError("Password is required.");
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
+
+                if (password.length() < 8) {
+                    editTextPassword.setError("Password must be at least 8 characters.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
@@ -113,14 +120,14 @@ public class Login extends AppCompatActivity {
 //                                                String appCheckToken = tokenResponse.getToken();
 //                                                Toast.makeText(getApplicationContext(), "token: " + appCheckToken, Toast.LENGTH_SHORT).show();
 //                                                Log.d("Token: ", appCheckToken);
-                                                mAuth.signInWithEmailAndPassword(email, password)
+                                                auth.signInWithEmailAndPassword(email, password)
                                                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<AuthResult> task) {
                                                                 progressBar.setVisibility(View.GONE);
                                                                 if (task.isSuccessful()) {
                                                                     Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                                                    Intent intent = new Intent(getApplicationContext(), Home.class);
+                                                                    Intent intent = new Intent(Login.this, Home.class);
                                                                     startActivity(intent);
                                                                     finish();
                                                                 } else {

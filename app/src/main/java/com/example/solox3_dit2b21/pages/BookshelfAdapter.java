@@ -19,14 +19,14 @@ import com.example.solox3_dit2b21.model.Category;
 
 import java.util.List;
 
-public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
-    private List<Book> allBooks;
+public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.ViewHolder> {
+    private List<Book> books;
     private CategoryDao categoryDao = new FirebaseCategoryDao();
 
 
     private MyRecyclerViewItemClickListener mItemClickListener;
-    public HomeAdapter(List<Book> allBooks, MyRecyclerViewItemClickListener itemClickListener) {
-        this.allBooks = allBooks;
+    public BookshelfAdapter(List<Book> books, MyRecyclerViewItemClickListener itemClickListener) {
+        this.books = books;
         this.mItemClickListener = itemClickListener;
     }
 
@@ -39,14 +39,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mItemClickListener.onItemClicked(allBooks.get(viewHolder.getLayoutPosition()));
+                mItemClickListener.onItemClicked(books.get(viewHolder.getLayoutPosition()));
             }
         });
         return viewHolder;
     }
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Book book = allBooks.get(position);
+        Book book = books.get(position);
         holder.bookTitle.setText(book.getTitle());
         LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookId.setText(book.getBookId());
@@ -68,7 +68,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return allBooks.size();
+        return books.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

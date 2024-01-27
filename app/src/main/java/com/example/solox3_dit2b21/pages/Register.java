@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,12 +23,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class Register extends AppCompatActivity {
 
-    EditText editTextEmail, editTextPassword, editTextPasswordCheck;
+    EditText editTextUsername, editTextEmail, editTextPassword, editTextPasswordCheck;
     Button btnRegister;
-    FirebaseAuth mAuth;
+    FirebaseAuth auth;
+    FirebaseUser user;
     ProgressBar progressBar;
     TextView textView;
 
@@ -35,9 +38,9 @@ public class Register extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), Home.class);
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(this, Home.class);
             startActivity(intent);
             finish();
         }
@@ -48,11 +51,11 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mAuth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
+        editTextUsername = findViewById(R.id.username);
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         ImageView imageViewShowHidePassword = findViewById(R.id.show_hide_password);
-        imageViewShowHidePassword.setImageResource(R.drawable.eye_checked);
         imageViewShowHidePassword
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -88,7 +91,7 @@ public class Register extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Login.class);
+                Intent intent = new Intent(Register.this, Login.class);
                 startActivity(intent);
                 finish();
             }
@@ -98,38 +101,71 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password, passwordCheck;
-                email = editTextEmail.getText().toString().trim();
-                password = editTextPassword.getText().toString().trim();
-                passwordCheck = editTextPasswordCheck.getText().toString().trim();
+                String username = editTextUsername.getText().toString().trim();
+                String email = editTextEmail.getText().toString().trim();
+                String password = editTextPassword.getText().toString().trim();
+                String passwordCheck = editTextPasswordCheck.getText().toString().trim();
+
+                if (TextUtils.isEmpty(username)) {
+                    editTextUsername.setError("Username is required.");
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
+                    editTextEmail.setError("Email is required.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Register.this, "Enter password", Toast.LENGTH_SHORT).show();
+                    editTextPassword.setError("Password is required.");
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
+
+                if (password.length() < 8) {
+                    editTextPassword.setError("Password must be at least 8 characters.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
                 if (TextUtils.isEmpty(passwordCheck)) {
-                    Toast.makeText(Register.this, "Re-enter password", Toast.LENGTH_SHORT).show();
+                    editTextPasswordCheck.setError("Please enter your password twice.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
                 if (!password.equals(passwordCheck)) {
-                    Toast.makeText(Register.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    editTextPasswordCheck.setError("Passwords do not match.");
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
-                mAuth.createUserWithEmailAndPassword(email, password)
+                auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
                                     Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
+                                    user = auth.getCurrentUser();
+
+                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(username)
+                                            .build();
+
+                                    user.updateProfile(profileUpdates)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.d("updateProfile", "New Display Name: " + username);
+                                                    } else {
+                                                        Log.d("updateProfileError", task.getException().getMessage());
+                                                    }
+                                                }
+                                            });
                                     Intent intent = new Intent(getApplicationContext(), Login.class);
                                     startActivity(intent);
                                     finish();

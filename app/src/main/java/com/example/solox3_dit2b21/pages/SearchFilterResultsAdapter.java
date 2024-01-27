@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.CategoryDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +38,7 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
 
     private Context context;
     private List<Book> bookList;
-
+    private CategoryDao categoryDao = new FirebaseCategoryDao();
     public SearchFilterResultsAdapter(Context context, List<Book> bookList) {
         this.context = context;
         this.bookList = bookList;
@@ -55,7 +58,6 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
         LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
         holder.bookAuthor.setText(book.getAuthorId());
         holder.bookDescription.setText(book.getDescription());
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(book.getCategoryId());
         holder.viewBookDetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,20 +66,18 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
                 context.startActivity(intent);
             }
         });
-        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        categoryDao.loadBookCategory(book.getCategoryId(), new DataCallback<Category>() {
             @Override
-            public void onDataChange(@org.checkerframework.checker.nullness.qual.NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Category category = dataSnapshot.getValue(Category.class);
-                    if (category != null) {
-                        holder.bookCategoryButton.setText(category.getCategoryName());
-                        Log.d("Firebase", "Category Reference: " + category.getCategoryId());
-                    }
+            public void onDataReceived(Category category) {
+                if (category != null) {
+                    holder.bookCategoryButton.setText(category.getCategoryName());
+                    Log.d("Firebase", "Category Reference: " + category.getCategoryId());
                 }
             }
+
             @Override
-            public void onCancelled(@org.checkerframework.checker.nullness.qual.NonNull DatabaseError databaseError) {
-                Log.e("Firebase", "Error fetching category data", databaseError.toException());
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Error fetching category data", exception);
             }
         });
     }

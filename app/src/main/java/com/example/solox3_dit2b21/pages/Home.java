@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,6 +31,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseBookDao bookDao = new FirebaseBookDao();
     @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -41,32 +47,27 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
-                Intent intent = new Intent(Home.this, EditorSpace.class);
+                Intent intent = new Intent(Home.this, Bookshelf.class);
+//                Intent intent = new Intent(Home.this, EditorSpace.class);
+//                intent.putExtra("bookId", "f28f342c-753b-4dcd-830f-a8849078f5cb");
                 startActivity(intent);
                 // Navigate to Bookshelf activity
-                // Replace CategoryPage.class with the correct Activity class for Bookshelf
-                // if (this is not instance of BookshelfActivity) {
-                //Intent intent = new Intent(Home.this, BookshelfActivity.class);
-                //startActivity(intent);
-                // }
             } else if (itemId == R.id.navigation_home) {
                 // Already in Home, no action needed
             } else if (itemId == R.id.navigation_category) {
                 // Navigate to Category activity
-                // if (this is not instance of CategoryPage) {
                 Intent intent = new Intent(Home.this, CategoryPage.class);
                 startActivity(intent);
-                // }
             } else if (itemId == R.id.navigation_profile) {
-                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
-                intent.putExtra("bookId", "book1");
+                Intent intent = new Intent(Home.this, Profile.class);
                 startActivity(intent);
                 // Navigate to Profile activity
-                // Replace CategoryPage.class with the correct Activity class for Profile
-                // if (this is not instance of ProfileActivity) {
-                //Intent intent = new Intent(Home.this, ProfileActivity.class);
-                //startActivity(intent);
-                // }
+//                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
+//                intent.putExtra("bookId", "book1");
+//                startActivity(intent);
+                // Navigate to Profile activity
+//                Intent intent = new Intent(Home.this, Profile.class);
+//                startActivity(intent);
             }
 
             return true;
@@ -88,7 +89,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         recyclerView2.setLayoutManager(layoutManager2);
 
 
-        // Create separate adapters for each RecyclerView
         adapter1 = new HomeAdapter(booksPopular, new HomeAdapter.MyRecyclerViewItemClickListener()
         {
             @Override

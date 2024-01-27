@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseCategoryDao implements CategoryDao {
+    DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference("Category");
+
     @Override
     public void loadBookCategory(String categoryId, DataCallback<Category> callback) {
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category").child(categoryId);
-        categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference categoryRefId = categoryRef.child(categoryId);
+        categoryRefId.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -32,7 +34,6 @@ public class FirebaseCategoryDao implements CategoryDao {
 
     @Override
     public void loadAllCategories(DataCallback<List<Category>> callback) {
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("Category");
         categoryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
