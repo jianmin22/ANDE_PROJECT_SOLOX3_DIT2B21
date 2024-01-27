@@ -49,10 +49,12 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
     private String bookId;
     private ChapterDao chapterDao;
     private Chapter currentChapter;
-
+    private List<Chapter> chapters;
     private SubChapter currentSubChapter;
     private ReadingHistoryDao readingHistoryDao;
     private String getCurrentDateTime;
+    private int lastReadChapterOrder;
+    private int lastReadSubChapterOrder;
     FirebaseAuth auth;
     FirebaseUser user;
     private String userId;
@@ -69,13 +71,14 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         userId = user.getUid();
         chapterDao = new FirebaseChapterDao();
         readingHistoryDao = new FirebaseReadingHistoryDao();
+        chapters = new ArrayList<>();
         CurrentDateUtils currentDateUtil = new CurrentDateUtils();
         getCurrentDateTime = currentDateUtil.getCurrentDateTime();
         // Retrieve the bookId passed from the previous activity
         Intent intent = getIntent();
         bookId = intent.getStringExtra("bookId");
-        int lastReadChapterOrder = intent.getIntExtra("lastReadChapterOrder", -1);
-        int lastReadSubChapterOrder = intent.getIntExtra("lastReadSubChapterOrder", -1);
+         lastReadChapterOrder = intent.getIntExtra("lastReadChapterOrder", -1);
+         lastReadSubChapterOrder = intent.getIntExtra("lastReadSubChapterOrder", -1);
         Log.d("lastReadChapterOrder: ", String.valueOf(lastReadChapterOrder));
         Log.d("lastReadSubChapterOrder: ", String.valueOf(lastReadSubChapterOrder));
         // Initialize the ViewPager and other views
@@ -144,15 +147,43 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         if (bookId != null && !bookId.isEmpty()) {
             chapterDao.fetchChapters(bookId, new DataCallback<List<Chapter>>() {
                 @Override
-                public void onDataReceived(List<Chapter> chapters) {
-                    if (!chapters.isEmpty()) {
-                        currentChapter = chapters.get(0); // Set the currentChapter as the first chapter
+                public void onDataReceived(List<Chapter> fetchedChapters) {
+                    if (!fetchedChapters.isEmpty()) {
+                        chapters.clear();
+                        chapters.addAll(fetchedChapters);
+                        boolean chapterFound = false;
 
-                        if (currentChapter.getSubChapters() != null && !currentChapter.getSubChapters().isEmpty()) {
-                            SubChapter firstSubChapter = currentChapter.getSubChapters().values().iterator().next();
+                        // If lastReadChapterOrder and lastReadSubChapterOrder are provided, try to find the corresponding chapter and subchapter
+                        if (lastReadChapterOrder != -1 && lastReadSubChapterOrder != -1) {
+                            for (Chapter chapter : chapters) {
+                                if (chapter.getChapterOrder() == lastReadChapterOrder) {
+                                    currentChapter = chapter;
+                                    // Find the subchapter with the lastReadSubChapterOrder within the current chapter
+                                    for (SubChapter subChapter : currentChapter.getSubChapters().values()) {
+                                        if (subChapter.getSubChapterOrder() == lastReadSubChapterOrder) {
+                                            currentSubChapter = subChapter;
+                                            chapterFound = true;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        // If the specific chapter and subchapter are not found or not provided, set the first chapter and its first subchapter as current
+                        if (!chapterFound) {
+                            currentChapter = chapters.get(0);
+                            if (!currentChapter.getSubChapters().isEmpty()) {
+                                currentSubChapter = currentChapter.getSubChapters().values().iterator().next();
+                            }
+                        }
+
+                        // Display the content of the current subchapter
+                        if (currentSubChapter != null) {
                             TextView chapterTitle = findViewById(R.id.ChapterTitle);
-                            chapterTitle.setText(firstSubChapter.getTitle());
-                            List<String> pages = splitChapterIntoPages(firstSubChapter.getChapterContent());
+                            chapterTitle.setText(currentSubChapter.getTitle());
+                            List<String> pages = splitChapterIntoPages(currentSubChapter.getChapterContent());
                             setupViewPager(pages);
                         }
                         populateDrawerMenu(chapters);
@@ -170,6 +201,7 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             Log.e("ReadingActivity", "No bookId provided");
         }
     }
+
 
 
 
@@ -198,6 +230,14 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
 
     private void navigateToSubChapter(SubChapter subChapter) {
         if (subChapter != null) {
+            // Find the chapter that contains the subChapter being navigated to
+            for (Chapter chapter : chapters) { // Assuming 'chapters' is the list of all chapters you fetched earlier
+                if (chapter.getSubChapters() != null && chapter.getSubChapters().containsValue(subChapter)) {
+                    currentChapter = chapter; // Set the currentChapter
+                    break; // Exit the loop once the chapter is found
+                }
+            }
+
             currentSubChapter = subChapter; // Set the currentSubChapter
 
             // Update the title
@@ -216,9 +256,15 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+
     private void updateReadingHistory() {
         if (currentChapter != null && currentSubChapter != null) {
-            readingHistoryDao.updateOrCreateReadingHistory(userId, bookId, currentChapter, currentSubChapter, getCurrentDateTime, new DataCallback<Boolean>() {
+            int chapterOrderToUpdate = currentChapter.getChapterOrder();
+            int subChapterOrderToUpdate = currentSubChapter.getSubChapterOrder();
+
+            Log.d("updateReadingHistory: ", String.valueOf(chapterOrderToUpdate));
+            Log.d("updateReadingHistory: ", String.valueOf(subChapterOrderToUpdate));
+            readingHistoryDao.updateOrCreateReadingHistory(userId, bookId, chapterOrderToUpdate, subChapterOrderToUpdate, getCurrentDateTime, new DataCallback<Boolean>() {
                 @Override
                 public void onDataReceived(Boolean result) {
                     if (result) {
