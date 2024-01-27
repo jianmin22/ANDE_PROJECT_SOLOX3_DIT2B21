@@ -77,6 +77,15 @@ public class Profile extends AppCompatActivity {
         // To select a default item (e.g. profile) when the activity starts
         bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
 
+        addBookBtn = findViewById(R.id.addBookBtn);
+        addBookBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Profile.this, AuthorEditBookDetails.class);
+                startActivity(intent);
+            }
+        });
+
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         String userId = user.getUid();
