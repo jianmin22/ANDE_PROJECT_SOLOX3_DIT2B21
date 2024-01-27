@@ -115,15 +115,15 @@ public class Login extends AppCompatActivity {
                     return;
                 }
 
-                Toast.makeText(getApplicationContext(), "Get Token", Toast.LENGTH_SHORT).show();
-                firebaseAppCheck
-                                .getLimitedUseAppCheckToken()
-                                        .addOnSuccessListener(new OnSuccessListener<AppCheckToken>() {
-                                            @Override
-                                            public void onSuccess(@NonNull AppCheckToken tokenResponse) {
-                                                String appCheckToken = tokenResponse.getToken();
-                                                Toast.makeText(getApplicationContext(), "token: " + appCheckToken, Toast.LENGTH_SHORT).show();
-                                                Log.d("Token: ", appCheckToken);
+//                Toast.makeText(getApplicationContext(), "Get Token", Toast.LENGTH_SHORT).show();
+//                firebaseAppCheck
+//                                .getLimitedUseAppCheckToken()
+//                                        .addOnSuccessListener(new OnSuccessListener<AppCheckToken>() {
+//                                            @Override
+//                                            public void onSuccess(@NonNull AppCheckToken tokenResponse) {
+//                                                String appCheckToken = tokenResponse.getToken();
+//                                                Toast.makeText(getApplicationContext(), "token: " + appCheckToken, Toast.LENGTH_SHORT).show();
+//                                                Log.d("Token: ", appCheckToken);
                                                 auth.signInWithEmailAndPassword(email, password)
                                                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                             @Override
@@ -144,18 +144,18 @@ public class Login extends AppCompatActivity {
                                                             }
                                                         });
                                             }
-                                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressBar.setVisibility(View.GONE);
-                                Log.e("AppCheck", e.getMessage());
-                                Toast.makeText(Login.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-            }
-        });
+                                        });
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                progressBar.setVisibility(View.GONE);
+//                                Log.e("AppCheck", e.getMessage());
+//                                Toast.makeText(Login.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//
+//            }
+//        });
 
     }
 }

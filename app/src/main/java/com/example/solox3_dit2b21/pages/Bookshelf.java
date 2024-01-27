@@ -34,6 +34,8 @@ import java.util.List;
 public class Bookshelf extends AppCompatActivity {
 
     private TextView tabFavouriteBooks, tabReadingHistory;
+    private String noFavouriteBooks = "No books yet. Favourite a book!";
+    private String noReadingHistory = "No books yet. Read a book!";
     int selectedColor, unselectedColor;
     private BottomNavigationView bottomNavigationView;
     FirebaseAuth auth;
@@ -144,10 +146,11 @@ public class Bookshelf extends AppCompatActivity {
                 bookshelfAdapter.notifyDataSetChanged();
 
                 TextView noBooksFound = findViewById(R.id.noBooksFound);
+                String noBooks = noBooksFound.getText().toString().trim();
 
                 if (books.size() == 0) {
-                    if (noBooksFound.getText().toString().trim().equals("")) {
-                        noBooksFound.setText("No books yet. Favourite a book!");
+                    if (noBooks.equals("") || noBooks.equals(noReadingHistory)) {
+                        noBooksFound.setText(noFavouriteBooks);
                         noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                     }
                 } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
@@ -160,6 +163,37 @@ public class Bookshelf extends AppCompatActivity {
             public void onError(Exception exception) {
                 Log.e("bindDataForFavouriteBooks", "Error fetching favourite books", exception);
                 Toast.makeText(Bookshelf.this, "Error fetching favourite books.", Toast.LENGTH_SHORT).show();
+            }
+        }, userId);
+    }
+
+    private void bindDataForReadingHistory(String userId) {
+
+        bookDao.getUserFavouriteBooks(new DataCallback<List<Book>>() {
+            @Override
+            public void onDataReceived(List<Book> books) {
+                bookshelfBooks.clear();
+                bookshelfBooks.addAll(books);
+                bookshelfAdapter.notifyDataSetChanged();
+
+                TextView noBooksFound = findViewById(R.id.noBooksFound);
+                String noBooks = noBooksFound.getText().toString().trim();
+
+                if (books.size() == 0) {
+                    if (noBooks.equals("") || noBooks.equals(noFavouriteBooks)) {
+                        noBooksFound.setText(noReadingHistory);
+                        noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    }
+                } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
+                    noBooksFound.setText("");
+                    noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForReadingHistory", "Error fetching reading history", exception);
+                Toast.makeText(Bookshelf.this, "Error fetching reading history.", Toast.LENGTH_SHORT).show();
             }
         }, userId);
     }
