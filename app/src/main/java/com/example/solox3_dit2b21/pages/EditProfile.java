@@ -153,8 +153,10 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                                 if (task.isSuccessful()) {
                                     Log.d("updateProfile", "New Display Name: " + username);
                                     Log.d("updateProfile", "New Photo URI: " + imageURL);
+                                    Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Log.d("updateProfileError", task.getException().getMessage());
+                                    Toast.makeText(EditProfile.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

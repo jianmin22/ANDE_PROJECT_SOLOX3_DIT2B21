@@ -17,6 +17,7 @@ import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
 import com.example.solox3_dit2b21.model.Comment;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class CommentHistoryAdapter extends RecyclerView.Adapter<CommentHistoryAd
     @Override
     public void onBindViewHolder(@NonNull CommentsViewHolder holder, int position) {
         Comment comment = commentList.get(position);
+
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        UserRecord userRecord = auth.getUser(comment.getUserId());
 
         // Set data to views
         holder.usernameTextView.setText(comment.getUserId());

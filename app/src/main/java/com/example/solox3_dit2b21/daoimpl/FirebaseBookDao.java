@@ -85,7 +85,9 @@ public class FirebaseBookDao implements BookDao {
 
     @Override
     public void getUserBooks(final DataCallback callback, String userId, Boolean published) {
-        bookRef.addValueEventListener(new ValueEventListener() {
+        Query userBooksQuery = bookRef.orderByChild("authorId").equalTo(userId);
+
+        userBooksQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Book> userBooks = new ArrayList<>();
