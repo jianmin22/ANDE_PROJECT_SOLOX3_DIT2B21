@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseReadingHistoryDao implements ReadingHistoryDao {
     @Override
-    public void updateOrCreateReadingHistory(String userId, String bookId, Chapter currentChapter, SubChapter currentSubChapter, String lastRead, DataCallback<Boolean> callback) {
+    public void updateOrCreateReadingHistory(String userId, String bookId, int chapterOrderToUpdate, int subChapterOrderToUpdate, String lastRead, DataCallback<Boolean> callback) {
         DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference("ReadingHistory");
 
         historyRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -39,8 +39,8 @@ public class FirebaseReadingHistoryDao implements ReadingHistoryDao {
 
                 Map<String, Object> historyData = new HashMap<>();
                 historyData.put("bookId", bookId);
-                historyData.put("chapterOrder", currentChapter.getChapterOrder());
-                historyData.put("subChapterOrder", currentSubChapter.getSubChapterOrder());
+                historyData.put("chapterOrder", chapterOrderToUpdate);
+                historyData.put("subChapterOrder", subChapterOrderToUpdate);
                 historyData.put("lastRead", lastRead);
                 historyData.put("userId", userId);
 
