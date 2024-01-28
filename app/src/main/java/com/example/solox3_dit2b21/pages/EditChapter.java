@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -119,6 +120,10 @@ public class EditChapter extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.backButtonChapter) {
             finish();
+        } else if (v.getId()==R.id.button_go_to_editor){
+            Intent intent = new Intent(EditChapter.this, EditorSpace.class);
+            intent.putExtra("bookId", bookId);
+            startActivity(intent);
         }
     }
 
