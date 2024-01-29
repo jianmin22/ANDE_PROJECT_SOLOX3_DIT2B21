@@ -50,24 +50,14 @@ public class CategoryPage extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
-                // Navigate to Bookshelf activity
-                // Replace CategoryPage.class with the correct Activity class for Bookshelf
-                // if (this is not instance of BookshelfActivity) {
-                //Intent intent = new Intent(Home.this, BookshelfActivity.class);
-                //startActivity(intent);
-                // }
+                Intent intent = new Intent(CategoryPage.this, Bookshelf.class);
+                startActivity(intent);
             } else if (itemId == R.id.navigation_home) {
                 Intent intent = new Intent(CategoryPage.this, Home.class);
                 startActivity(intent);
-            } else if (itemId == R.id.navigation_category) {
-
-            } else if (itemId == R.id.navigation_profile) {
-                // Navigate to Profile activity
-                // Replace CategoryPage.class with the correct Activity class for Profile
-                // if (this is not instance of ProfileActivity) {
-                //Intent intent = new Intent(Home.this, ProfileActivity.class);
-                //startActivity(intent);
-                // }
+            } if (itemId == R.id.navigation_profile) {
+                Intent intent = new Intent(CategoryPage.this, Profile.class);
+                startActivity(intent);
             }
 
             return true;
