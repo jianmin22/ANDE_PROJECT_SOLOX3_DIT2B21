@@ -4,25 +4,20 @@ package com.example.solox3_dit2b21.model;
 public class User {
     private String userId;
     private String email;
-    private String password;
-    private int publishedNumber;
-    private int commentNumber;
-    private int averageRating;
-    private String image;
+    private String username;
+    private String profilePic;
+    private String description;
     private String createdDate;
 
     public User() {
     }
 
-    public User(String userId, String email, String password, int publishedNumber,
-                int commentNumber, int averageRating, String image, String createdDate) {
+    public User(String userId, String email, String username, String profilePic, String description, String createdDate) {
         this.userId = userId;
         this.email = email;
-        this.password = password;
-        this.publishedNumber = publishedNumber;
-        this.commentNumber = commentNumber;
-        this.averageRating = averageRating;
-        this.image = image;
+        this.username = username;
+        this.profilePic = profilePic;
+        this.description = description;
         this.createdDate = createdDate;
     }
 
@@ -42,44 +37,28 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getUsername() {
+        return username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public int getPublishedNumber() {
-        return publishedNumber;
+    public String getProfilePic() {
+        return profilePic;
     }
 
-    public void setPublishedNumber(int publishedNumber) {
-        this.publishedNumber = publishedNumber;
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 
-    public int getCommentNumber() {
-        return commentNumber;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCommentNumber(int commentNumber) {
-        this.commentNumber = commentNumber;
-    }
-
-    public int getAverageRating() {
-        return averageRating;
-    }
-
-    public void setAverageRating(int averageRating) {
-        this.averageRating = averageRating;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getCreatedDate() {

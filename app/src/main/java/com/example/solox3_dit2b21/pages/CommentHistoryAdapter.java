@@ -24,12 +24,14 @@ import java.util.List;
 public class CommentHistoryAdapter extends RecyclerView.Adapter<CommentHistoryAdapter.CommentsViewHolder> {
 
     private Context context;
+    private String username;
     private List<Comment> commentList;
 
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
 
-    public CommentHistoryAdapter(Context context, List<Comment> commentList) {
+    public CommentHistoryAdapter(Context context, String username, List<Comment> commentList) {
         this.context = context;
+        this.username = username;
         this.commentList = commentList;
     }
 
@@ -44,11 +46,8 @@ public class CommentHistoryAdapter extends RecyclerView.Adapter<CommentHistoryAd
     public void onBindViewHolder(@NonNull CommentsViewHolder holder, int position) {
         Comment comment = commentList.get(position);
 
-//        FirebaseAuth auth = FirebaseAuth.getInstance();
-//        UserRecord userRecord = auth.getUser(comment.getUserId());
-
         // Set data to views
-        holder.usernameTextView.setText(comment.getUserId());
+        holder.usernameTextView.setText(username);
         holder.commentTextView.setText(comment.getCommentText());
         // Format and set the timestamp
         String formattedDate = FormatDateUtils.formatDateString(comment.getDate());
