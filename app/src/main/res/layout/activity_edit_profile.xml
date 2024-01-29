@@ -8,20 +8,6 @@
     android:orientation="vertical"
     android:layout_gravity="center_horizontal">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true"
-            android:indeterminateTint="#FF0000"
-            android:visibility="gone" />
-    </FrameLayout>
 
     <ImageView
         android:id="@+id/back"
@@ -85,5 +71,21 @@
         android:text="@string/save_profile"
         android:onClick="onClick"
         app:cornerRadius="15dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateTint="#FF0000"
+            android:visibility="gone" />
+    </FrameLayout>
+
 
 </LinearLayout>
