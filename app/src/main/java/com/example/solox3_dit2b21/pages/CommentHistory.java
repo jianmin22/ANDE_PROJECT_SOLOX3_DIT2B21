@@ -64,7 +64,6 @@ public class CommentHistory extends AppCompatActivity {
                 recyclerView.setLayoutManager(new LinearLayoutManager(CommentHistory.this));
                 commentHistoryAdapter = new CommentHistoryAdapter(CommentHistory.this, username, userComments);
                 recyclerView.setAdapter(commentHistoryAdapter);
-                commentHistoryAdapter.notifyDataSetChanged();
             }
 
             @Override
