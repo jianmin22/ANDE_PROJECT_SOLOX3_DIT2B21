@@ -31,12 +31,13 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/backButtonComment"
                 android:layout_width="16dp"
                 android:layout_height="52dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="0.2"
+                android:onClick="onClick"
                 app:srcCompat="@drawable/back" />
 
             <TextView
@@ -51,7 +52,7 @@
                 android:textStyle="bold"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView3"
+                app:layout_constraintStart_toEndOf="@+id/backButtonComment"
                 app:layout_constraintEnd_toEndOf="parent" />
         </LinearLayout>
 

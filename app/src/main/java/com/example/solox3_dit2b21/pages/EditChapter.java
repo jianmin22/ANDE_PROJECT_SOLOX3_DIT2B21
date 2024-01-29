@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +12,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.dao.ChapterDao;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseChapterDao;
 import com.example.solox3_dit2b21.model.Chapter;
+import com.example.solox3_dit2b21.model.SubChapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,21 +27,22 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class EditChapter extends AppCompatActivity {
+public class EditChapter extends AppCompatActivity implements View.OnClickListener{
     private RecyclerView recyclerView;
     private EditChaptersAdapter adapter;
     private List<Chapter> chapters = new ArrayList<>();
     private DatabaseReference databaseReference;
     private String bookId;
-
+    private ChapterDao chapterDao;
     private String chapterNodeIdentifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_chapter);
-
+        chapterDao = new FirebaseChapterDao();
         bookId = getIntent().getStringExtra("bookId");
         if (bookId == null) {
             Log.e("EditChapter", "No bookId passed to the activity");
@@ -60,74 +67,89 @@ public class EditChapter extends AppCompatActivity {
         newChapter.setBookId(bookId);
         newChapter.setTitle("Chapter " + newChapterOrder);
         newChapter.setChapterOrder(newChapterOrder);
+
         // Initialize empty subChapters map or any other required fields
-        newChapter.setSubChapters(new HashMap<>());
+        Map<String, SubChapter> subChaptersMap = new HashMap<>();
+
+        // Create a new subchapter
+        SubChapter newSubChapter = new SubChapter();
+        newSubChapter.setTitle("Part 1");
+        newSubChapter.setChapterContent("Your content here...");
+        newSubChapter.setSubChapterOrder(1); // Assuming subChapter order starts from 1
+
+        // Add the new subchapter to the subChapters map
+        subChaptersMap.put("subChapter1", newSubChapter); // Using "subChapter1" as the key
+
+        // Set the subChapters map in the new chapter
+        newChapter.setSubChapters(subChaptersMap);
 
         chapters.add(newChapter);
         adapter.notifyItemInserted(chapters.size() - 1); // Notify adapter about the new chapter
     }
 
-    private void getChaptersData() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Chapter");
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void getChaptersData() {
+        chapterDao.getChaptersByBookId(bookId, new DataCallback<List<Chapter>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                    if (bookChapterSnapshot.child("bookId").getValue(String.class).equals(bookId)) {
-                        chapterNodeIdentifier = bookChapterSnapshot.getKey(); // Store the node identifier
-                        Log.d("chapterNodeIdentifier: ", chapterNodeIdentifier);
-                        DataSnapshot chaptersSnapshot = bookChapterSnapshot.child("chapters");
-                        for (DataSnapshot chapterSnapshot : chaptersSnapshot.getChildren()) {
-                            Log.d("node identifier: ",chapterSnapshot.getKey());
-                            Chapter chapter = chapterSnapshot.getValue(Chapter.class);
-                            if (chapter != null) {
-                                chapters.add(chapter);
-                            }
-                        }
-                        break;
-                    }
+            public void onDataReceived(List<Chapter> chaptersData) {
+                if (chaptersData.isEmpty()) {
+                    // No chapters found for the book, create a new one
+                    addNewChapter();
+
+                    adapter.notifyDataSetChanged();
+                } else {
+                    chapters.clear();
+                    chapters.addAll(chaptersData);
+                    adapter.notifyDataSetChanged();
                 }
-                adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("EditChapter", "Database error: " + databaseError.getMessage());
+            public void onError(Exception e) {
+                Log.e("EditChapter", "Error fetching chapters: " + e.getMessage());
             }
         });
     }
 
-    private void saveChapters(View view) {
-        // First, find the parent node for the chapters based on bookId
-        databaseReference.orderByChild("bookId").equalTo(bookId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                                // We found the parent node, now get its key
-                                String parentNodeKey = bookChapterSnapshot.getKey();
-                                DatabaseReference bookChaptersRef = databaseReference.child(parentNodeKey).child("chapters");
-                                bookChaptersRef.setValue(chapters)
-                                        .addOnSuccessListener(aVoid -> Toast.makeText(EditChapter.this, "Chapter " + " saved successfully", Toast.LENGTH_SHORT).show())
-                                        .addOnFailureListener(e -> Toast.makeText(EditChapter.this, "Failed to save chapter " + ": " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                                ;
-
-                            }
-                        } else {
-                            Log.e("EditChapter", "No parent node found for bookId: " + bookId);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e("EditChapter", "Database error: " + databaseError.getMessage());
-                    }
-                });
+    private Chapter createNewChapter() {
+        Chapter newChapter = new Chapter();
+        newChapter.setBookId(bookId);
+        newChapter.setTitle("Chapter 1");
+        newChapter.setChapterOrder(1);
+        // Initialize with a default subchapter if needed
+        Map<String, SubChapter> subChapters = new HashMap<>();
+        SubChapter defaultSubChapter = new SubChapter();
+        defaultSubChapter.setTitle("Part 1");
+        defaultSubChapter.setChapterContent("Start writing here...");
+        defaultSubChapter.setSubChapterOrder(1);
+        subChapters.put("SubChapter1", defaultSubChapter); // Use a unique key for the subchapter
+        newChapter.setSubChapters(subChapters);
+        return newChapter;
     }
 
 
+    private void saveChapters(View view) {
+        chapterDao.saveChapters(bookId, chapters, new DataStatusCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(EditChapter.this, "Chapters saved successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(EditChapter.this, "Failed to save chapters: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void onClick(View v) {
+        if (v.getId() == R.id.backButtonChapter) {
+            finish();
+        } else if (v.getId()==R.id.button_go_to_editor){
+            Intent intent = new Intent(EditChapter.this, EditorSpace.class);
+            intent.putExtra("bookId", bookId);
+            startActivity(intent);
+        }
+    }
 
 
 }

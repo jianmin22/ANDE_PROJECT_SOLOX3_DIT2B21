@@ -22,12 +22,14 @@ import java.util.List;
 public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.ViewHolder> {
     private List<Book> books;
     private CategoryDao categoryDao = new FirebaseCategoryDao();
-
+    private boolean isFromReadingHistory;
 
     private MyRecyclerViewItemClickListener mItemClickListener;
-    public BookshelfAdapter(List<Book> books, MyRecyclerViewItemClickListener itemClickListener) {
+    public BookshelfAdapter(List<Book> books,boolean isFromReadingHistory, MyRecyclerViewItemClickListener itemClickListener) {
         this.books = books;
+        this.isFromReadingHistory = isFromReadingHistory;
         this.mItemClickListener = itemClickListener;
+
     }
 
     @Override
@@ -64,6 +66,15 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.View
                 Log.e("Firebase", "Error fetching category data", exception);
             }
         });
+        holder.itemView.setOnClickListener(v -> {
+            if (isFromReadingHistory) {
+                // If from reading history, go straight to the reading page
+                mItemClickListener.onReadingHistoryItemClicked(book);
+            } else {
+                // Otherwise, go to the book detail page
+                mItemClickListener.onItemClicked(book);
+            }
+        });
     }
 
     @Override
@@ -90,6 +101,7 @@ public class BookshelfAdapter extends RecyclerView.Adapter<BookshelfAdapter.View
     //RecyclerView Click Listener
     public interface MyRecyclerViewItemClickListener {
         void onItemClicked(Book book);
+        void onReadingHistoryItemClicked(Book book);
     }
 
 

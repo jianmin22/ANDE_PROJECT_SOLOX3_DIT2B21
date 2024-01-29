@@ -1,60 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <RelativeLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true">
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp">
 
-        <EditText
-            android:id="@+id/editText_chapter_title"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:textSize="18sp"
-            android:text="Chapter 1: The Story Begin"
-            android:background="@android:color/transparent"/>
+            android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/imageView_delete_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="63dp"
-            android:contentDescription="expand"
-            android:src="@drawable/ic_trash" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_chapter_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/imageView_add_toggle"
+                android:layout_alignParentStart="true"
+                android:textSize="18sp"
+                android:text="Chapter 1: The Story Begins"
+                android:background="@android:color/transparent"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                android:ellipsize="end"
+                android:maxLines="1"/>
 
-        <ImageView
-            android:id="@+id/imageView_expand_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="34dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="8dp"
-            android:contentDescription="expand"
-            android:src="@drawable/ic_expand_more" />
 
-        <ImageView
-            android:id="@+id/imageView_add_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="3dp"
-            android:layout_marginEnd="3dp"
-            android:contentDescription="expand"
-            android:src="@drawable/ic_add" />
 
-        <!-- Your Edit and Delete buttons here -->
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/imageView_add_toggle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/imageView_expand_toggle"
+                android:src="@drawable/ic_add"
+                />
+
+            <ImageView
+                android:id="@+id/imageView_expand_toggle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/imageView_delete_toggle"
+                android:src="@drawable/ic_expand_more"
+           />
+
+            <ImageView
+                android:id="@+id/imageView_delete_toggle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_trash"
+      />
+
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Subchapters layout, initially gone and made visible when expanded -->
     <LinearLayout
@@ -62,41 +68,54 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
-    <RelativeLayout
+        android:visibility="gone"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp">
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        <!-- Subchapter items go here -->
+        <RelativeLayout
 
-        <!-- Dynamically add your subchapters here in code -->
-        <!-- Example static subchapter -->
-        <EditText
-            android:id="@+id/editText_subchapter"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1.1 Type something here..."
-            android:paddingLeft="16dp"
-            android:textSize="16sp"
-            android:background="@android:color/transparent"/>
+            android:orientation="horizontal"
+            >
 
-        <ImageView
-            android:id="@+id/imageView_delete_subchapter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_toStartOf="@+id/imageView_add_subchapter"
-            android:src="@drawable/ic_trash" />
+            <!-- Dynamically add your subchapters here in code -->
+            <!-- Example static subchapter -->
+            <EditText
+                android:id="@+id/editText_subchapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.1 Type something here..."
+                android:paddingLeft="16dp"
+                android:textSize="16sp"
+                android:background="@android:color/transparent"/>
 
-        <ImageView
-            android:id="@+id/imageView_add_subchapter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="40dp"
-            android:src="@drawable/ic_add" />
-        <!-- Add more TextViews for additional subchapters -->
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/imageView_delete_subchapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@+id/imageView_add_subchapter"
+                android:src="@drawable/ic_trash" />
+
+            <ImageView
+                android:id="@+id/imageView_add_subchapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="40dp"
+                android:src="@drawable/ic_add" />
+            <!-- Add more TextViews for additional subchapters -->
+        </RelativeLayout>
     </LinearLayout>
+
+    <!-- Optional divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/listDivider"/>
+
 </LinearLayout>

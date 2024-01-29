@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,25 +31,28 @@ import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
+import com.example.solox3_dit2b21.Utils.DeletionCompleteListener;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AuthorEditBookDetails extends AppCompatActivity implements View.OnClickListener{
     private String bookId;
     private String userId;
+    FirebaseStorageManager storageManager = new FirebaseStorageManager();
     private static final int PICK_IMAGE_REQUEST = 1;
     CategoryDao categoryDao = new FirebaseCategoryDao();
     BookDao bookDao = new FirebaseBookDao();
+    private boolean deleting=false;
     Book bookDetails;
     ImageView bookImage;
     EditText bookTitleEditText;
     Spinner categorySpinner;
     EditText descriptionEditText;
     String imageURL;
+    List<String> oldImageURL=new ArrayList<String>();
     String categoryId;
     List<Category> categoriesList = new ArrayList<>();
     private ProgressBar progressBar;
@@ -155,11 +156,6 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 finish();
             }
         });
-
-
-
-
-
     }
 
     private void selectImage() {
@@ -175,11 +171,11 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             showLoading(true);
             Uri imageUri = data.getData();
-            FirebaseStorageManager storageManager = new FirebaseStorageManager();
             storageManager.uploadImage(imageUri, new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     String imageUrl = uri.toString();
+                    Log.d("Upload Image Success:" , imageUrl);
                     imageURL=imageUrl;
                     LoadImageURL.loadImageURL(imageUrl, bookImage);
                     showLoading(false);
@@ -200,22 +196,42 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     @Override
     public void onClick (View v){
         if (v.getId() == R.id.back) {
-            finish();
-        } else if (v.getId() == R.id.proceedEditChapterButton) {
-            if (bookId!=null&&!bookId.equals("")){
-                Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.class);
-                intent.putExtra("bookId", bookId);
-                startActivity(intent);
-            }else{
-                Toast.makeText(AuthorEditBookDetails.this, "Please Save Your Book Details First.",Toast.LENGTH_SHORT).show();
+            if(!oldImageURL.isEmpty()){
+                deleting=true;
+                DeletionCompleteListener deletionListener = () -> finish();
+                if (oldImageURL.size() > 1) {
+                    List<String> urlsToDelete = oldImageURL.subList(1, oldImageURL.size());
+                    deleteImages(urlsToDelete,deletionListener);
+                    deleteImages(Collections.singletonList(imageURL), deletionListener);
+                }else if(oldImageURL.size()==1){
+                    deleteImages(Collections.singletonList(imageURL),deletionListener);
+                }
+            }
+            if(!deleting){
+                finish();
+            }
+        }else if (v.getId() == R.id.proceedEditChapterButton) {
+            if(!oldImageURL.isEmpty()){
+                deleting=true;
+                DeletionCompleteListener deletionListener = () -> navigateToEditBook();
+                if (oldImageURL.size() > 1) {
+                    List<String> urlsToDelete = oldImageURL.subList(1, oldImageURL.size());
+                    deleteImages(urlsToDelete, deletionListener);
+                    deleteImages(Collections.singletonList(imageURL),deletionListener);
+                }else if(oldImageURL.size()==1){
+                    deleteImages(Collections.singletonList(imageURL),deletionListener);
+                }
+            }
+            if(!deleting) {
+                navigateToEditBook();
             }
 
         } else if (v.getId() == R.id.saveBookDetailsButton) {
             String title = bookTitleEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
-
             if (!categoryId.isEmpty() && !title.isEmpty() && !description.isEmpty()) {
                 Book book;
+
                 if (bookId != null && !bookId.isEmpty()) {
                     book = bookDetails;
                     book.setTitle(title);
@@ -226,6 +242,11 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         @Override
                         public void onSuccess() {
                             Toast.makeText(AuthorEditBookDetails.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
+                            if (!oldImageURL.isEmpty()) {
+                                deleting=true;
+                                DeletionCompleteListener deletionListener = () -> Log.d("update and delete image success",imageURL);
+                                deleteImages(oldImageURL,deletionListener);
+                            }
                         }
 
                         @Override
@@ -242,6 +263,11 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         public void onSuccess() {
                             bookId=newBookId;
                             Toast.makeText(AuthorEditBookDetails.this, "Book saved successfully", Toast.LENGTH_SHORT).show();
+                            if (!oldImageURL.isEmpty()) {
+                                deleting=true;
+                                DeletionCompleteListener deletionListener = () -> Log.d("update and delete image success",imageURL);
+                                deleteImages(oldImageURL,deletionListener);
+                            }
                         }
 
                         @Override
@@ -255,32 +281,59 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 Toast.makeText(AuthorEditBookDetails.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             }
         } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.bookImage) {
-            deleteImageAndSelectNewOne();
+            selectNewImage();
         }
 
 
     }
+    private void navigateToEditBook(){
+        if (bookId != null && !bookId.equals("")) {
+            Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.class);
+            intent.putExtra("bookId", bookId);
+            startActivity(intent);
+        } else {
+            Toast.makeText(AuthorEditBookDetails.this, "Please Save Your Book Details First.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
-    private void deleteImageAndSelectNewOne() {
+    private void selectNewImage() {
         if (imageURL != null && !imageURL.equals("")) {
-            FirebaseStorageManager storageManager = new FirebaseStorageManager();
-            storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d("Firebase Storage", "Delete Success");
-                    selectImage();
-                }
-            }, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e("Delete Image Failed:", e.getMessage());
-                    selectImage();
-                }
-            });
+            oldImageURL.add(imageURL);
+            selectImage();
         } else {
             selectImage();
         }
     }
+
+    private void deleteImages(List<String> urls, DeletionCompleteListener callback) {
+        if (urls.isEmpty()) {
+            callback.onAllDeletionsComplete();
+            return;
+        }
+
+        AtomicInteger pendingDeletions = new AtomicInteger(urls.size()); // Track pending deletions
+
+        for (String url : urls) {
+            storageManager.deleteImage(url, new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("Firebase Storage", "Delete Success for URL: " + url);
+                    if (pendingDeletions.decrementAndGet() == 0) { // Check if all deletions are done
+                        callback.onAllDeletionsComplete();
+                    }
+                }
+            }, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Delete Image Failed for URL: " + url, e.getMessage());
+                    if (pendingDeletions.decrementAndGet() == 0) { // Check if all deletions are done
+                        callback.onAllDeletionsComplete();
+                    }
+                }
+            });
+        }
+    }
+
 
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);

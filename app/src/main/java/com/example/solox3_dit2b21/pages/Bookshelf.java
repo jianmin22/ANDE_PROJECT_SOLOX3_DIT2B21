@@ -24,6 +24,7 @@ import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.BookWithReadingHistory;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -99,7 +100,7 @@ public class Bookshelf extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setSelectedTab(tabReadingHistory, tabFavouriteBooks);
-                // insert bindDataForReadingHistory
+                bindDataForReadingHistory(userId);
             }
         });
 
@@ -122,7 +123,7 @@ public class Bookshelf extends AppCompatActivity {
     private void setUIRef() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false);
         recyclerViewBookshelf.setLayoutManager(layoutManager);
-        bookshelfAdapter = new BookshelfAdapter(bookshelfBooks, new BookshelfAdapter.MyRecyclerViewItemClickListener()
+        bookshelfAdapter = new BookshelfAdapter(bookshelfBooks,false, new BookshelfAdapter.MyRecyclerViewItemClickListener()
         {
             @Override
             public void onItemClicked(Book book)
@@ -131,32 +132,38 @@ public class Bookshelf extends AppCompatActivity {
                 intent.putExtra("bookId", book.getBookId());
                 startActivity(intent);
             }
+
+            @Override
+            public void onReadingHistoryItemClicked(Book book) {
+                Log.d("Bookshelf", "Reading history item clicked, but action is not defined.");
+            }
+
         });
 
         recyclerViewBookshelf.setAdapter(bookshelfAdapter);
     }
 
     private void bindDataForFavouriteBooks(String userId) {
-
         bookDao.getUserFavouriteBooks(new DataCallback<List<Book>>() {
             @Override
             public void onDataReceived(List<Book> books) {
                 bookshelfBooks.clear();
                 bookshelfBooks.addAll(books);
-                bookshelfAdapter.notifyDataSetChanged();
-
-                TextView noBooksFound = findViewById(R.id.noBooksFound);
-                String noBooks = noBooksFound.getText().toString().trim();
-
-                if (books.size() == 0) {
-                    if (noBooks.equals("") || noBooks.equals(noReadingHistory)) {
-                        noBooksFound.setText(noFavouriteBooks);
-                        noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                bookshelfAdapter = new BookshelfAdapter(bookshelfBooks, false, new BookshelfAdapter.MyRecyclerViewItemClickListener() {
+                    @Override
+                    public void onItemClicked(Book book) {
+                        Intent intent = new Intent(Bookshelf.this, AuthorBookDetails.class);
+                        intent.putExtra("bookId", book.getBookId());
+                        startActivity(intent);
                     }
-                } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
-                    noBooksFound.setText("");
-                    noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
-                }
+
+                    @Override
+                    public void onReadingHistoryItemClicked(Book book) {
+                        // This method will not be used for favorite books
+                    }
+                });
+                recyclerViewBookshelf.setAdapter(bookshelfAdapter);
+                updateNoBooksFoundMessage(books.isEmpty());
             }
 
             @Override
@@ -167,27 +174,44 @@ public class Bookshelf extends AppCompatActivity {
         }, userId);
     }
 
+
     private void bindDataForReadingHistory(String userId) {
-
-        bookDao.getUserFavouriteBooks(new DataCallback<List<Book>>() {
+        bookDao.getUserReadingHistoryBooks(userId, new DataCallback<List<BookWithReadingHistory>>() {
             @Override
-            public void onDataReceived(List<Book> books) {
+            public void onDataReceived(List<BookWithReadingHistory> booksWithHistory) {
                 bookshelfBooks.clear();
-                bookshelfBooks.addAll(books);
-                bookshelfAdapter.notifyDataSetChanged();
-
-                TextView noBooksFound = findViewById(R.id.noBooksFound);
-                String noBooks = noBooksFound.getText().toString().trim();
-
-                if (books.size() == 0) {
-                    if (noBooks.equals("") || noBooks.equals(noFavouriteBooks)) {
-                        noBooksFound.setText(noReadingHistory);
-                        noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                    }
-                } else if (books.size() != 0 && !noBooksFound.getText().toString().trim().equals("")) {
-                    noBooksFound.setText("");
-                    noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
+                for (BookWithReadingHistory bookWithHistory : booksWithHistory) {
+                    bookshelfBooks.add(bookWithHistory.getBook()); // Add the book part of BookWithReadingHistory to the list
                 }
+                // Update the adapter and RecyclerView
+                bookshelfAdapter = new BookshelfAdapter(bookshelfBooks, true, new BookshelfAdapter.MyRecyclerViewItemClickListener() {
+                    @Override
+                    public void onItemClicked(Book book) {
+                        // This method will not be used for reading history
+                    }
+
+                    @Override
+                    public void onReadingHistoryItemClicked(Book book) {
+                        int lastReadChapterOrder = -1; // Default value indicating no chapter order found
+                        int lastReadSubChapterOrder = -1; // Default value indicating no subchapter order found
+                        for (BookWithReadingHistory bookWithHistory : booksWithHistory) {
+                            if (bookWithHistory.getBook().getBookId().equals(book.getBookId())) {
+                                lastReadChapterOrder = bookWithHistory.getLastReadChapterOrder();
+                                lastReadSubChapterOrder = bookWithHistory.getLastReadSubChapterOrder();
+                                Log.d("onReadingHistoryItemClicked: ", "lastReadChapterOrder: " + lastReadChapterOrder + ", lastReadSubChapterOrder: " + lastReadSubChapterOrder);
+                                break; // Found the matching book, no need to continue
+                            }
+                        }
+                        // Navigate directly to the reading page with the last read chapter and subchapter
+                        Intent intent = new Intent(Bookshelf.this, Reading.class);
+                        intent.putExtra("bookId", book.getBookId());
+                        intent.putExtra("lastReadChapterOrder", lastReadChapterOrder);
+                        intent.putExtra("lastReadSubChapterOrder", lastReadSubChapterOrder);
+                        startActivity(intent);
+                    }
+                });
+                recyclerViewBookshelf.setAdapter(bookshelfAdapter);
+                updateNoBooksFoundMessage(booksWithHistory.isEmpty());
             }
 
             @Override
@@ -195,6 +219,20 @@ public class Bookshelf extends AppCompatActivity {
                 Log.e("bindDataForReadingHistory", "Error fetching reading history", exception);
                 Toast.makeText(Bookshelf.this, "Error fetching reading history.", Toast.LENGTH_SHORT).show();
             }
-        }, userId);
+        });
+    }
+
+
+
+
+    private void updateNoBooksFoundMessage(boolean isEmpty) {
+        TextView noBooksFound = findViewById(R.id.noBooksFound);
+        if (isEmpty) {
+            noBooksFound.setText(noReadingHistory);
+            noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        } else {
+            noBooksFound.setText("");
+            noBooksFound.setTextSize(TypedValue.COMPLEX_UNIT_SP, 0);
+        }
     }
 }

@@ -6,7 +6,7 @@ import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.model.Book;
-import com.example.solox3_dit2b21.model.UserRating;
+import com.example.solox3_dit2b21.model.BookWithReadingHistory;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseBookDao implements BookDao {
     DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
@@ -313,6 +315,67 @@ public class FirebaseBookDao implements BookDao {
             }
         });
     }
+
+    @Override
+    public void getUserReadingHistoryBooks(String userId, DataCallback<List<BookWithReadingHistory>> callback) {
+        DatabaseReference historyRef = FirebaseDatabase.getInstance().getReference("ReadingHistory");
+        DatabaseReference bookRef = FirebaseDatabase.getInstance().getReference("Book");
+
+        historyRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Integer> bookIdToChapterOrderMap = new HashMap<>();
+                Map<String, Integer> bookIdToSubChapterOrderMap = new HashMap<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String bookId = snapshot.child("bookId").getValue(String.class);
+                    Integer chapterOrder = snapshot.child("chapterOrder").getValue(Integer.class);
+                    Integer subChapterOrder = snapshot.child("subChapterOrder").getValue(Integer.class);
+
+                    if (bookId != null) {
+                        bookIdToChapterOrderMap.put(bookId, chapterOrder);
+                        bookIdToSubChapterOrderMap.put(bookId, subChapterOrder);
+                    }
+                }
+
+                List<BookWithReadingHistory> booksWithHistory = new ArrayList<>();
+                AtomicInteger booksFetched = new AtomicInteger();
+                bookIdToChapterOrderMap.forEach((bookId, chapterOrder) -> {
+                    bookRef.child(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot bookSnapshot) {
+                            Book book = bookSnapshot.getValue(Book.class);
+                            Integer subChapterOrder = bookIdToSubChapterOrderMap.get(bookId);
+
+                            if (book != null) {
+                                booksWithHistory.add(new BookWithReadingHistory(book, chapterOrder, subChapterOrder));
+                                if (booksFetched.incrementAndGet() == bookIdToChapterOrderMap.size()) {
+                                    callback.onDataReceived(booksWithHistory);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.e("FirebaseBookDao", "Failed to fetch book details: " + databaseError.getMessage());
+                        }
+                    });
+                });
+
+                if (bookIdToChapterOrderMap.isEmpty()) {
+                    callback.onDataReceived(booksWithHistory); // Return empty list if no reading history found
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseBookDao", "Failed to fetch reading history: " + databaseError.getMessage());
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+
 
 }
 
