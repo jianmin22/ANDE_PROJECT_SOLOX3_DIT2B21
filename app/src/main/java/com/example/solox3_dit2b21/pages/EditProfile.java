@@ -29,6 +29,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener {
@@ -36,6 +39,9 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private EditText usernameEditText;
     private ProgressBar progressBar;
     private static final int PICK_IMAGE_REQUEST = 1;
+    FirebaseStorageManager storageManager = new FirebaseStorageManager();
+    List<String> oldImageURL=new ArrayList<String>();
+
     String imageURL;
     ImageView profilePic;
     FirebaseAuth auth;
@@ -76,6 +82,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            showLoading(true);
             Uri imageUri = data.getData();
 
             FirebaseStorageManager storageManager = new FirebaseStorageManager();
@@ -96,27 +103,28 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private void deleteImageAndSelectNewOne() {
+    private void selectNewImage() {
         if (imageURL != null && !imageURL.equals("")) {
-            showLoading(true);
-            FirebaseStorageManager storageManager = new FirebaseStorageManager();
-            storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
+            oldImageURL.add(imageURL);
+            selectImage();
+        } else {
+            selectImage();
+        }
+    }
+
+    private void deleteImages(List<String> urls) {
+        for (String url : urls) {
+            storageManager.deleteImage(url, new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Log.d("Firebase Storage", "Delete Success");
-                    showLoading(false);
-                    selectImage();
+                    Log.d("Firebase Storage", "Delete Success for URL: " + url);
                 }
             }, new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.e("Delete Image Failed:", e.getMessage());
-                    showLoading(false);
-                    selectImage();
+                    Log.e("Delete Image Failed for URL: " + url, e.getMessage());
                 }
             });
-        } else {
-            selectImage();
         }
     }
 
@@ -127,6 +135,15 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.back) {
+            if(!oldImageURL.isEmpty()){
+                if (oldImageURL.size() > 1) {
+                    List<String> urlsToDelete = oldImageURL.subList(1, oldImageURL.size());
+                    deleteImages(urlsToDelete);
+                    deleteImages(Collections.singletonList(imageURL));
+                }else if(oldImageURL.size()==1){
+                    deleteImages(Collections.singletonList(imageURL));
+                }
+            }
             finish();
         } else if (v.getId() == R.id.saveProfileButton) {
             String username = usernameEditText.getText().toString().trim();
@@ -153,6 +170,9 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                                 if (task.isSuccessful()) {
                                     Log.d("updateProfile", "New Display Name: " + username);
                                     Log.d("updateProfile", "New Photo URI: " + imageURL);
+                                    if (!oldImageURL.isEmpty()) {
+                                        deleteImages(oldImageURL);
+                                    }
                                     Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Log.d("updateProfileError", task.getException().getMessage());
@@ -162,7 +182,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         });
             }
         } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.profilePic) {
-            deleteImageAndSelectNewOne();
+            selectNewImage();
         }
     }
 }

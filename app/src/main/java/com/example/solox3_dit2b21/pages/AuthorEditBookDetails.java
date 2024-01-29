@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -158,11 +159,6 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 finish();
             }
         });
-
-
-
-
-
     }
 
     private void selectImage() {
@@ -202,47 +198,17 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     @Override
     public void onClick (View v){
         if (v.getId() == R.id.back) {
+            if(!oldImageURL.isEmpty()){
                 if (oldImageURL.size() > 1) {
-                    for (int i = 1; i < oldImageURL.size(); i++) {
-                        String url = oldImageURL.get(i);
-                        storageManager.deleteImage(url, new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("Firebase Storage", "Delete Success for URL: " + url);
-                            }
-                        }, new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("Delete Image Failed for URL: " + url, e.getMessage());
-                            }
-                        });
-                    }
-                storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firebase Storage", "Delete Success");
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Delete Image Failed:", e.getMessage());
-                    }
-                });
-            }else if(oldImageURL.size()==1){
-                    storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Firebase Storage", "Delete Success");
-                        }
-                    }, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("Delete Image Failed:", e.getMessage());
-                        }
-                    });
+                    List<String> urlsToDelete = oldImageURL.subList(1, oldImageURL.size());
+                    deleteImages(urlsToDelete);
+                    deleteImages(Collections.singletonList(imageURL));
+                }else if(oldImageURL.size()==1){
+                    deleteImages(Collections.singletonList(imageURL));
                 }
+            }
             finish();
-        } else if (v.getId() == R.id.proceedEditChapterButton) {
+        }else if (v.getId() == R.id.proceedEditChapterButton) {
             if (bookId!=null&&!bookId.equals("")){
                 Intent intent = new Intent(AuthorEditBookDetails.this, EditChapter.class);
                 intent.putExtra("bookId", bookId);
@@ -268,19 +234,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         public void onSuccess() {
                             Toast.makeText(AuthorEditBookDetails.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
                             if (!oldImageURL.isEmpty()) {
-                                for (String url : oldImageURL) {
-                                    storageManager.deleteImage(url, new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d("Firebase Storage", "Delete Success for URL: " + url);
-                                        }
-                                    }, new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.e("Delete Image Failed for URL: " + url, e.getMessage());
-                                        }
-                                    });
-                                }
+                                deleteImages(oldImageURL);
                             }
                         }
 
@@ -299,19 +253,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                             bookId=newBookId;
                             Toast.makeText(AuthorEditBookDetails.this, "Book saved successfully", Toast.LENGTH_SHORT).show();
                             if (!oldImageURL.isEmpty()) {
-                                for (String url : oldImageURL) {
-                                    storageManager.deleteImage(url, new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d("Firebase Storage", "Delete Success for URL: " + url);
-                                        }
-                                    }, new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.e("Delete Image Failed for URL: " + url, e.getMessage());
-                                        }
-                                    });
-                                }
+                                deleteImages(oldImageURL);
                             }
                         }
 
@@ -338,6 +280,22 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
             selectImage();
         } else {
             selectImage();
+        }
+    }
+
+    private void deleteImages(List<String> urls) {
+        for (String url : urls) {
+            storageManager.deleteImage(url, new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("Firebase Storage", "Delete Success for URL: " + url);
+                }
+            }, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Delete Image Failed for URL: " + url, e.getMessage());
+                }
+            });
         }
     }
 
