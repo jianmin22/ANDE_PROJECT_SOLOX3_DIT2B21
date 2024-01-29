@@ -46,21 +46,56 @@
         android:textAllCaps="false"
         android:textColor="#2A5AF1" />
 
+    <!-- Username Heading -->
+    <TextView
+        android:id="@+id/usernameHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/username"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
 
-    <!-- Edit Text for Book Title -->
+    <!-- Edit Text for Username -->
     <EditText
         android:id="@+id/usernameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/uploadImageTextView"
         android:layout_margin="16dp"
         android:layout_gravity="center"
         android:background="@drawable/edittext_border"
-        android:hint=""
         android:maxLines="1"
         android:padding="5dp"
         android:textSize="24sp"
         android:textStyle="bold" />
+
+    <!-- Bio Heading -->
+    <TextView
+        android:id="@+id/bioHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/bio"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/bioEditText"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:hint="@string/enter_bio"
+        android:maxLength="150"
+        android:background="@drawable/edittext_border"
+        android:padding="3dp"/>
 
     <Button
         android:id="@+id/saveProfileButton"
