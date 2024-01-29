@@ -48,15 +48,6 @@ public class CommentHistory extends AppCompatActivity {
 
         bindDataForUsername(userId);
         bindDataForUserComments(userId);
-//        setUIRef();
-    }
-
-    private void setUIRef() {
-
-
-        Toast.makeText(this, "username: " + username, Toast.LENGTH_SHORT).show();
-//        commentHistoryAdapter = new CommentHistoryAdapter(this, username, userComments);
-//        recyclerView.setAdapter(commentHistoryAdapter);
     }
 
     private void bindDataForUsername(String userId) {
@@ -68,11 +59,12 @@ public class CommentHistory extends AppCompatActivity {
                 } else {
                     username = "";
                 }
+
+                // set UI ref here instead so that it will only be set after the username has been fetched
                 recyclerView.setLayoutManager(new LinearLayoutManager(CommentHistory.this));
                 commentHistoryAdapter = new CommentHistoryAdapter(CommentHistory.this, username, userComments);
                 recyclerView.setAdapter(commentHistoryAdapter);
                 commentHistoryAdapter.notifyDataSetChanged();
-                Toast.makeText(CommentHistory.this, "username2: " + username, Toast.LENGTH_SHORT).show();
             }
 
             @Override
