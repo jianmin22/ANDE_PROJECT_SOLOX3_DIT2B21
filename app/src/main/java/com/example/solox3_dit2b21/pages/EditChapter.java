@@ -92,9 +92,16 @@ public class EditChapter extends AppCompatActivity implements View.OnClickListen
         chapterDao.getChaptersByBookId(bookId, new DataCallback<List<Chapter>>() {
             @Override
             public void onDataReceived(List<Chapter> chaptersData) {
-                chapters.clear();
-                chapters.addAll(chaptersData);
-                adapter.notifyDataSetChanged();
+                if (chaptersData.isEmpty()) {
+                    // No chapters found for the book, create a new one
+                    addNewChapter();
+
+                    adapter.notifyDataSetChanged();
+                } else {
+                    chapters.clear();
+                    chapters.addAll(chaptersData);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -103,6 +110,23 @@ public class EditChapter extends AppCompatActivity implements View.OnClickListen
             }
         });
     }
+
+    private Chapter createNewChapter() {
+        Chapter newChapter = new Chapter();
+        newChapter.setBookId(bookId);
+        newChapter.setTitle("Chapter 1");
+        newChapter.setChapterOrder(1);
+        // Initialize with a default subchapter if needed
+        Map<String, SubChapter> subChapters = new HashMap<>();
+        SubChapter defaultSubChapter = new SubChapter();
+        defaultSubChapter.setTitle("Part 1");
+        defaultSubChapter.setChapterContent("Start writing here...");
+        defaultSubChapter.setSubChapterOrder(1);
+        subChapters.put("SubChapter1", defaultSubChapter); // Use a unique key for the subchapter
+        newChapter.setSubChapters(subChapters);
+        return newChapter;
+    }
+
 
     private void saveChapters(View view) {
         chapterDao.saveChapters(bookId, chapters, new DataStatusCallback() {
