@@ -151,7 +151,7 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
             @Override
             public void onDataReceived(Double rating) {
                 calculatedUserRating = rating;
-                bookRating.setText(String.valueOf(calculatedUserRating));
+                bookRating.setText(String.format("%.1f", calculatedUserRating));
             }
 
             @Override
