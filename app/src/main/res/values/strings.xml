@@ -26,4 +26,6 @@
     <string name="bookshelf">Bookshelf</string>
     <string name="favourite_books">Favourite Books</string>
     <string name="reading_history">Reading History</string>
+    <string name="bio">Bio</string>
+    <string name="enter_bio">Enter Bio (Maximum 150 Characters)</string>
 </resources>

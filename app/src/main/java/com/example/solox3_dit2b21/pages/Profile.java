@@ -38,10 +38,12 @@ public class Profile extends AppCompatActivity {
     private TextView profileUsername, profileBio, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     int selectedColor, unselectedColor;
     private ImageView profilePic, settings, addBookBtn;
+    private String userId, imageURL;
 
     private BottomNavigationView bottomNavigationView;
     FirebaseAuth auth;
-    FirebaseUser user;
+    FirebaseUser firebaseUser;
+    private User user;
     private RecyclerView recyclerViewProfile;
     private ProfileAdapter profileAdapter;
     private List<Book> booksProfile = new ArrayList<>();
@@ -90,18 +92,13 @@ public class Profile extends AppCompatActivity {
         });
 
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        String userId = user.getUid();
+        firebaseUser = auth.getCurrentUser();
+        userId = firebaseUser.getUid();
         bindDataForUser(userId);
 
+        profilePic = findViewById(R.id.profilePic);
         profileUsername = findViewById(R.id.profileUsername);
         profileBio = findViewById(R.id.profileBio);
-
-        profilePic = findViewById(R.id.profilePic);
-//        if (user.getPhotoUrl() != null) {
-//            Log.d("profile pic", user.getPhotoUrl().toString());
-//            LoadImageURL.loadImageURL(user.getPhotoUrl().toString(), profilePic);
-//        }
 
         settings = findViewById(R.id.settings);
         settings.setOnClickListener(new View.OnClickListener() {
@@ -177,7 +174,13 @@ public class Profile extends AppCompatActivity {
             public void onDataReceived(User userData) {
                 if (userData != null) {
                     profileUsername.setText(userData.getUsername());
-                    profileBio.setText(userData.getBio());
+                    if (userData.getBio() != null) {
+                        profileBio.setText(userData.getBio());
+                    }
+                    if (userData.getProfilePic() != null) {
+                        imageURL = userData.getProfilePic();
+                        LoadImageURL.loadImageURL(imageURL.toString(), profilePic);
+                    }
                 } else {
                     throw new Error("User not received");
                 }
@@ -288,15 +291,15 @@ public class Profile extends AppCompatActivity {
 
     private void refreshProfileData() {
         // Call the methods to refresh your data
-        bindDataForTotalPublished(user.getUid());
-        bindDataForTotalComments(user.getUid());
-        bindDataForAverageRating(user.getUid());
+        bindDataForTotalPublished(userId);
+        bindDataForTotalComments(userId);
+        bindDataForAverageRating(userId);
 
         // Determine which tab is currently selected and refresh accordingly
         if (tabPublished.getCurrentTextColor() == selectedColor) {
-            bindDataForProfile(user.getUid(), true);
+            bindDataForProfile(userId, true);
         } else {
-            bindDataForProfile(user.getUid(), false);
+            bindDataForProfile(userId, false);
         }
     }
 }
