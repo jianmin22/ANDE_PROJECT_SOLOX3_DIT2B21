@@ -1,6 +1,9 @@
 package com.example.solox3_dit2b21.model;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class User {
     private String userId;
     private String email;
@@ -8,17 +11,19 @@ public class User {
     private String profilePic;
     private String bio;
     private String createdDate;
+    private String lastUpdated;
 
     public User() {
     }
 
-    public User(String userId, String email, String username, String profilePic, String bio, String createdDate) {
+    public User(String userId, String email, String username, String profilePic, String bio, String createdDate, String lastUpdated) {
         this.userId = userId;
         this.email = email;
         this.username = username;
         this.profilePic = profilePic;
         this.bio = bio;
         this.createdDate = createdDate;
+        this.lastUpdated = lastUpdated;
     }
 
     public String getUserId() {
@@ -67,5 +72,25 @@ public class User {
 
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("userId", userId);
+        result.put("email", email);
+        result.put("username", username);
+        result.put("profilePic", profilePic);
+        result.put("bio", bio);
+        result.put("createdDate", createdDate);
+        result.put("lastUpdated", lastUpdated);
+        return result;
     }
 }

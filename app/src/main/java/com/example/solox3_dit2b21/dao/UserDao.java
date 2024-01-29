@@ -8,5 +8,6 @@ public interface UserDao {
 
     void getUser(String userId, DataCallback<User> callback);
     void getUsername(String userId, DataCallback<String> callback);
+    void updateUser(User user, DataStatusCallback callback);
 }
 

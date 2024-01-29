@@ -5,7 +5,6 @@ import android.util.Log;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.UserDao;
-import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +12,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 public class FirebaseUserDao implements UserDao {
     DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User");
@@ -62,5 +63,13 @@ public class FirebaseUserDao implements UserDao {
                 callback.onError(databaseError.toException());
             }
         });
+    }
+
+    @Override
+    public void updateUser(User user, DataStatusCallback callback) {
+        Map<String, Object> userUpdate = user.toMap();
+        userRef.child(user.getUserId()).updateChildren(userUpdate)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 }
