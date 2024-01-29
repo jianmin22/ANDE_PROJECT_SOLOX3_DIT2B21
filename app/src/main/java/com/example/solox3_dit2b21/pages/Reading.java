@@ -39,12 +39,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.wasabeef.richeditor.RichEditor;
+
 public class Reading extends AppCompatActivity implements View.OnClickListener {
 
     private TextView currentPageNumber;
     private ImageView previousButton;
     private ImageView nextButton;
-    private TextView readingArea;
+    private RichEditor readingArea;
     private int currentPage = 0; // The current page index
     private List<String> pages;
     private String bookId;
@@ -84,6 +86,7 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         Log.d("lastReadSubChapterOrder: ", String.valueOf(lastReadSubChapterOrder));
         // Initialize the ViewPager and other views
         readingArea = findViewById(R.id.readingArea);
+        readingArea.setInputEnabled(false);
 
 
         // Set up button listeners
@@ -136,8 +139,8 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
                         if (currentSubChapter != null) {
                             TextView chapterTitle = findViewById(R.id.ChapterTitle);
                             chapterTitle.setText(currentSubChapter.getTitle());
-                            readingArea.setText(Html.fromHtml(currentSubChapter.getChapterContent(), Html.FROM_HTML_MODE_COMPACT));
-                            readingArea.setMovementMethod(new android.text.method.ScrollingMovementMethod());
+                            readingArea.setHtml(currentSubChapter.getChapterContent());
+                            readingArea.setInputEnabled(false);
                         }
                         populateDrawerMenu(chapters);
                     } else {
@@ -195,8 +198,8 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             // Update the title
             TextView chapterTitle = findViewById(R.id.ChapterTitle);
             chapterTitle.setText(currentSubChapter.getTitle());
-            readingArea.setText(Html.fromHtml(currentSubChapter.getChapterContent(), Html.FROM_HTML_MODE_COMPACT));
-            readingArea.setMovementMethod(new android.text.method.ScrollingMovementMethod());
+            readingArea.setHtml(currentSubChapter.getChapterContent());
+            readingArea.setInputEnabled(false);
             // Optionally, close the drawer if open
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
