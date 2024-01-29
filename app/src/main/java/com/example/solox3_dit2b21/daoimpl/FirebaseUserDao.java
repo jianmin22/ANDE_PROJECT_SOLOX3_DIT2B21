@@ -66,6 +66,13 @@ public class FirebaseUserDao implements UserDao {
     }
 
     @Override
+    public void insertUser(User user, DataStatusCallback callback) {
+        userRef.child(user.getUserId()).setValue(user)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
     public void updateUser(User user, DataStatusCallback callback) {
         Map<String, Object> userUpdate = user.toMap();
         userRef.child(user.getUserId()).updateChildren(userUpdate)
