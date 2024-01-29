@@ -24,7 +24,8 @@ public class FirebaseUserDao implements UserDao {
         userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+                DataSnapshot userSnapshot = dataSnapshot.getChildren().iterator().next();
+                User user = userSnapshot.getValue(User.class);
 
                 callback.onDataReceived(user);
             }

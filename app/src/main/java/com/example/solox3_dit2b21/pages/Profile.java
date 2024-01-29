@@ -23,8 +23,10 @@ import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
+import com.example.solox3_dit2b21.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Profile extends AppCompatActivity {
-    private TextView profileUsername, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
+    private TextView profileUsername, profileBio, totalPublished, totalComments, averageRating, tabPublished, tabDraft;
     int selectedColor, unselectedColor;
     private ImageView profilePic, settings, addBookBtn;
 
@@ -45,6 +47,7 @@ public class Profile extends AppCompatActivity {
     private List<Book> booksProfile = new ArrayList<>();
     private FirebaseBookDao bookDao = new FirebaseBookDao();
     private FirebaseCommentDao commentDao = new FirebaseCommentDao();
+    private FirebaseUserDao userDao = new FirebaseUserDao();
     private FirebaseUserRatingDao userRatingDao = new FirebaseUserRatingDao();
     @Override
     protected void onStart() {
@@ -89,14 +92,16 @@ public class Profile extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         String userId = user.getUid();
+        bindDataForUser(userId);
 
         profileUsername = findViewById(R.id.profileUsername);
-        profileUsername.setText(user.getDisplayName());
+        profileBio = findViewById(R.id.profileBio);
 
         profilePic = findViewById(R.id.profilePic);
-        if (user.getPhotoUrl() != null) {
-            LoadImageURL.loadImageURL(user.getPhotoUrl().toString(), profilePic);
-        }
+//        if (user.getPhotoUrl() != null) {
+//            Log.d("profile pic", user.getPhotoUrl().toString());
+//            LoadImageURL.loadImageURL(user.getPhotoUrl().toString(), profilePic);
+//        }
 
         settings = findViewById(R.id.settings);
         settings.setOnClickListener(new View.OnClickListener() {
@@ -164,6 +169,25 @@ public class Profile extends AppCompatActivity {
         }, Profile.this);
 
         recyclerViewProfile.setAdapter(profileAdapter);
+    }
+
+    private void bindDataForUser(String userId) {
+        userDao.getUser(userId, new DataCallback<User>() {
+            @Override
+            public void onDataReceived(User userData) {
+                if (userData != null) {
+                    profileUsername.setText(userData.getUsername());
+                    profileBio.setText(userData.getBio());
+                } else {
+                    throw new Error("User not received");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForUser", "Error fetching user", exception);
+            }
+        });
     }
 
     private void bindDataForTotalPublished(String userId) {

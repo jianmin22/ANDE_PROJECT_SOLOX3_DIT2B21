@@ -6,18 +6,18 @@ public class User {
     private String email;
     private String username;
     private String profilePic;
-    private String description;
+    private String bio;
     private String createdDate;
 
     public User() {
     }
 
-    public User(String userId, String email, String username, String profilePic, String description, String createdDate) {
+    public User(String userId, String email, String username, String profilePic, String bio, String createdDate) {
         this.userId = userId;
         this.email = email;
         this.username = username;
         this.profilePic = profilePic;
-        this.description = description;
+        this.bio = bio;
         this.createdDate = createdDate;
     }
 
@@ -53,12 +53,12 @@ public class User {
         this.profilePic = profilePic;
     }
 
-    public String getDescription() {
-        return description;
+    public String getBio() {
+        return bio;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public String getCreatedDate() {
