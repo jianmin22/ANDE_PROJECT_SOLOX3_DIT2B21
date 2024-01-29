@@ -8,4 +8,5 @@ public interface ChapterDao {
     void saveChapters(String bookId, List<Chapter> chapters, DataStatusCallback callback);
 
     void getChaptersByBookId(String bookId, DataCallback<List<Chapter>> callback);
+
 }

@@ -12,7 +12,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FirebaseChapterDao implements ChapterDao {
     DatabaseReference chapterRef = FirebaseDatabase.getInstance().getReference("Chapter");
@@ -23,8 +25,8 @@ public class FirebaseChapterDao implements ChapterDao {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Chapter> chapters = new ArrayList<>();
                 for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                    if (bookChapterSnapshot.child("bookId").getValue(String.class).equals(bookId)) {
-                        // Assuming "chapters" is a direct child of the book chapter snapshot
+                    String chapterBookId = bookChapterSnapshot.child("bookId").getValue(String.class);
+                    if (chapterBookId != null && chapterBookId.equals(bookId)) {
                         DataSnapshot chaptersSnapshot = bookChapterSnapshot.child("chapters");
                         for (DataSnapshot chapterSnapshot : chaptersSnapshot.getChildren()) {
                             Chapter chapter = chapterSnapshot.getValue(Chapter.class);
@@ -44,7 +46,6 @@ public class FirebaseChapterDao implements ChapterDao {
             }
         });
     }
-
 
 
     @Override
@@ -77,34 +78,40 @@ public class FirebaseChapterDao implements ChapterDao {
 
     @Override
     public void saveChapters(String bookId, List<Chapter> chapters, DataStatusCallback callback) {
-        chapterRef.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
-                                String parentNodeKey = bookChapterSnapshot.getKey();
-                                if (parentNodeKey != null) {
-                                    DatabaseReference bookChaptersRef = chapterRef.child(parentNodeKey).child("chapters");
-                                    bookChaptersRef.setValue(chapters)
-                                            .addOnSuccessListener(aVoid -> callback.onSuccess())
-                                            .addOnFailureListener(callback::onFailure);
-                                } else {
-                                    // Handle the case where the parentNodeKey is null
-                                    callback.onFailure(new Exception("Parent node key is null"));
-                                }
-                            }
+        chapterRef.orderByChild("bookId").equalTo(bookId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Existing chapters found, update them
+                    for (DataSnapshot bookChapterSnapshot : dataSnapshot.getChildren()) {
+                        String parentNodeKey = bookChapterSnapshot.getKey();
+                        if (parentNodeKey != null) {
+                            DatabaseReference bookChaptersRef = chapterRef.child(parentNodeKey).child("chapters");
+                            bookChaptersRef.setValue(chapters)
+                                    .addOnSuccessListener(aVoid -> callback.onSuccess())
+                                    .addOnFailureListener(callback::onFailure);
                         } else {
-                            // No data present for the given bookId, might want to handle this case separately
-                            callback.onFailure(new Exception("No data present for the given bookId"));
+                            callback.onFailure(new Exception("Parent node key is null"));
                         }
                     }
+                } else {
+                    // No existing chapters found, create a new entry
+                    DatabaseReference newBookChapterRef = chapterRef.push(); // Create a new unique key for the chapter
+                    Map<String, Object> newChapterData = new HashMap<>();
+                    newChapterData.put("bookId", bookId);
+                    newChapterData.put("chapters", chapters); // Assuming chapters is a list of Chapter objects
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        callback.onFailure(databaseError.toException());
-                    }
+                    newBookChapterRef.setValue(newChapterData)
+                            .addOnSuccessListener(aVoid -> callback.onSuccess())
+                            .addOnFailureListener(callback::onFailure);
                 }
-        );
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onFailure(databaseError.toException());
+            }
+        });
     }
+
 }
