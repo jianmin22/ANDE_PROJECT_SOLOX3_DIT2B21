@@ -37,7 +37,6 @@ public class Login extends AppCompatActivity {
     FirebaseAuth auth;
     ProgressBar progressBar;
     TextView textView;
-    FirebaseAppCheck firebaseAppCheck;
 
     @Override
     public void onStart() {
@@ -55,10 +54,6 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        FirebaseApp.initializeApp(this);
-        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
-        firebaseAppCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance());
 
         auth = FirebaseAuth.getInstance();
         editTextEmail = findViewById(R.id.email);
@@ -115,47 +110,27 @@ public class Login extends AppCompatActivity {
                     return;
                 }
 
-//                Toast.makeText(getApplicationContext(), "Get Token", Toast.LENGTH_SHORT).show();
-//                firebaseAppCheck
-//                                .getLimitedUseAppCheckToken()
-//                                        .addOnSuccessListener(new OnSuccessListener<AppCheckToken>() {
-//                                            @Override
-//                                            public void onSuccess(@NonNull AppCheckToken tokenResponse) {
-//                                                String appCheckToken = tokenResponse.getToken();
-//                                                Toast.makeText(getApplicationContext(), "token: " + appCheckToken, Toast.LENGTH_SHORT).show();
-//                                                Log.d("Token: ", appCheckToken);
-                                                auth.signInWithEmailAndPassword(email, password)
-                                                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                                                progressBar.setVisibility(View.GONE);
-                                                                if (task.isSuccessful()) {
-                                                                    Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                                                    Intent intent = new Intent(Login.this, Home.class);
-                                                                    startActivity(intent);
-                                                                    finish();
-                                                                } else {
-                                                                    if (task.getException().getMessage().equals("The supplied auth credential is incorrect, malformed or has expired.")) {
-                                                                        Toast.makeText(Login.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
-                                                                    } else {
-                                                                        Toast.makeText(Login.this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                }
-                                                            }
-                                                        });
-                                            }
-                                        });
-//                        .addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                progressBar.setVisibility(View.GONE);
-//                                Log.e("AppCheck", e.getMessage());
-//                                Toast.makeText(Login.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//
-//            }
-//        });
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                progressBar.setVisibility(View.GONE);
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(Login.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(Login.this, Home.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    if (task.getException().getMessage().equals("The supplied auth credential is incorrect, malformed or has expired.")) {
+                                        Toast.makeText(Login.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(Login.this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                        });
+            }
+        });
 
     }
 }
