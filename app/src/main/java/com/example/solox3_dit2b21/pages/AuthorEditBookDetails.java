@@ -238,6 +238,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                     book.setDescription(description);
                     book.setCategoryId(categoryId);
                     book.setImage(imageURL);
+                    book.setLastUpdated(CurrentDateUtils.getCurrentDateTime());
                     bookDao.updateBookDetails(book, new DataStatusCallback() {
                         @Override
                         public void onSuccess() {

@@ -31,10 +31,12 @@
             android:exported="false" />
         <activity
             android:name=".pages.EditChapter"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".pages.EditorSpace"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".pages.Register"
             android:exported="false"

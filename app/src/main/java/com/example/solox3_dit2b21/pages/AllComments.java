@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.solox3_dit2b21.dao.UserDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
 import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +30,7 @@ public class AllComments extends AppCompatActivity implements View.OnClickListen
     private RecyclerView recyclerView;
     private CommentAdapter adapter;
     private List<Comment> allComments = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
