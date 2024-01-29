@@ -31,6 +31,7 @@
             android:exported="false" />
         <activity
             android:name=".pages.EditChapter"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".pages.EditorSpace"
