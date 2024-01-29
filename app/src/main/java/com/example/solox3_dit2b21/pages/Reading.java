@@ -7,6 +7,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.SubMenu;
@@ -43,7 +44,7 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
     private TextView currentPageNumber;
     private ImageView previousButton;
     private ImageView nextButton;
-    private ViewPager2 viewPager;
+    private TextView readingArea;
     private int currentPage = 0; // The current page index
     private List<String> pages;
     private String bookId;
@@ -82,66 +83,18 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
         Log.d("lastReadChapterOrder: ", String.valueOf(lastReadChapterOrder));
         Log.d("lastReadSubChapterOrder: ", String.valueOf(lastReadSubChapterOrder));
         // Initialize the ViewPager and other views
-        viewPager = findViewById(R.id.viewPager);
-        currentPageNumber = findViewById(R.id.currentPageNumber);
-        previousButton = findViewById(R.id.previousButton);
-        nextButton = findViewById(R.id.nextButton);
+        readingArea = findViewById(R.id.readingArea);
+
 
         // Set up button listeners
-        setupButtonListeners();
 
         // Fetch data from Firebase
         fetchChapters();
     }
 
 
-    private void setupButtonListeners() {
-        previousButton.setOnClickListener(v -> {
-            if (currentPage > 0) {
-                currentPage--;
-                viewPager.setCurrentItem(currentPage);
-            }
-        });
-
-        nextButton.setOnClickListener(v -> {
-            if (currentPage < pages.size() - 1) {
-                currentPage++;
-                viewPager.setCurrentItem(currentPage);
-            }
-        });
-
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                currentPage = position;
-                updatePagination();
-            }
-        });
-    }
-
-    private void updatePagination() {
-        currentPageNumber.setText(String.valueOf(currentPage + 1));
-        previousButton.setEnabled(currentPage > 0);
-        nextButton.setEnabled(currentPage < pages.size() - 1);
-    }
-
-    private void setupViewPager(List<String> pages) {
-        this.pages = pages;  // Update the list of pages
-        ReadingPageAdapter adapter = new ReadingPageAdapter(this, pages);
-        viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(0);  // Reset to the first page of the new content
-        updatePagination();  // Update pagination controls
-    }
 
 
-    private List<String> splitChapterIntoPages(String chapterContent) {
-        List<String> pages = new ArrayList<>();
-        int pageSize = 800;
-        for (int i = 0; i < chapterContent.length(); i += pageSize) {
-            pages.add(chapterContent.substring(i, Math.min(chapterContent.length(), i + pageSize)));
-        }
-        return pages;
-    }
 
     private void fetchChapters() {
         if (bookId != null && !bookId.isEmpty()) {
@@ -183,8 +136,8 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
                         if (currentSubChapter != null) {
                             TextView chapterTitle = findViewById(R.id.ChapterTitle);
                             chapterTitle.setText(currentSubChapter.getTitle());
-                            List<String> pages = splitChapterIntoPages(currentSubChapter.getChapterContent());
-                            setupViewPager(pages);
+                            readingArea.setText(Html.fromHtml(currentSubChapter.getChapterContent(), Html.FROM_HTML_MODE_COMPACT));
+                            readingArea.setMovementMethod(new android.text.method.ScrollingMovementMethod());
                         }
                         populateDrawerMenu(chapters);
                     } else {
@@ -201,7 +154,6 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
             Log.e("ReadingActivity", "No bookId provided");
         }
     }
-
 
 
 
@@ -242,12 +194,9 @@ public class Reading extends AppCompatActivity implements View.OnClickListener {
 
             // Update the title
             TextView chapterTitle = findViewById(R.id.ChapterTitle);
-            chapterTitle.setText(subChapter.getTitle());
-
-            // Split the subchapter content into pages and update the ViewPager
-            List<String> pages = splitChapterIntoPages(subChapter.getChapterContent());
-            setupViewPager(pages);  // This method should reset and update the ViewPager
-
+            chapterTitle.setText(currentSubChapter.getTitle());
+            readingArea.setText(Html.fromHtml(currentSubChapter.getChapterContent(), Html.FROM_HTML_MODE_COMPACT));
+            readingArea.setMovementMethod(new android.text.method.ScrollingMovementMethod());
             // Optionally, close the drawer if open
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
