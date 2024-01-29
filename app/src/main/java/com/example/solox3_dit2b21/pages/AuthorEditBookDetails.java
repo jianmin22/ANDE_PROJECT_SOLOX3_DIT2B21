@@ -39,10 +39,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AuthorEditBookDetails extends AppCompatActivity implements View.OnClickListener{
     private String bookId;
     private String userId;
+    FirebaseStorageManager storageManager = new FirebaseStorageManager();
     private static final int PICK_IMAGE_REQUEST = 1;
     CategoryDao categoryDao = new FirebaseCategoryDao();
     BookDao bookDao = new FirebaseBookDao();
@@ -52,6 +54,7 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     Spinner categorySpinner;
     EditText descriptionEditText;
     String imageURL;
+    List<String> oldImageURL=new ArrayList<String>();
     String categoryId;
     List<Category> categoriesList = new ArrayList<>();
     private ProgressBar progressBar;
@@ -175,7 +178,6 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             showLoading(true);
             Uri imageUri = data.getData();
-            FirebaseStorageManager storageManager = new FirebaseStorageManager();
             storageManager.uploadImage(imageUri, new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
@@ -200,6 +202,45 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
     @Override
     public void onClick (View v){
         if (v.getId() == R.id.back) {
+                if (oldImageURL.size() > 1) {
+                    for (int i = 1; i < oldImageURL.size(); i++) {
+                        String url = oldImageURL.get(i);
+                        storageManager.deleteImage(url, new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("Firebase Storage", "Delete Success for URL: " + url);
+                            }
+                        }, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Delete Image Failed for URL: " + url, e.getMessage());
+                            }
+                        });
+                    }
+                storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Firebase Storage", "Delete Success");
+                    }
+                }, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Delete Image Failed:", e.getMessage());
+                    }
+                });
+            }else if(oldImageURL.size()==1){
+                    storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Firebase Storage", "Delete Success");
+                        }
+                    }, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Delete Image Failed:", e.getMessage());
+                        }
+                    });
+                }
             finish();
         } else if (v.getId() == R.id.proceedEditChapterButton) {
             if (bookId!=null&&!bookId.equals("")){
@@ -213,9 +254,9 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
         } else if (v.getId() == R.id.saveBookDetailsButton) {
             String title = bookTitleEditText.getText().toString();
             String description = descriptionEditText.getText().toString();
-
             if (!categoryId.isEmpty() && !title.isEmpty() && !description.isEmpty()) {
                 Book book;
+
                 if (bookId != null && !bookId.isEmpty()) {
                     book = bookDetails;
                     book.setTitle(title);
@@ -226,6 +267,21 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         @Override
                         public void onSuccess() {
                             Toast.makeText(AuthorEditBookDetails.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
+                            if (!oldImageURL.isEmpty()) {
+                                for (String url : oldImageURL) {
+                                    storageManager.deleteImage(url, new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("Firebase Storage", "Delete Success for URL: " + url);
+                                        }
+                                    }, new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("Delete Image Failed for URL: " + url, e.getMessage());
+                                        }
+                                    });
+                                }
+                            }
                         }
 
                         @Override
@@ -242,6 +298,21 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                         public void onSuccess() {
                             bookId=newBookId;
                             Toast.makeText(AuthorEditBookDetails.this, "Book saved successfully", Toast.LENGTH_SHORT).show();
+                            if (!oldImageURL.isEmpty()) {
+                                for (String url : oldImageURL) {
+                                    storageManager.deleteImage(url, new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("Firebase Storage", "Delete Success for URL: " + url);
+                                        }
+                                    }, new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("Delete Image Failed for URL: " + url, e.getMessage());
+                                        }
+                                    });
+                                }
+                            }
                         }
 
                         @Override
@@ -255,28 +326,16 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                 Toast.makeText(AuthorEditBookDetails.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             }
         } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.bookImage) {
-            deleteImageAndSelectNewOne();
+            selectNewImage();
         }
 
 
     }
 
-    private void deleteImageAndSelectNewOne() {
+    private void selectNewImage() {
         if (imageURL != null && !imageURL.equals("")) {
-            FirebaseStorageManager storageManager = new FirebaseStorageManager();
-            storageManager.deleteImage(imageURL, new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.d("Firebase Storage", "Delete Success");
-                    selectImage();
-                }
-            }, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e("Delete Image Failed:", e.getMessage());
-                    selectImage();
-                }
-            });
+            oldImageURL.add(imageURL);
+            selectImage();
         } else {
             selectImage();
         }
