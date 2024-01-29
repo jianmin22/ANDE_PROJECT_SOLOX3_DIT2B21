@@ -43,7 +43,6 @@ public class Profile extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     FirebaseAuth auth;
     FirebaseUser firebaseUser;
-    private User user;
     private RecyclerView recyclerViewProfile;
     private ProfileAdapter profileAdapter;
     private List<Book> booksProfile = new ArrayList<>();
@@ -94,7 +93,6 @@ public class Profile extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         firebaseUser = auth.getCurrentUser();
         userId = firebaseUser.getUid();
-        bindDataForUser(userId);
 
         profilePic = findViewById(R.id.profilePic);
         profileUsername = findViewById(R.id.profileUsername);
@@ -137,7 +135,7 @@ public class Profile extends AppCompatActivity {
 
         recyclerViewProfile = findViewById(R.id.recycler_view_profile);
 
-        refreshProfileData();
+        bindProfileData();
         setUIRef();
     }
 
@@ -289,8 +287,9 @@ public class Profile extends AppCompatActivity {
         }, userId, published);
     }
 
-    private void refreshProfileData() {
-        // Call the methods to refresh your data
+    private void bindProfileData() {
+        // Call the methods to bind your data
+        bindDataForUser(userId);
         bindDataForTotalPublished(userId);
         bindDataForTotalComments(userId);
         bindDataForAverageRating(userId);

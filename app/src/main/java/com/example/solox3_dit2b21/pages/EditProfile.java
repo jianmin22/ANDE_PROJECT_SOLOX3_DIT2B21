@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.AuthUtils;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.FirebaseStorageManager;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.DataCallback;
@@ -71,11 +72,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         profilePic = findViewById(R.id.profilePic);
         usernameEditText = findViewById(R.id.usernameEditText);
         bioEditText = findViewById(R.id.bioEditText);
-
-//        if (user.getPhotoUrl() != null) {
-//            imageURL = user.getPhotoUrl().toString();
-//            LoadImageURL.loadImageURL(imageURL, profilePic);
-//        }
 
         bindDataForEditProfile(userId);
     }
@@ -215,6 +211,8 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 updatedUser.setBio(bio);
 
                 updatedUser.setProfilePic(imageURL);
+
+                updatedUser.setLastUpdated(CurrentDateUtils.getCurrentDateTime());
 
                 userDao.updateUser(updatedUser, new DataStatusCallback() {
                     @Override

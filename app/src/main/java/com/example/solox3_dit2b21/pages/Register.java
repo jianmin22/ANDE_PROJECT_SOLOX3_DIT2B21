@@ -18,6 +18,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
+import com.example.solox3_dit2b21.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -30,9 +34,10 @@ public class Register extends AppCompatActivity {
     EditText editTextUsername, editTextEmail, editTextPassword, editTextPasswordCheck;
     Button btnRegister;
     FirebaseAuth auth;
-    FirebaseUser user;
+    FirebaseUser firebaseUser;
     ProgressBar progressBar;
     TextView textView;
+    private FirebaseUserDao userDao = new FirebaseUserDao();
 
     @Override
     public void onStart() {
@@ -148,24 +153,20 @@ public class Register extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
-                                    user = auth.getCurrentUser();
+                                    firebaseUser = auth.getCurrentUser();
 
-                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                            .setDisplayName(username)
-                                            .build();
+                                    User user = new User(firebaseUser.getUid(), firebaseUser.getEmail(), username, "", "", CurrentDateUtils.getCurrentDateTime(), CurrentDateUtils.getCurrentDateTime());
+                                    userDao.insertUser(user, new DataStatusCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            Toast.makeText(Register.this, "Account Created", Toast.LENGTH_SHORT).show();
+                                        }
 
-                                    user.updateProfile(profileUpdates)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Log.d("updateProfile", "New Display Name: " + username);
-                                                    } else {
-                                                        Log.d("updateProfileError", task.getException().getMessage());
-                                                    }
-                                                }
-                                            });
+                                        @Override
+                                        public void onFailure(Exception exception) {
+                                            Toast.makeText(Register.this, "Failed to register account", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                     Intent intent = new Intent(getApplicationContext(), Login.class);
                                     startActivity(intent);
                                     finish();
