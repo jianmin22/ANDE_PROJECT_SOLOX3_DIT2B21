@@ -1,15 +1,24 @@
 package com.example.solox3_dit2b21.daoimpl;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.UserFavouriteBookDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.google.firebase.database.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
+    DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
+
     @Override
     public void loadNumberOfUserFavouriteBook(String bookId, DataCallback<Integer> callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         Query userFavouriteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
         userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -30,8 +39,31 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
     }
 
     @Override
+    public void loadIsUserFavouriteBook(String bookId, String userId, DataCallback<Boolean> callback) {
+        Query userFavouriteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
+        userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot userFavouriteSnapshot) {
+                boolean isFavourite = false;
+                for (DataSnapshot snapshot : userFavouriteSnapshot.getChildren()) {
+                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+                    if (userFavouriteBook != null && userFavouriteBook.getUserId().equals(userId)) {
+                        isFavourite = true;
+                        break; // Break the loop as we found the user's favorite book
+                    }
+                }
+                callback.onDataReceived(isFavourite);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    @Override
     public void deleteUserFavourite(String bookId, String userId, DataStatusCallback callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         Query deleteQuery = userFavouriteRef.orderByChild("bookId").equalTo(bookId);
 
         deleteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,9 +89,34 @@ public class FirebaseUserFavouriteBookDao implements UserFavouriteBookDao {
 
     @Override
     public void insertUserFavourite(UserFavouriteBook userFavouriteBook, DataStatusCallback callback) {
-        DatabaseReference userFavouriteRef = FirebaseDatabase.getInstance().getReference("UserFavouriteBook");
         userFavouriteRef.push().setValue(userFavouriteBook)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
+    public void getUserFavouriteBookIds(String userId, DataCallback<List<String>> callback) {
+        Query userFavouriteQuery = userFavouriteRef.orderByChild("userId").equalTo(userId);
+
+        userFavouriteQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> userBookIds = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    UserFavouriteBook userFavouriteBook = snapshot.getValue(UserFavouriteBook.class);
+                    if (userFavouriteBook != null) {
+                        userBookIds.add(userFavouriteBook.getBookId());
+                    }
+                }
+
+                callback.onDataReceived(userBookIds);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

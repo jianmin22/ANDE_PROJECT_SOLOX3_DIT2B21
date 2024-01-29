@@ -113,8 +113,8 @@
             android:layout_marginTop="10dp"
             android:textSize="20sp"
             android:text="@string/btn_log_in"
-            app:cornerRadius="3dp"
-            android:background="@color/selected_color"
+            app:cornerRadius="6dp"
+            android:backgroundTint="@color/selected_color"
             android:padding="10dp"/>
 
         <LinearLayout

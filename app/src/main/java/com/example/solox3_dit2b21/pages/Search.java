@@ -14,14 +14,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
+
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.SearchHistoryDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseSearchHistoryDao;
 import com.example.solox3_dit2b21.model.SearchHistory;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,15 +30,19 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
 
     private FlexboxLayout flexboxLayout;
     private EditText mainSearchField;
-    private String userId = "user1";
+    private String userId;
 
     private SearchHistoryDao searchHistoryDao = new FirebaseSearchHistoryDao();
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
+        userId=AuthUtils.getUserId();
         flexboxLayout = findViewById(R.id.flexboxLayout3);
         mainSearchField = findViewById(R.id.mainSearchField);
 
@@ -145,11 +149,17 @@ public class Search extends AppCompatActivity implements View.OnClickListener {
         } else if (v.getId() == R.id.removeIcon) {
                 String searchId = (String) v.getTag();
 
-                DatabaseReference ref = database.getReference("SearchHistory");
+            searchHistoryDao.removeSearchHistory(searchId, new DataStatusCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d("Success Remove Search History" , "Success Remove Search History with Id: "+searchId);
+                }
 
-                DatabaseReference searchIdRef = ref.child(searchId);
-
-                searchIdRef.removeValue();
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.e("Error Occurred when Remove Search History" , exception.getMessage());
+                }
+            });
             }else if (v.getId()==R.id.filterButton){
                 Intent intent = new Intent(Search.this, CategoryPage.class);
                 startActivity(intent);

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".pages.EditProfile"
+    android:orientation="vertical"
+    android:layout_gravity="center_horizontal">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:indeterminateTint="#FF0000" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:onClick="onClick"
+        android:src="@drawable/back" />
+
+    <!-- Book Image -->
+    <ImageView
+        android:id="@+id/profilePic"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@id/back"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:onClick="onClick"
+        android:src="@drawable/empty_profile_pic" />
+
+    <!-- Click to Upload Image -->
+    <TextView
+        android:id="@+id/uploadImageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bookImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:onClick="onClick"
+        android:text="Upload Image"
+        android:textAllCaps="false"
+        android:textColor="#2A5AF1" />
+
+
+    <!-- Edit Text for Book Title -->
+    <EditText
+        android:id="@+id/usernameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/uploadImageTextView"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:background="@drawable/edittext_border"
+        android:hint=""
+        android:maxLines="1"
+        android:padding="5dp"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/saveProfileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/sand"
+        android:text="@string/save_profile"
+        android:onClick="onClick"
+        app:cornerRadius="15dp" />
+
+</LinearLayout>

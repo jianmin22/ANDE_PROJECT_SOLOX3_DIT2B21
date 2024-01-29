@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.Utils.AuthUtils;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.BookDao;
 import com.example.solox3_dit2b21.dao.CategoryDao;
@@ -37,7 +38,7 @@ import java.util.List;
 public class AuthorBookDetails extends AppCompatActivity implements View.OnClickListener {
     private String bookId;
     private Book bookDetails;
-    private String userId="user1";
+    private String userId;
     private List<Comment> twoCommentsForBook=new ArrayList<>();
     private double calculatedUserRating;
     private Category bookCategory;
@@ -67,11 +68,17 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
     private CategoryDao categoryDao = new FirebaseCategoryDao();
     private UserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AuthUtils.redirectToLoginIfNotAuthenticated(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_author_book_details);
+        userId=AuthUtils.getUserId();
         Bundle getData = getIntent().getExtras();
 
         if (getData != null) {
@@ -93,6 +100,10 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
                 public void onDataReceived(Book returnedBookDetails) {
                     if (returnedBookDetails!=null) {
                         bookDetails = returnedBookDetails;
+                        if (!bookDetails.getAuthorId().equals(userId)){
+                            Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
                         LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
                         bookTitle.setText(bookDetails.getTitle());
                         descriptionContent.setText(bookDetails.getDescription());
@@ -190,6 +201,16 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
         });
     }
 
+    private void navigateToFilterResult() {
+        Intent intent = new Intent(AuthorBookDetails.this, SearchFilterResults.class);
+        intent.putExtra("filter", bookDetails.getCategoryId());
+        String searchOrder="2";
+        String filterOrder="1";
+        intent.putExtra("searchOrder",searchOrder);
+        intent.putExtra("filterOrder", filterOrder);
+        startActivity(intent);
+    }
+
     @Override
     public void onClick(View v){
         if (v.getId()==R.id.back){
@@ -202,6 +223,8 @@ public class AuthorBookDetails extends AppCompatActivity implements View.OnClick
             Intent intent = new Intent(AuthorBookDetails.this, AuthorEditBookDetails.class);
             intent.putExtra("bookId", bookId);
             startActivity(intent);
+        } else if (v.getId()==R.id.categoryButton){
+            navigateToFilterResult();
         }
     }
 }

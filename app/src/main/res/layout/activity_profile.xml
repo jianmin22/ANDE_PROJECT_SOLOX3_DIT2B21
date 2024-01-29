@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:gravity="center_vertical" >
 
@@ -27,6 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="5dp"
                 android:text=""
                 android:textColor="@color/black"
                 android:textStyle="bold"
@@ -42,14 +42,27 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/profilePic"
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="100dp"
+            android:layout_margin="5dp"
+            android:layout_gravity="center"
+            android:elevation="10dp">
+
+            <ImageView
+                android:id="@+id/profilePic"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_gravity="center"
+                android:src="@drawable/empty_profile_pic" />
+
+        </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -75,6 +88,12 @@
                     android:textColor="@color/unselected_color" />
             </LinearLayout>
 
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:layout_marginVertical="10dp"
+                android:background="@android:color/darker_gray" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -98,6 +117,12 @@
                     android:textColor="@color/unselected_color" />
             </LinearLayout>
 
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:layout_marginVertical="10dp"
+                android:background="@android:color/darker_gray" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -118,7 +143,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/average_rating"
-                    android:textColor="@color/unselected_color" />
+                    android:textColor="@color/unselected_color"
+                    android:textAlignment="center" />
             </LinearLayout>
 
         </LinearLayout>
@@ -127,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -186,21 +212,21 @@
 
         </LinearLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="285dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toTopOf="@id/tabPublishedDraft" />
+
         <TextView
             android:id="@+id/noBooksFound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:layout_gravity="center" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="380dp"
-            android:layout_gravity="center"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toTopOf="@id/tabPublishedDraft" />
 
     </LinearLayout>
 
