@@ -42,32 +42,23 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         bindDataForPopular();
         bindDataForLatest();
         setUIRef();
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.navigation_bookshelf) {
-                Intent intent = new Intent(Home.this, Bookshelf.class);
-//                Intent intent = new Intent(Home.this, EditorSpace.class);
-//                intent.putExtra("bookId", "f28f342c-753b-4dcd-830f-a8849078f5cb");
-                startActivity(intent);
                 // Navigate to Bookshelf activity
-            } else if (itemId == R.id.navigation_home) {
-                // Already in Home, no action needed
+                Intent intent = new Intent(Home.this, Bookshelf.class);
+                startActivity(intent);
             } else if (itemId == R.id.navigation_category) {
                 // Navigate to Category activity
                 Intent intent = new Intent(Home.this, CategoryPage.class);
                 startActivity(intent);
             } else if (itemId == R.id.navigation_profile) {
+                // Navigate to Profile activity
                 Intent intent = new Intent(Home.this, Profile.class);
                 startActivity(intent);
-                // Navigate to Profile activity
-//                Intent intent = new Intent(Home.this, AuthorEditBookDetails.class);
-//                intent.putExtra("bookId", "book1");
-//                startActivity(intent);
-                // Navigate to Profile activity
-//                Intent intent = new Intent(Home.this, Profile.class);
-//                startActivity(intent);
             }
 
             return true;

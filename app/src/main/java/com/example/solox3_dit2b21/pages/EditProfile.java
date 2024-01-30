@@ -16,8 +16,13 @@ import android.widget.Toast;
 
 import com.example.solox3_dit2b21.R;
 import com.example.solox3_dit2b21.Utils.AuthUtils;
+import com.example.solox3_dit2b21.Utils.CurrentDateUtils;
 import com.example.solox3_dit2b21.Utils.FirebaseStorageManager;
 import com.example.solox3_dit2b21.Utils.LoadImageURL;
+import com.example.solox3_dit2b21.dao.DataCallback;
+import com.example.solox3_dit2b21.dao.DataStatusCallback;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
+import com.example.solox3_dit2b21.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,17 +40,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText usernameEditText;
+    private EditText usernameEditText, bioEditText;
     private ProgressBar progressBar;
     private boolean deleting=false;
     private static final int PICK_IMAGE_REQUEST = 1;
     FirebaseStorageManager storageManager = new FirebaseStorageManager();
     List<String> oldImageURL=new ArrayList<String>();
 
-    String imageURL;
+    private String imageURL, userId;
     ImageView profilePic;
     FirebaseAuth auth;
-    FirebaseUser user;
+    FirebaseUser firebaseUser;
+    private User user;
+    private FirebaseUserDao userDao = new FirebaseUserDao();
     @Override
     protected void onStart() {
         super.onStart();
@@ -57,18 +64,16 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_edit_profile);
 
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
+        firebaseUser = auth.getCurrentUser();
+        userId = firebaseUser.getUid();
 
         progressBar = findViewById(R.id.progressBar);
 
         profilePic = findViewById(R.id.profilePic);
-        if (user.getPhotoUrl() != null) {
-            imageURL = user.getPhotoUrl().toString();
-            LoadImageURL.loadImageURL(imageURL, profilePic);
-        }
-
         usernameEditText = findViewById(R.id.usernameEditText);
-        usernameEditText.setText(user.getDisplayName());
+        bioEditText = findViewById(R.id.bioEditText);
+
+        bindDataForEditProfile(userId);
     }
 
     private void selectImage() {
@@ -150,6 +155,32 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    private void bindDataForEditProfile(String userId) {
+        userDao.getUser(userId, new DataCallback<User>() {
+            @Override
+            public void onDataReceived(User userData) {
+                if (userData != null) {
+                    user = userData;
+                    usernameEditText.setText(userData.getUsername());
+                    if (userData.getBio() != null) {
+                        bioEditText.setText(userData.getBio());
+                    }
+                    if (userData.getProfilePic() != null) {
+                        imageURL = userData.getProfilePic();
+                        LoadImageURL.loadImageURL(imageURL.toString(), profilePic);
+                    }
+                } else {
+                    throw new Error("User not received");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("bindDataForUser", "Error fetching user", exception);
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.back) {
@@ -173,37 +204,33 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             if (TextUtils.isEmpty(username)) {
                 usernameEditText.setError("Username is required.");
             } else {
-                UserProfileChangeRequest profileUpdates;
-                if (imageURL == null) {
-                    profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(username)
-                            .build();
-                } else {
-                    profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(username)
-                            .setPhotoUri(Uri.parse(imageURL))
-                            .build();
-                }
+                User updatedUser = user;
+                updatedUser.setUsername(username);
 
-                user.updateProfile(profileUpdates)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d("updateProfile", "New Display Name: " + username);
-                                    Log.d("updateProfile", "New Photo URI: " + imageURL);
-                                    if (!oldImageURL.isEmpty()) {
-                                        deleting=true;
-                                        DeletionCompleteListener deletionListener = () -> Log.d("update and delete image success",imageURL);
-                                        deleteImages(oldImageURL,deletionListener);
-                                    }
-                                    Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("updateProfileError", task.getException().getMessage());
-                                    Toast.makeText(EditProfile.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                String bio = bioEditText.getText().toString().trim();
+                updatedUser.setBio(bio);
+
+                updatedUser.setProfilePic(imageURL);
+
+                updatedUser.setLastUpdated(CurrentDateUtils.getCurrentDateTime());
+
+                userDao.updateUser(updatedUser, new DataStatusCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(EditProfile.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                        if (!oldImageURL.isEmpty()) {
+                            deleting=true;
+                            DeletionCompleteListener deletionListener = () -> Log.d("update and delete image success",imageURL);
+                            deleteImages(oldImageURL,deletionListener);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Log.e("Update Profile Failed", exception.getMessage());
+                        Toast.makeText(EditProfile.this, "Failed to update profile!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         } else if (v.getId() == R.id.uploadImageTextView || v.getId() == R.id.profilePic) {
             selectNewImage();

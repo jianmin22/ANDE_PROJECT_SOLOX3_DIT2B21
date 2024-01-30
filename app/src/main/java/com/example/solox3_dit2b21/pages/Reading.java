@@ -43,12 +43,7 @@ import jp.wasabeef.richeditor.RichEditor;
 
 public class Reading extends AppCompatActivity implements View.OnClickListener {
 
-    private TextView currentPageNumber;
-    private ImageView previousButton;
-    private ImageView nextButton;
     private RichEditor readingArea;
-    private int currentPage = 0; // The current page index
-    private List<String> pages;
     private String bookId;
     private ChapterDao chapterDao;
     private Chapter currentChapter;

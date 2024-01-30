@@ -33,10 +33,9 @@ public class EditChapter extends AppCompatActivity implements View.OnClickListen
     private RecyclerView recyclerView;
     private EditChaptersAdapter adapter;
     private List<Chapter> chapters = new ArrayList<>();
-    private DatabaseReference databaseReference;
+
     private String bookId;
     private ChapterDao chapterDao;
-    private String chapterNodeIdentifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,21 +110,7 @@ public class EditChapter extends AppCompatActivity implements View.OnClickListen
         });
     }
 
-    private Chapter createNewChapter() {
-        Chapter newChapter = new Chapter();
-        newChapter.setBookId(bookId);
-        newChapter.setTitle("Chapter 1");
-        newChapter.setChapterOrder(1);
-        // Initialize with a default subchapter if needed
-        Map<String, SubChapter> subChapters = new HashMap<>();
-        SubChapter defaultSubChapter = new SubChapter();
-        defaultSubChapter.setTitle("Part 1");
-        defaultSubChapter.setChapterContent("Start writing here...");
-        defaultSubChapter.setSubChapterOrder(1);
-        subChapters.put("SubChapter1", defaultSubChapter); // Use a unique key for the subchapter
-        newChapter.setSubChapters(subChapters);
-        return newChapter;
-    }
+
 
 
     private void saveChapters(View view) {
