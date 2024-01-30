@@ -3,6 +3,7 @@
     <item
         android:id="@+id/navigation_bookshelf"
         android:icon="@drawable/ic_bookshelf"
+        android:padding="10dp"
         android:title="bookshelf" />
     <item
         android:id="@+id/navigation_home"
