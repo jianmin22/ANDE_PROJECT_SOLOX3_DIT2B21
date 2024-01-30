@@ -121,7 +121,7 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setSelectedTab(tabPublished, tabDraft);
-                bindDataForProfile(userId, true);
+                bindDataForProfileBooks(userId, true);
             }
         });
 
@@ -129,7 +129,7 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setSelectedTab(tabDraft, tabPublished);
-                bindDataForProfile(userId, false);
+                bindDataForProfileBooks(userId, false);
             }
         });
 
@@ -249,7 +249,7 @@ public class Profile extends AppCompatActivity {
         }, userId);
     }
 
-    private void bindDataForProfile(String userId, Boolean published) {
+    private void bindDataForProfileBooks(String userId, Boolean published) {
 
         bookDao.getUserBooks(new DataCallback<List<Book>>() {
             @Override
@@ -296,9 +296,9 @@ public class Profile extends AppCompatActivity {
 
         // Determine which tab is currently selected and refresh accordingly
         if (tabPublished.getCurrentTextColor() == selectedColor) {
-            bindDataForProfile(userId, true);
+            bindDataForProfileBooks(userId, true);
         } else {
-            bindDataForProfile(userId, false);
+            bindDataForProfileBooks(userId, false);
         }
     }
 }
