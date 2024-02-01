@@ -8,4 +8,5 @@ public interface UserRatingDao {
     void updateUserRating(String bookId, String userId, double newRating, DataStatusCallback callback);
     void insertUserRating(UserRating userRating, DataStatusCallback callback);
     void getAverageUserRating(DataCallback callback, String userId);
+    void loadIsUserRated(String bookId, String userId, DataCallback<Double> callback);
 }

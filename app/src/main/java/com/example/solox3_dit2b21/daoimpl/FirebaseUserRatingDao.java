@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.dao.DataStatusCallback;
 import com.example.solox3_dit2b21.dao.UserRatingDao;
+import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.example.solox3_dit2b21.model.UserRating;
 import com.google.firebase.database.*;
 
@@ -64,6 +65,29 @@ public class FirebaseUserRatingDao implements UserRatingDao {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 callback.onFailure(databaseError.toException());
+            }
+        });
+    }
+
+    public void loadIsUserRated(String bookId, String userId, DataCallback<Double> callback) {
+        Query userRatingQuery = userRatingRef.orderByChild("bookId").equalTo(bookId);
+        final Double[] rating = {null};
+        userRatingQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot userFavouriteSnapshot) {
+                for (DataSnapshot snapshot : userFavouriteSnapshot.getChildren()) {
+                    UserRating userRating = snapshot.getValue(UserRating.class);
+                    if (userRating != null && userRating.getUserId().equals(userId)) {
+                        rating[0] = userRating.getRating();
+                        break;
+                    }
+                }
+                callback.onDataReceived(rating[0]);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
             }
         });
     }

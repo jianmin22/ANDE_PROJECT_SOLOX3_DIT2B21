@@ -144,6 +144,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                     loadComments(bookId);
                     loadUserRating(bookId);
                     loadIsUserFavouriteBook(bookId);
+                    loadIsUserRated(bookId);
                     loadUserFavourite(bookId);
                 } else {
                     Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
@@ -285,7 +286,26 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 finish();
             }
         });
+    }
 
+    private void loadIsUserRated(String bookId) {
+        userRatingDao.loadIsUserRated(bookId, userId, new DataCallback<Double>() {
+            @Override
+            public void onDataReceived(Double rating) {
+                if (rating != null) {
+                    rated=true;
+                    rateGiveByCurrentUser=rating;
+                    updateEmojiImage(rating);
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("Firebase", "Failed to get user rating", exception);
+                Toast.makeText(getApplicationContext(), "Failed to get user rating", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
     private void deleteUserFavourite() {
@@ -350,6 +370,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
                 rated = false;
                 resetEmojiImages();
                 rateGiveByCurrentUser = 0.0;
+                loadUserRating(bookId);
             }
 
             @Override
