@@ -24,6 +24,7 @@ import com.example.solox3_dit2b21.Utils.LoadImageURL;
 import com.example.solox3_dit2b21.dao.CategoryDao;
 import com.example.solox3_dit2b21.dao.DataCallback;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.google.firebase.database.DataSnapshot;
@@ -33,11 +34,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+import com.example.solox3_dit2b21.dao.UserDao;
+
 
 public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilterResultsAdapter.ViewHolder> {
 
     private Context context;
     private List<Book> bookList;
+    UserDao userDao=new FirebaseUserDao();
     private CategoryDao categoryDao = new FirebaseCategoryDao();
     public SearchFilterResultsAdapter(Context context, List<Book> bookList) {
         this.context = context;
@@ -58,7 +62,22 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
         if(book.getImage()!=null&&!book.getImage().isEmpty()){
             LoadImageURL.loadImageURL(book.getImage(),holder.bookImage);
         }
-        holder.bookAuthor.setText(book.getAuthorId());
+        userDao.getUsername(book.getAuthorId(), new DataCallback<String>() {
+            @Override
+            public void onDataReceived(String userName) {
+                if (userName != null) {
+                    holder.bookAuthor.setText("Author: "+userName);
+                } else {
+                    holder.bookAuthor.setText("Author: "+"");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("Username", "Error fetching username", exception);
+                holder.bookAuthor.setText("Author: "+"");
+            }
+        });
         holder.bookDescription.setText(book.getDescription());
         holder.viewBookDetails.setOnClickListener(new View.OnClickListener() {
             @Override

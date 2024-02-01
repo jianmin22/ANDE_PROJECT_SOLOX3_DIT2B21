@@ -152,7 +152,7 @@ public class Bookshelf extends AppCompatActivity {
                 bookshelfAdapter = new BookshelfAdapter(bookshelfBooks, false, new BookshelfAdapter.MyRecyclerViewItemClickListener() {
                     @Override
                     public void onItemClicked(Book book) {
-                        Intent intent = new Intent(Bookshelf.this, AuthorBookDetails.class);
+                        Intent intent = new Intent(Bookshelf.this, BookDetails.class);
                         intent.putExtra("bookId", book.getBookId());
                         startActivity(intent);
                     }
