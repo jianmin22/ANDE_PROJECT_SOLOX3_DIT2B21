@@ -27,12 +27,14 @@ import com.example.solox3_dit2b21.dao.UserRatingDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCategoryDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseCommentDao;
+import com.example.solox3_dit2b21.daoimpl.FirebaseUserDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseUserFavouriteBookDao;
 import com.example.solox3_dit2b21.daoimpl.FirebaseUserRatingDao;
 import com.example.solox3_dit2b21.model.Book;
 import com.example.solox3_dit2b21.model.Category;
 import com.example.solox3_dit2b21.model.Comment;
 import com.example.solox3_dit2b21.R;
+import com.example.solox3_dit2b21.model.User;
 import com.example.solox3_dit2b21.model.UserFavouriteBook;
 import com.example.solox3_dit2b21.model.UserRating;
 
@@ -45,8 +47,6 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     private String bookId;
     private Book bookDetails;
     private String userId;
-    private String userName;
-    private String profilePicURL;
     private List<Comment> twoCommentsForBook=new ArrayList<>();
     private double calculatedUserRating;
     private Category bookCategory;
@@ -89,6 +89,8 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
 
     private CategoryDao categoryDao = new FirebaseCategoryDao();
     private UserFavouriteBookDao userFavouriteBookDao = new FirebaseUserFavouriteBookDao();
+    private FirebaseUserDao userDao = new FirebaseUserDao();
+
 
     @Override
     protected void onStart() {
@@ -100,8 +102,7 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_details);
-        userId=AuthUtils.getUserId();
-        userName=AuthUtils.getUserName();
+
         Bundle getData = getIntent().getExtras();
 
         if (getData != null) {
@@ -124,36 +125,71 @@ public class BookDetails extends AppCompatActivity implements View.OnClickListen
             currentProfilePic=findViewById(R.id.currentProfilePic);
             currentUserName=findViewById(R.id.currentUserName);
             addCommentsInputField=findViewById(R.id.addCommentsInputField);
+            fetchUser(AuthUtils.getUserId(), bookId);
+        }
+    }
 
-            bookDao.loadBookDetailsById(bookId, new DataCallback<Book>() {
-                @Override
-                public void onDataReceived(Book returnedBookDetails) {
-                    if (returnedBookDetails!=null) {
-                        bookDetails = returnedBookDetails;
+    private void loadBook(String bookId){
+        bookDao.loadBookDetailsById(bookId, new DataCallback<Book>() {
+            @Override
+            public void onDataReceived(Book returnedBookDetails) {
+                if (returnedBookDetails!=null) {
+                    bookDetails = returnedBookDetails;
+                    if(bookDetails.getImage()!=null&&!bookDetails.getImage().isEmpty()){
                         LoadImageURL.loadImageURL(bookDetails.getImage(),bookImage);
-                        bookTitle.setText(bookDetails.getTitle());
-                        descriptionContent.setText(bookDetails.getDescription());
-                        loadCategory(bookDetails.getCategoryId());
-                        loadComments(bookId);
-                        loadUserRating(bookId);
-                        loadIsUserFavouriteBook(bookId);
-                        currentUserName.setText(userName);
-
-                        loadUserFavourite(bookId);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
-                        finish();
                     }
-                }
-
-                @Override
-                public void onError(Exception exception) {
-                    Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
-                    Log.e("Firebase", "Failed to get book details", exception);
+                    bookTitle.setText(bookDetails.getTitle());
+                    descriptionContent.setText(bookDetails.getDescription());
+                    loadCategory(bookDetails.getCategoryId());
+                    loadComments(bookId);
+                    loadUserRating(bookId);
+                    loadIsUserFavouriteBook(bookId);
+                    loadUserFavourite(bookId);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
                     finish();
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Toast.makeText(getApplicationContext(), "Failed to get Book Details", Toast.LENGTH_LONG).show();
+                Log.e("Firebase", "Failed to get book details", exception);
+                finish();
+            }
+        });
+    }
+
+
+    private void fetchUser(String userIdPassed, String bookId) {
+
+        userId=userIdPassed;
+        userDao.getUser(userIdPassed, new DataCallback<User>() {
+            @Override
+            public void onDataReceived(User userData) {
+                if (userData != null) {
+                    String userName = userData.getUsername();
+                    currentUserName.setText(userName);
+                    String profilepic = userData.getProfilePic();
+
+                    if (profilepic == null || profilepic.isEmpty()) {
+                        currentProfilePic.setImageResource(R.drawable.empty_profile_pic);
+                    } else {
+                        LoadImageURL.loadImageURL(profilepic, currentProfilePic);
+                    }
+                    loadBook(bookId);
+                } else {
+                    throw new Error("User not received");
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                Log.e("getUser", "Error fetching user", exception);
+                Toast.makeText(getApplicationContext(), "Failed to get Data", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
 
