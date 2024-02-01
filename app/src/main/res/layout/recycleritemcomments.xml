@@ -24,12 +24,12 @@
             android:layout_marginBottom="8dp">
 
             <ImageView
-                android:id="@+id/icon"
+                android:id="@+id/profilePicComment"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ellipse"
                 android:layout_marginRight="8dp"
-                android:background="@drawable/profilepicshapecomment"/>
+                android:background="@drawable/empty_profile_pic"/>
 
             <TextView
                 android:id="@+id/username"
