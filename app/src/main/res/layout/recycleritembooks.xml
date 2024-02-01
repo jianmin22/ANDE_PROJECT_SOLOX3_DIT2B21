@@ -14,7 +14,8 @@
         android:id="@+id/bookImage"
         android:layout_width="126dp"
         android:layout_height="171dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:src="@drawable/bookplaceholder" />
 
         <TextView
             android:id="@+id/bookTitle"

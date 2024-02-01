@@ -48,7 +48,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Book book = allBooks.get(position);
         holder.bookTitle.setText(book.getTitle());
-        LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
+        if(book.getImage()!=null&&!book.getImage().isEmpty()){
+            LoadImageURL.loadImageURL(book.getImage(),holder.bookImage);
+        }
         holder.bookId.setText(book.getBookId());
 
         categoryDao.loadBookCategory(book.getCategoryId(), new DataCallback<Category>() {
