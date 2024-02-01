@@ -119,7 +119,9 @@ public class AuthorEditBookDetails extends AppCompatActivity implements View.OnC
                                 Toast.makeText(getApplicationContext(), "Failed to load page", Toast.LENGTH_LONG).show();
                                 finish();
                             }
-                            LoadImageURL.loadImageURL(bookDetails.getImage(), bookImage);
+                            if(bookDetails.getImage()!=null&&!bookDetails.getImage().isEmpty()){
+                                LoadImageURL.loadImageURL(bookDetails.getImage(),bookImage);
+                            }
                             bookTitleEditText.setText(bookDetails.getTitle());
                             descriptionEditText.setText(bookDetails.getDescription());
                             imageURL=bookDetails.getImage();

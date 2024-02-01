@@ -55,7 +55,9 @@ public class SearchFilterResultsAdapter extends RecyclerView.Adapter<SearchFilte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.bookTitle.setText(book.getTitle());
-        LoadImageURL.loadImageURL(book.getImage(), holder.bookImage);
+        if(book.getImage()!=null&&!book.getImage().isEmpty()){
+            LoadImageURL.loadImageURL(book.getImage(),holder.bookImage);
+        }
         holder.bookAuthor.setText(book.getAuthorId());
         holder.bookDescription.setText(book.getDescription());
         holder.viewBookDetails.setOnClickListener(new View.OnClickListener() {
